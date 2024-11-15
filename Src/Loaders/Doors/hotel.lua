@@ -12,6 +12,22 @@ if game.PlaceId == 6516141723 then
 MsdoorsNotify("Msdoors","Por favor, execute no jogo não no lobby!","Execução","rbxassetid://133997875469993", Color3.new(0.5, 0, 0.5), 6)
 end
 
+
+MsdoorsNotify("Atualização","Você está usando uma versão desatualizada do Msdoors!","Nova versão disponível no github","rbxassetid://133997875469993", Color3.new(255, 0, 0), 15)
+
+local Oldversion = Window:MakeTab({
+    Name = "Atualizar Script",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+Oldversion:AddButton({
+    Name = "Atualizar",
+    Callback = function()
+        OrionLib:Destroy() loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/download/main.lua"))()
+    end
+})
+
 --// Serviços \\--
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
