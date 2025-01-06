@@ -1,3 +1,5 @@
+print("[Msdoors] • Está é uma versão cancelada! trate de atualizar.")
+
 --//Serviços\\--
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 --//APIS\\--
