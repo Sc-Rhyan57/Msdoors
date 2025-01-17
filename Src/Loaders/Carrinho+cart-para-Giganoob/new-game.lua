@@ -553,7 +553,7 @@ Msplayerplaylist:AddInput("ADD-MUSIC-ID", {
         end
 	end,
 })
-
+--[[
 MsPlayer:AddTextbox({
     Name = "Adicionar Música (Nome e Id) separados por vírgula)",
     Default = "",
@@ -569,9 +569,9 @@ MsPlayer:AddTextbox({
         end
     end
 })
-
-Msplayer-playlist:AddDivider()
-Msplayer-playlist:AddButton({
+]]--
+Msplayerplaylist:AddDivider()
+Msplayerplaylist:AddButton({
     Name = "Tocar Playlist",
     Callback = function()
        playMusic(musicPlayer.currentIndex > 0 and musicPlayer.currentIndex or 1)
@@ -579,7 +579,7 @@ Msplayer-playlist:AddButton({
 })
 
 
-Msplayer-playlist:AddButton({
+Msplayerplaylist:AddButton({
     Name = "Próxima Música",
     Callback = function()
         local nextIndex = musicPlayer.currentIndex + 1
@@ -588,7 +588,7 @@ Msplayer-playlist:AddButton({
     end
 })
 
-Msplayer-playlist:AddButton({
+Msplayerplaylist:AddButton({
     Text = "Pausar",
     Func = function()
     if musicPlayer.currentSound and musicPlayer.isPlaying then
