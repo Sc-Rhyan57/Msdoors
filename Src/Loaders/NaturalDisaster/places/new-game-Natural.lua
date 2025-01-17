@@ -317,7 +317,7 @@ local function teleportWithTween(targetCFrame)
         tween:Play()
         return tween
     end
-	
+end
     getgenv().msdoors_isteleporting = false
     local connection
 
@@ -670,5 +670,4 @@ SaveManager:SetSubFolder("carrinhointothegiganoob")
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
-
 _G.MsdoorsLoaded = true
