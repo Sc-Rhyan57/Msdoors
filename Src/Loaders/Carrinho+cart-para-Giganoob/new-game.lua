@@ -378,8 +378,8 @@ GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font
 GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
 GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
 GroupCredits:AddButton({
-    Name = "Copiar Link",
-    Callback = function()
+    Text = "Copiar Link",
+    Func = function()
         local url = "https://dsc.gg/msdoors-gg"
         if syn then
             syn.request({
@@ -402,10 +402,11 @@ GroupCredits:AddButton({
 	})
 
         end
-    end
+
+    end,
+    DoubleClick = false,
+    Tooltip = "Interage com todos carrinhos no botão play/stop"
 })
-
-
 
 
 -- UI Settings
