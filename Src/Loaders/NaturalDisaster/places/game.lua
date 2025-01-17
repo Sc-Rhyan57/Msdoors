@@ -240,6 +240,7 @@ local function initializeTeleportSystem()
             and character:FindFirstChild("Humanoid") 
             and character.Humanoid.Health > 0
     end
+
 local function teleportWithTween(targetCFrame)
         if not isCharacterValid() then return end
         
@@ -252,9 +253,9 @@ local function teleportWithTween(targetCFrame)
         tween:Play()
         return tween
     end
+
     getgenv().msdoors_isteleporting = false
     local connection
-    
     FarmingGroup:AddToggle({
         Name = "AutoFarm wins",
         Default = false,
