@@ -230,7 +230,7 @@ game:GetService("Workspace")[game.Players.LocalPlayer.Name]:FindFirstChildOfClas
 	Visible = true,
 })
 
-PlayersTab:AddToggle("Autofarm-old", {
+PlayersTab:AddToggle("Autofarmold", {
     Text = "Autofarm[OLD]",
     Default = false,
     Tooltip = "Fique teleportando para o lobby durante a partida.",
@@ -246,25 +246,22 @@ PlayersTab:AddToggle("Autofarm-old", {
         end
     end
 })
-
-CartsTab:AddSlider("speed-player-natutal", {
+CartsTab:AddSlider("SpeedPlayer", {
 	Text = "Speed",
 	Default = 16,
-	Min = 16,
+	Min = 1,
 	Max = 55,
 	Rounding = 1,
 	Compact = false,
-	Callback = function(value)
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+	Callback = function(Value)
+	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
 	end,
-
-	Tooltip = "Velocidade do player atual.",
+	Tooltip = "Velocidade de caminhada do player",
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
-	Visible = true,
+	Visible = true
 })
-
-CartsTab:AddSlider("gravity-player-natutal", {
+CartsTab:AddSlider("gravityplayernatutal", {
 	Text = "Gravidade / Jumpboost",
 	Default = 1,
 	Min = 0,
@@ -281,7 +278,7 @@ CartsTab:AddSlider("gravity-player-natutal", {
 })
 
 
-ExploitsTab:AddToggle("Walk-on-water-new", {
+ExploitsTab:AddToggle("Walkonwaternew", {
     Text = "Andar sobre a água",
     Default = false,
     Tooltip = "Fique teleportando para o lobby durante a partida.",
@@ -296,7 +293,7 @@ ExploitsTab:AddToggle("Walk-on-water-new", {
         end
     end
 })
-ExploitsTab:AddToggle("Solid-island-new", {
+ExploitsTab:AddToggle("Solidislandnew", {
     Text = "ilha sólida",
     Default = false,
     Tooltip = "Deixará as bordas da ilha sólida",
@@ -309,7 +306,7 @@ ExploitsTab:AddToggle("Solid-island-new", {
     end
 })
 
-ExploitsTab:AddToggle("Escolher-mapa-old", {
+ExploitsTab:AddToggle("Escolhermapaold", {
     Text = "Escolher mapa",
     Default = false,
     Tooltip = "Mostra a gui para escolher mapas",
@@ -476,7 +473,7 @@ local function pararMonitoramento()
 
 
 end
-GamesTab:AddToggle("Warn-of-disasters", {
+GamesTab:AddToggle("WarnOfdisasters", {
     Text = "Avisar desastres",
     Default = false,
     Tooltip = "Avisar desastres na sua tela",
@@ -489,7 +486,7 @@ GamesTab:AddToggle("Warn-of-disasters", {
 				end
         end
 })
-GamesTab:AddToggle("Warn-of-disasters-in-chat", {
+GamesTab:AddToggle("Warnofdisastersinchat", {
     Text = "Avisar desastres no chat",
     Default = false,
     Tooltip = "Avisar desastres para todos no chat",
