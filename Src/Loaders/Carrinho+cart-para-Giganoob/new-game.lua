@@ -123,10 +123,8 @@ local Tabs = {
 }
 
 local Msplayer = Tabs.GroupMusic:AddLeftGroupbox("Música")
-Msplayer:AddLabel('<font color="#9DABFF">Relaxe enquanto joga.</font>')
 
 local Msplayerplaylist = Tabs.GroupMusic:AddRightGroupbox("Playlist system")
-MsPlayerplaylist:AddLabel('<font color="#9DABFF">Playlists</font>')
 
 local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
 CartsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</font>')
