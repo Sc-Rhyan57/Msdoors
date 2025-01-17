@@ -125,7 +125,7 @@ local Tabs = {
 local Msplayer = Tabs.GroupMusic:AddLeftGroupbox("Música")
 MsPlayer:AddLabel('<font color="#9DABFF">Escute músicas enquanto joga.</font>')
 
-local Msplayer-playlist = Tabs.GroupMusic:AddRightGroupbox("Playlist system")
+local Msplayerplaylist = Tabs.GroupMusic:AddRightGroupbox("Playlist system")
 MsPlayer:AddLabel('<font color="#9DABFF">Playlists</font>')
 
 local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
@@ -452,7 +452,7 @@ TeleportGroup:AddDropdown("teleport-droppdown", {
 })
 
 
-Msplayer-playlist:AddInput("ADD-NAME-PLAYLIST", {
+Msplayerplaylist:AddInput("ADD-NAME-PLAYLIST", {
 	Default = "",
 	Numeric = false,
 	Finished = true,
@@ -464,7 +464,7 @@ Msplayer-playlist:AddInput("ADD-NAME-PLAYLIST", {
     musicPlayer.currentPlaylistName = value
 	end,
 })
-Msplayer-playlist:AddButton({
+Msplayerplaylist:AddButton({
     Name = "Excluir playlist",
     Callback = function()
         if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylistName ~= "" then
@@ -478,7 +478,7 @@ Msplayer-playlist:AddButton({
 })
 
 
-MsPlayer:AddButton({
+MsPlayerplaylist:AddButton({
     Name = "Criar Playlist",
     Callback = function()
         if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylistName ~= "" then
@@ -490,7 +490,7 @@ MsPlayer:AddButton({
         end
     end
 })
-Msplayer-playlist:AddButton({
+Msplayerplaylist:AddButton({
     Name = "Carregar Playlist",
     Callback = function()
         if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylistName ~= "" then
@@ -507,7 +507,7 @@ Msplayer-playlist:AddButton({
 
     end
 })
-Msplayer-playlist:AddButton({
+Msplayerplaylist:AddButton({
     Name = "Salvar playlist",
     Callback = function()
         if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylist then
@@ -520,7 +520,7 @@ Msplayer-playlist:AddButton({
 })
 
 
-Msplayer-playlist:AddButton({
+Msplayerplaylist:AddButton({
     Name = "Excluir playlist",
     Callback = function()
         if musicPlayer.currentPlaylistName then
@@ -534,7 +534,7 @@ Msplayer-playlist:AddButton({
 })
 
 
-Msplayer-playlist:AddInput("ADD-MUSIC-ID", {
+Msplayerplaylist:AddInput("ADD-MUSIC-ID", {
 	Default = "",
 	Numeric = false,
 	Finished = true,
