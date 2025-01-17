@@ -573,3 +573,100 @@ GamesTab:AddToggle("Warn-of-disasters-in-chat", {
         _G.msdoors_chatActive = value
         end
 })
+
+GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
+GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
+GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
+GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
+GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
+GroupCredits:AddButton({
+    Text = "Copiar Link",
+    Func = function()
+        local url = "https://dsc.gg/msdoors-gg"
+        if syn then
+            syn.request({
+                Url = url,
+                Method = "GET"
+            })
+        elseif setclipboard then
+            setclipboard(url)
+            Library:Notify({
+		Title = "Link copiado!",
+		Description = "Seu executor não suporta redirecionar. link copiado.",
+		Time = 5,
+	})
+
+        else
+                        Library:Notify({
+		Title = "LOL",
+		Description = "Seu executor não suporta redirecionar ou copiar links.",
+		Time = 5,
+	})
+
+        end
+
+    end,
+    DoubleClick = false,
+    Tooltip = "Interage com todos carrinhos no botão play/stop"
+})
+
+
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("msdoors")
+SaveManager:SetFolder("msdoors/carrinhointothegiganoob")
+SaveManager:SetSubFolder("carrinhointothegiganoob")
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
+
+_G.MsdoorsLoaded = true
