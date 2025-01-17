@@ -246,7 +246,7 @@ PlayersTab:AddToggle("Autofarmold", {
         end
     end
 })
-CartsTab:AddSlider("SpeedPlayer", {
+PlayersTab:AddSlider("SpeedPlayer", {
 	Text = "Speed",
 	Default = 16,
 	Min = 1,
@@ -261,7 +261,7 @@ CartsTab:AddSlider("SpeedPlayer", {
 	Disabled = false,
 	Visible = true
 })
-CartsTab:AddSlider("gravityplayernatutal", {
+PlayersTab:AddSlider("gravityplayernatutal", {
 	Text = "Gravidade / Jumpboost",
 	Default = 1,
 	Min = 0,
