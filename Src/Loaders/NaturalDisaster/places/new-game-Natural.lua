@@ -274,7 +274,7 @@ CartsTab:AddSlider("gravityplayernatutal", {
 	Tooltip = "Gravidade do player atual.",
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
-	Visible = true,
+	Visible = true
 })
 
 
