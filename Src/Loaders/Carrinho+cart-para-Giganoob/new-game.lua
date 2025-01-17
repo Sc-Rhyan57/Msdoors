@@ -570,22 +570,25 @@ MsPlayer:AddTextbox({
     end
 })
 ]]--
-Msplayerplaylist:AddDivider()
+
 Msplayerplaylist:AddButton({
-    Name = "Tocar Playlist",
-    Callback = function()
-       playMusic(musicPlayer.currentIndex > 0 and musicPlayer.currentIndex or 1)
-    end
+    Text = "Tocar Playlist",
+    Func = function()
+    playMusic(musicPlayer.currentIndex > 0 and musicPlayer.currentIndex or 1)
+    end,
+    DoubleClick = false,
+    Tooltip = "Reproduz todas músicas da playlist."
 })
 
-
 Msplayerplaylist:AddButton({
-    Name = "Próxima Música",
-    Callback = function()
+    Text = "Próxima música",
+    Func = function()
         local nextIndex = musicPlayer.currentIndex + 1
         if nextIndex > #musicPlayer.currentPlaylist then nextIndex = 1 end
         playMusic(nextIndex)
-    end
+    end,
+    DoubleClick = false,
+    Tooltip = "Pular para próxima música."
 })
 
 Msplayerplaylist:AddButton({
