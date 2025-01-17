@@ -48,6 +48,7 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local musicPlayer = { isPlaying = false, currentSound = nil, currentPlaylist = nil, playlists = {}, currentIndex = 0, volume = 0.5, folderName = ".msdoors", }
 print("[Msdoors] • [✅] Inicialização de Serviços")
+
 --[[ VERIFICAÇÃO DE JOGO ]]--
 local GAME_ID_ESPERADO = 5275822877
 local function getGameInfo()
@@ -118,13 +119,9 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
-    GroupMusic = Window:AddTab("Musica", "user"),
-    Settings = Window:AddTab("Settings", "settings")
+    GroupCredits = Window:AddTab("Créditos", "user"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
-
-local Msplayer = Tabs.GroupMusic:AddLeftGroupbox("Música")
-
-local Msplayerplaylist = Tabs.GroupMusic:AddRightGroupbox("Playlist system")
 
 local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
 CartsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</font>')
@@ -133,80 +130,6 @@ JeepsTab:AddLabel('<font color="#FF0000">This function may cause some lag for th
 local TeleportGroup = Tabs.Main:AddRightGroupbox("Teleportes")
 TeleportGroup:AddLabel('<font color="#9DABFF">Aba de teleportes</font>')
 
-
---[[ MUSIC SYSTEM ]]--
-local function createFolderIfNotExists()
-    if not isfolder(musicPlayer.folderName) then
-        makefolder(musicPlayer.folderName)
-    end
-end
-
-local function savePlaylist(name, data)
-    createFolderIfNotExists()
-    local filePath = musicPlayer.folderName .. "/" .. name .. ".json"
-    local jsonData = HttpService:JSONEncode(data)
-    writefile(filePath, jsonData)
-end
-
-local function loadPlaylist(name)
-    local filePath = musicPlayer.folderName .. "/" .. name .. ".json"
-    if isfile(filePath) then
-        local jsonData = readfile(filePath)
-        return HttpService:JSONDecode(jsonData)
-    else
-        return nil
-    end
-end
-
-local function deletePlaylist(name)
-    local filePath = musicPlayer.folderName .. "/" .. name .. ".json"
-    if isfile(filePath) then
-        delfile(filePath)
-    end
-end
-
-local function createNotification(title, content, duration)
-    Library:Notify({
-		Title = title,
-		Description = content,
-		Time = duration,
-	})
-end
-
-local function playMusic(index)
-    if not musicPlayer.currentPlaylist or #musicPlayer.currentPlaylist == 0 then
-        createNotification("Erro", "Playlist vazia ou não carregada.(tente re-entrar)", 3)
-        return
-    end
-
-    if musicPlayer.currentSound then
-        musicPlayer.currentSound:Destroy()
-    end
-
-    local sound = Instance.new("Sound", game:GetService("Workspace"))
-    local musicData = musicPlayer.currentPlaylist[index]
-    if not musicData then
-        createNotification("Erro", "Nenhuma música encontrada.", 3)
-        return
-    end
-
-    sound.SoundId = "rbxassetid://" .. musicData.Id
-    sound.Volume = musicPlayer.volume
-    sound.Looped = false
-    sound:Play()
-
-    musicPlayer.isPlaying = true
-    musicPlayer.currentSound = sound
-    musicPlayer.currentIndex = index
-
-    createNotification("Reprodutor", "Tocando: " .. musicData.NAME, 3)
-
-    sound.Ended:Connect(function()
-        local nextIndex = musicPlayer.currentIndex + 1
-        if nextIndex > #musicPlayer.currentPlaylist then nextIndex = 1 end
-        playMusic(nextIndex)
-    end)
-end
 
 -- Variáveis globais para controle
 getgenv().AutoClickDetectors = false
@@ -449,243 +372,99 @@ TeleportGroup:AddDropdown("teleport-droppdown", {
 	Visible = true
 })
 
+GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
+GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
+GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
+GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
+GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
+GroupCredits:AddButton({
+    Name = "Copiar Link",
+    Callback = function()
+        local url = "https://dsc.gg/msdoors-gg"
+        if syn then
+            syn.request({
+                Url = url,
+                Method = "GET"
+            })
+        elseif setclipboard then
+            setclipboard(url)
+            Library:Notify({
+		Title = "Link copiado!",
+		Description = "Seu executor não suporta redirecionar. link copiado.,
+		Time = 5,
+	})
 
-Msplayerplaylist:AddInput("ADD-NAME-PLAYLIST", {
-	Default = "",
-	Numeric = false,
-	Finished = true,
-	ClearTextOnFocus = true,
-	Text = "Nome da playlist",
-	Tooltip = "Adicionar um nome a playlist",
-	Placeholder = "",
+        else
+                        Library:Notify({
+		Title = "LOL",
+		Description = "Seu executor não suporta redirecionar ou copiar links.,
+		Time = 5,
+	})
+
+        end
+    end
+})
+
+
+
+
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
 	Callback = function(value)
-    musicPlayer.currentPlaylistName = value
+		Library.KeybindFrame.Visible = value
 	end,
 })
-Msplayerplaylist:AddButton({
-    Name = "Excluir playlist",
-    Callback = function()
-        if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylistName ~= "" then
-            musicPlayer.playlists[musicPlayer.currentPlaylistName] = {}
-            savePlaylist(musicPlayer.currentPlaylistName, musicPlayer.playlists[musicPlayer.currentPlaylistName])
-            createNotification("Playlist", "Playlist criada com sucesso!", 3)
-        else
-            createNotification("Erro", "Insira um nome para a playlist.", 3)
-        end
-    end
-})
-
-
-MsPlayerplaylist:AddButton({
-    Name = "Criar Playlist",
-    Callback = function()
-        if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylistName ~= "" then
-            musicPlayer.playlists[musicPlayer.currentPlaylistName] = {}
-            savePlaylist(musicPlayer.currentPlaylistName, musicPlayer.playlists[musicPlayer.currentPlaylistName])
-            createNotification("Playlist", "Playlist criada com sucesso!", 3)
-        else
-            createNotification("Erro", "Insira um nome para a playlist.", 3)
-        end
-    end
-})
-Msplayerplaylist:AddButton({
-    Name = "Carregar Playlist",
-    Callback = function()
-        if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylistName ~= "" then
-            local loadedPlaylist = loadPlaylist(musicPlayer.currentPlaylistName)
-            if loadedPlaylist then
-                musicPlayer.currentPlaylist = loadedPlaylist
-                createNotification("Playlist", "Playlist carregada com sucesso!", 3)
-            else
-                createNotification("Erro", "Playlist não encontrada.", 3)
-            end
-        else
-            createNotification("Erro", "Insira o nome da playlist para carregar.", 3)
-        end
-
-    end
-})
-Msplayerplaylist:AddButton({
-    Name = "Salvar playlist",
-    Callback = function()
-        if musicPlayer.currentPlaylistName and musicPlayer.currentPlaylist then
-            savePlaylist(musicPlayer.currentPlaylistName, musicPlayer.currentPlaylist)
-            createNotification("Playlist", "Playlist salva com sucesso!", 3)
-        else
-            createNotification("Erro", "Nenhuma playlist carregada para salvar.", 3)
-        end
-    end
-})
-
-
-Msplayerplaylist:AddButton({
-    Name = "Excluir playlist",
-    Callback = function()
-        if musicPlayer.currentPlaylistName then
-            deletePlaylist(musicPlayer.currentPlaylistName)
-            musicPlayer.currentPlaylist = nil
-            createNotification("Playlist", "Playlist excluída com sucesso!", 3)
-        else
-            createNotification("Erro", "Insira o nome da playlist para excluir.", 3)
-        end
-    end
-})
-
-
-Msplayerplaylist:AddInput("ADD-MUSIC-ID", {
-	Default = "",
-	Numeric = false,
-	Finished = true,
-	ClearTextOnFocus = true,
-	Text = "Musica(ID ROBLOX)",
-	Tooltip = "Adicionar músicas por id a playlist.",
-	Placeholder = "",
-	Callback = function(value)
-        if musicPlayer.currentPlaylist then
-            local splitValue = string.split(value, ",")
-            local musicData = { NAME = splitValue[1], Id = splitValue[2] }
-            table.insert(musicPlayer.currentPlaylist, musicData)
-            createNotification("Playlist", "Música adicionada à playlist.", 3)
-        else
-            createNotification("Erro", "Carregue uma playlist antes de adicionar músicas.", 3)
-        end
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
 	end,
 })
---[[
-MsPlayer:AddTextbox({
-    Name = "Adicionar Música (Nome e Id) separados por vírgula)",
-    Default = "",
-    TextDisappear = true,
-    Callback = function(value)
-        if musicPlayer.currentPlaylist then
-            local splitValue = string.split(value, ",")
-            local musicData = { NAME = splitValue[1], Id = splitValue[2] }
-            table.insert(musicPlayer.currentPlaylist, musicData)
-            createNotification("Playlist", "Música adicionada à playlist.", 3)
-        else
-            createNotification("Erro", "Carregue uma playlist antes de adicionar músicas.", 3)
-        end
-    end
-})
-]]--
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
 
-Msplayerplaylist:AddButton({
-    Text = "Tocar Playlist",
-    Func = function()
-    playMusic(musicPlayer.currentIndex > 0 and musicPlayer.currentIndex or 1)
-    end,
-    DoubleClick = false,
-    Tooltip = "Reproduz todas músicas da playlist."
-})
+	Text = "Notification Side",
 
-Msplayerplaylist:AddButton({
-    Text = "Próxima música",
-    Func = function()
-        local nextIndex = musicPlayer.currentIndex + 1
-        if nextIndex > #musicPlayer.currentPlaylist then nextIndex = 1 end
-        playMusic(nextIndex)
-    end,
-    DoubleClick = false,
-    Tooltip = "Pular para próxima música."
-})
-
-Msplayerplaylist:AddButton({
-    Text = "Pausar",
-    Func = function()
-    if musicPlayer.currentSound and musicPlayer.isPlaying then
-            musicPlayer.currentSound:Pause()
-            musicPlayer.isPlaying = false
-            createNotification("Reprodutor", "Música pausada.", 3)
-        else
-            createNotification("Erro", "Nenhuma música está tocando ou já está pausada.", 3)
-        end
-    end,
-    DoubleClick = false,
-    Tooltip = "Pausa musicas em reprodução."
-})
-
-
-local musicIdFromTextbox = ""
-MsPlayer:AddInput("MUSIC-ID", {
-	Default = "",
-	Numeric = false,
-	Finished = false,
-	ClearTextOnFocus = true,
-	Text = "Musica(ID ROBLOX)",
-	Tooltip = "Ao inserir o id e clicar em tocar você reproduz a música!",
-	Placeholder = "",
-	Callback = function(value)
-		musicIdFromTextbox = value 
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
 	end,
 })
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
 
-MsPlayer:AddButton({
-    Text = "Tocar",
-    Func = function()
-    if musicIdFromTextbox == "" then
-            createNotification("Erro", "Insira um ID válido no textbox.", 3)
-            return
-        end
+	Text = "DPI Scale",
 
-        if musicPlayer.currentSound then
-            musicPlayer.currentSound:Destroy()
-        end
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
 
-        local sound = Instance.new("Sound", game:GetService("Workspace"))
-        sound.SoundId = "rbxassetid://" .. musicIdFromTextbox
-        sound.Volume = musicPlayer.volume
-        sound.Looped = false
-        sound:Play()
-
-        musicPlayer.isPlaying = true
-        musicPlayer.currentSound = sound
-
-        createNotification("Reprodutor", "Tocando música com ID: " .. musicIdFromTextbox, 3)
-
-        sound.Ended:Connect(function()
-            musicPlayer.isPlaying = false
-            createNotification("Reprodutor", "Música finalizada.", 3)
-        end)
-    end,
-    DoubleClick = false,
-    Tooltip = "Reproduzir música do id inserido."
-})
-
-
-MsPlayer:AddButton({
-    Text = "Pausar",
-    Func = function()
-    if musicPlayer.currentSound and musicPlayer.isPlaying then
-            musicPlayer.currentSound:Pause()
-            musicPlayer.isPlaying = false
-            createNotification("Reprodutor", "Música pausada.", 3)
-        else
-            createNotification("Erro", "Nenhuma música está tocando ou já está pausada.", 3)
-        end
-    end,
-    DoubleClick = false,
-    Tooltip = "Pausa musicas em reprodução."
-})
-
-MsPlayer:AddSlider("msplayer-volume", {
-	Text = "Volume",
-	Default = 0.5,
-	Min = 0,
-	Max = 2,
-	Rounding = 1,
-	Compact = false,
-	Callback = function(value)
-     musicPlayer.volume = value
-        if musicPlayer.currentSound then
-            musicPlayer.currentSound.Volume = value
-        end
+		Library:SetDPIScale(DPI)
 	end,
-
-	Tooltip = "Definir volume da musica em reprodução.",
-	DisabledTooltip = "I am disabled!",
-	Disabled = false,
-	Visible = true,
 })
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("msdoors")
+SaveManager:SetFolder("msdoors/carrinhointothegiganoob")
+SaveManager:SetSubFolder("carrinhointothegiganoob")
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
 
 --[[
 RightGroup2:AddToggle("MyToggle", {
@@ -706,3 +485,6 @@ LeftGroup1:AddSlider("MySlider", {
     Compact = false
 })
 ]]--
+
+
+
