@@ -523,13 +523,7 @@ local function monitorarDesastre()
 		print("[Msdoors] • Desastre: " .. survivalTag.Value)
 		TrySendChatMessage("⚠️ Desastre: " .. survivalTag.Value)
                 showStylishHUD("Desastre: " .. survivalTag.Value)
-                OrionLib:MakeNotification({
-                    Name = "Desastre Detectado",
-                    Content = "O desastre é " .. survivalTag.Value,
-                    Image = "rbxassetid://4483345998",
-                    Time = 5
-                })
-                
+                               
             end
             return true
         end
@@ -660,9 +654,7 @@ MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind")
 	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
-MenuGroup:AddButton("Unload", function()
-	Library:Unload()
-end)
+MenuGroup:AddButton("Unload", function() Library:Unload() end)
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
@@ -673,5 +665,3 @@ SaveManager:SetSubFolder("carrinhointothegiganoob")
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
-	
-_G.MsdoorsLoaded = true
