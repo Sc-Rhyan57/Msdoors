@@ -651,16 +651,24 @@ MenuGroup:AddDropdown("DPIDropdown", {
 	end,
 })
 MenuGroup:AddDivider()
-MenuGroup:AddLabel("Menu bind")
-	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
-MenuGroup:AddButton("Unload", function() Library:Unload() end)
+MenuGroup:AddButton("Unload",
+function() 
+Library:Unload() 
+        end,
+	DoubleClick = false,
+	Tooltip = "Fechará a UIr",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("msdoors")
-SaveManager:SetFolder("msdoors/carrinhointothegiganoob")
+SaveManager:SetFolder("msdoors/naturaldisastee")
 SaveManager:SetSubFolder("carrinhointothegiganoob")
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
