@@ -140,12 +140,114 @@ TeleportsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</
 local VisualsTab = Tabs.Main:AddLeftGroupbox("Visual")
 VisualsTab:AddLabel('<font color="#00FF34">Things like Delete Screen Effects</font>')
 local PlayersTab = Tabs.Main:AddLeftGroupbox("Players")
-PlayersTab:AddLabel('<font color="#00FF34">Speed hack, walk speed and player stuff.</font>')
+GamesTab:AddLabel('<font color="#00FF34">Funções do jogo atual</font>')
+local GroupFarming = Tabs.Credits:AddLeftGroupbox("Farming")
+GroupFarming:AddLabel('<font color="#00FF34">New Farm style with optimization.</font>')
 local ExploitsTab = Tabs.Main:AddRightGroupbox("Exploits")
 ExploitsTab:AddLabel('<font color="#00FF34">things like solid sland and solid water</font>')
 local GamesTab = Tabs.Main:AddRightGroupbox("Game")
 GamesTab:AddLabel('<font color="#00FF34">Funções do jogo atual</font>')
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
+
+
+local cache = {
+    RunService = game:GetService("RunService"),
+    Players = game:GetService("Players"),
+    LocalPlayer = game:GetService("Players").LocalPlayer,
+    TweenService = game:GetService("TweenService")
+}
+local config = {
+    locations = {
+        farm = CFrame.new(-281, 167, 339),
+        safe = CFrame.new(-278, 180, 343)
+    },
+    tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Linear),
+    updateRate = 0 -- 0 = máxima velocidade
+}
+local function initializeTeleportSystem()
+    local function isCharacterValid()
+        local character = cache.LocalPlayer.Character
+        return character 
+            and character:FindFirstChild("HumanoidRootPart") 
+            and character:FindFirstChild("Humanoid") 
+            and character.Humanoid.Health > 0
+    end
+
+local function teleportWithTween(targetCFrame)
+        if not isCharacterValid() then return end
+        
+        local humanoidRootPart = cache.LocalPlayer.Character.HumanoidRootPart
+        local tween = cache.TweenService:Create(
+            humanoidRootPart,
+            config.tweenInfo,
+            {CFrame = targetCFrame}
+        )
+        tween:Play()
+        return tween
+    end
+
+    getgenv().msdoors_isteleporting = false
+    local connection
+    GroupFarming:AddToggle("AutofarmNew", {
+    Text = "Autofarm[NEW]",
+    Default = false,
+    Tooltip = "Fique teleportando para o lobby durante a partida.",
+    Callback = function(Value)
+    getgenv().msdoors_isteleporting = Value
+            
+            if Value then
+                connection = cache.RunService.Heartbeat:Connect(function()
+                    if not isCharacterValid() then return end
+                    cache.LocalPlayer.Character.HumanoidRootPart.CFrame = config.locations.farm
+                end)
+            else
+                if connection then 
+                    connection:Disconnect()
+                    connection = nil
+                    teleportWithTween(config.locations.safe)
+                end
+            end
+    end
+})
+
+GroupFarming:AddButton({
+	Text = "Instant teleport safe",
+	Func = function()
+		print("[Msdoors] • Teleportado para: Safe Pos")
+		if isCharacterValid() then
+                teleportWithTween(config.locations.safe)
+				end
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-108, 49, 0)
+	end,
+	DoubleClick = false,
+	Tooltip = "Caso o teleporte falhe ao desaticar o aurofarm clique aqui!",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+ 
+    
+GroupFarming:AddLabel('<font color="#00FF34">Status do AutoFarm</font>')
+    local statusLabel = GroupFarming:AddLabel('Waiting...')
+
+    cache.RunService.Heartbeat:Connect(function()
+        if getgenv().msdoors_isteleporting then
+            statusLabel:Set('Status: Active - <font color="#FF0000">Farming....</font>')
+        else
+            statusLabel:Set('Status: Inactive - <font color="#00FF34">SafeMode</font>')
+        end
+    end)
+    cache.LocalPlayer.CharacterAdded:Connect(function()
+        if getgenv().msdoors_isteleporting then
+            task.wait(0.5)
+            connection = cache.RunService.Heartbeat:Connect(function()
+                if not isCharacterValid() then return end
+                cache.LocalPlayer.Character.HumanoidRootPart.CFrame = config.locations.farm
+            end)
+        end
+    end)
+end
+initializeTeleportSystem()
 
 TeleportsTab:AddButton({
 	Text = "Ilha",
@@ -246,6 +348,7 @@ PlayersTab:AddToggle("Autofarmold", {
         end
     end
 })
+
 PlayersTab:AddSlider("SpeedPlayer", {
 	Text = "Speed",
 	Default = 16,
