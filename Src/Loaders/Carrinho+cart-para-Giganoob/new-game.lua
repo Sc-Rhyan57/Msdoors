@@ -372,7 +372,6 @@ TeleportGroup:AddDropdown("teleport-droppdown", {
 	Disabled = false,
 	Visible = true
 })
-
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
 GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
