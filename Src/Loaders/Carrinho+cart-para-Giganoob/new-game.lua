@@ -122,7 +122,7 @@ local Tabs = {
     Credits = Window:AddTab("Créditos", "user"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
-local GroupCredits = Tabs.Main:AddLeftGroupbox("Créditos")
+local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
 local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
 CartsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</font>')
