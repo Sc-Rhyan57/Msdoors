@@ -653,16 +653,6 @@ MenuGroup:AddDropdown("DPIDropdown", {
 MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
-MenuGroup:AddButton("Unload",
-function() 
-Library:Unload() 
-        end,
-	DoubleClick = false,
-	Tooltip = "Fechará a UIr",
-	DisabledTooltip = "I am disabled!",
-	Disabled = false,
-	Visible = true,
-})
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
