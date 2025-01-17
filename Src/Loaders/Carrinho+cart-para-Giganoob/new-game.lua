@@ -467,25 +467,4 @@ SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
 
---[[
-RightGroup2:AddToggle("MyToggle", {
-    Text = "Example Toggle",
-    Default = false,
-    Tooltip = "This is a tooltip",
-    Callback = function(Value)
-        print("Toggle is now:", Value)
-    end
-})
-
-LeftGroup1:AddSlider("MySlider", {
-    Text = "Example Slider",
-    Default = 0,
-    Min = 0,
-    Max = 100,
-    Rounding = 1,
-    Compact = false
-})
-]]--
-
-
-
+_G.MsdoorsLoaded = true
