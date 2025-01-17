@@ -119,8 +119,8 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
-    Credits = Window:AddTab("Créditos", "user"),
-    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+    Credits = Window:AddTab("Créditos", "brain-circuit"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "bolt"),
 }
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
