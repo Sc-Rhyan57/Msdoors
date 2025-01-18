@@ -45,11 +45,80 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
-local Noclip = nil
-local PathBeam = nil
-local VelocityHandler = nil
+
 print("[Msdoors] • [✅] Inicialização de Serviços")
+
+
+local aimbotEnabled = false
+local aimbotPart = "Head"
+local maxDistance = 500
+local whitelist = {}
+local blacklist = {}
+local ignoreTeams = true
+local prioritizeBlacklist = false
+
+local aimDot = Drawing.new("Circle")
+aimDot.Visible = false
+aimDot.Radius = 6
+aimDot.Color = Color3.new(1, 0, 0)
+aimDot.Filled = true
+local rotationAngle = 0
+RunService.RenderStepped:Connect(function()
+    if aimbotEnabled then
+        rotationAngle = rotationAngle + math.rad(3)
+        local xOffset = math.cos(rotationAngle) * 15
+        local yOffset = math.sin(rotationAngle) * 15
+        aimDot.Position = Camera.ViewportSize / 2 + Vector2.new(xOffset, yOffset)
+    else
+        aimDot.Visible = false
+    end
+end)
+
+local function getClosestPlayer()
+    local closestPlayer, shortestDistance = nil, maxDistance
+    local prioritizedPlayers = prioritizeBlacklist and blacklist or Players:GetPlayers()
+
+    for _, player in pairs(prioritizedPlayers) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(aimbotPart) then
+            local targetPart = player.Character[aimbotPart]
+            local distance = (Camera.CFrame.Position - targetPart.Position).Magnitude
+            if not table.find(whitelist, player.Name) then
+                local isSameTeam = player.Team and player.Team == LocalPlayer.Team
+                if not (ignoreTeams and isSameTeam) then
+                    if distance < shortestDistance then
+                        closestPlayer = player
+                        shortestDistance = distance
+                    end
+                end
+            end
+        end
+    end
+    return closestPlayer
+end
+
+local function aimAt(player)
+    if player and player.Character and player.Character:FindFirstChild(aimbotPart) then
+        local target = player.Character[aimbotPart]
+        local smoothness = 0.2
+        local currentCFrame = Camera.CFrame
+        local targetCFrame = CFrame.new(currentCFrame.Position, target.Position)
+        Camera.CFrame = currentCFrame:Lerp(targetCFrame, smoothness)
+    end
+end
+RunService.RenderStepped:Connect(function()
+    if aimbotEnabled then
+        aimDot.Visible = true
+        local target = getClosestPlayer()
+        if target then
+            aimAt(target)
+        end
+    end
+end)
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
