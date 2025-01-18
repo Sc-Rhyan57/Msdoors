@@ -141,13 +141,12 @@ local VisualsTab = Tabs.Main:AddLeftGroupbox("Visual")
 VisualsTab:AddLabel('<font color="#00FF34">Things like Delete Screen Effects</font>')
 local PlayersTab = Tabs.Main:AddLeftGroupbox("Players")
 PlayersTab:AddLabel('<font color="#00FF34">Funções do jogador Atual.</font>')
-local GroupFarming = Tabs.Credits:AddLeftGroupbox("Farming")
+local GroupFarming = Tabs.Main:AddRightGroupbox("Farming")
 GroupFarming:AddLabel('<font color="#00FF34">New Farm style with optimization.</font>')
 local ExploitsTab = Tabs.Main:AddRightGroupbox("Exploits")
 ExploitsTab:AddLabel('<font color="#00FF34">things like solid sland and solid water</font>')
 local GamesTab = Tabs.Main:AddRightGroupbox("Game")
 GamesTab:AddLabel('<font color="#00FF34">Funções do jogo atual</font>')
-local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
 
 local cache = {
