@@ -136,15 +136,15 @@ local Tabs = {
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
 local TeleportsTab = Tabs.Main:AddLeftGroupbox("Teleports")
-TeleportsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</font>')
+TeleportsTab:AddLabel('<font color="#9DABFF">Teleporte entre a ilha e a torre!</font>')
 local VisualsTab = Tabs.Main:AddLeftGroupbox("Visual")
 VisualsTab:AddLabel('<font color="#00FF34">Things like Delete Screen Effects</font>')
 local PlayersTab = Tabs.Main:AddLeftGroupbox("Players")
 PlayersTab:AddLabel('<font color="#00FF34">Funções do jogador Atual.</font>')
 local GroupFarming = Tabs.Main:AddRightGroupbox("Farming")
-GroupFarming:AddLabel('<font color="#00FF34">New Farm style with optimization.</font>')
+GroupFarming:AddLabel('<font color="#FF0000">New Farm style with optimization.</font>')
 local ExploitsTab = Tabs.Main:AddRightGroupbox("Exploits")
-ExploitsTab:AddLabel('<font color="#00FF34">things like solid sland and solid water</font>')
+ExploitsTab:AddLabel('<font color="#FF0000">things like solid sland and solid water</font>')
 local GamesTab = Tabs.Main:AddRightGroupbox("Game")
 GamesTab:AddLabel('<font color="#00FF34">Funções do jogo atual</font>')
 
@@ -231,9 +231,9 @@ GroupFarming:AddLabel('<font color="#00FF34">Status do AutoFarm</font>')
 
     cache.RunService.Heartbeat:Connect(function()
         if getgenv().msdoors_isteleporting then
-	   Options.StatusLabel:SetText('Status: Active - <font color="#FF0000">Farming....</font>')
+	   statusLabel:SetText('Status: Active - <font color="#FF0000">Farming....</font>')
         else
-            Options.StatusLabel:SetText('Status: Inactive - <font color="#00FF34">SafeMode</font>')
+            statusLabel:SetText('Status: Inactive - <font color="#00FF34">SafeMode</font>')
         end
     end)
     cache.LocalPlayer.CharacterAdded:Connect(function()
