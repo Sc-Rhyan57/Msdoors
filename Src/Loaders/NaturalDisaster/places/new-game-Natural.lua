@@ -233,7 +233,7 @@ GroupFarming:AddLabel('<font color="#00FF34">Status do AutoFarm</font>')
         if getgenv().msdoors_isteleporting then
 	   Options.StatusLabel:SetText('Status: Active - <font color="#FF0000">Farming....</font>')
         else
-            Options.statusLabel:SetText('Status: Inactive - <font color="#00FF34">SafeMode</font>')
+            Options.StatusLabel:SetText('Status: Inactive - <font color="#00FF34">SafeMode</font>')
         end
     end)
     cache.LocalPlayer.CharacterAdded:Connect(function()
