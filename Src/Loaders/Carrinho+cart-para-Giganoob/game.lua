@@ -51,7 +51,7 @@ local PathBeam = nil
 local VelocityHandler = nil
 print("[Msdoors] • [✅] Inicialização de Serviços")
 --[[ VERIFICAÇÃO DE JOGO ]]--
-local GAME_ID_ESPERADO = 9285238704
+local GAME_ID_ESPERADO = 5275822877
 local function getGameInfo()
     local success, gameInfo = pcall(function()
         return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
