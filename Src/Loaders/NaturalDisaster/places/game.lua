@@ -358,6 +358,33 @@ end
 	Disabled = false,
 	Visible = true,
 })
+GamesTab:AddButton({
+	Text = "Conseguir bússola",
+	Func = function()
+if game.Workspace:FindFirstChild("compass", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("compass", true):Clone() -- clone it 
+	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
+	print("[Msdoors] • Balão consedido!")
+        Library:Notify({
+		Title = "BussolaConsedido!",
+		Description = "Bussola cloanda com sucesso!",
+		Time = 5,
+	})
+else 
+	print("[Msdoors] • Bussola não disponível!")
+        Library:Notify({
+		Title = "Bussola não encontrada...",
+		Description = "Não á ninguém com Uma bussola para Clone nesse servidor.",
+		Time = 5,
+	})
+end 
+	end,
+	DoubleClick = false,
+	Tooltip = "Clona a bussola de algum player que o tem.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
 GamesTab:AddDivider()
 
 PlayersTab:AddToggle("Autofarmold", {
