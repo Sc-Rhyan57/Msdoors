@@ -1,4 +1,4 @@
---// <Race Clicker> | UPDATE EM BREVEL \\--
+--// <Carts Game> | UPDATE EM BREVEL \\--
 
 --[[
                                                                                                                      
@@ -46,10 +46,9 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
-local Noclip = nil
-local PathBeam = nil
-local VelocityHandler = nil
+local musicPlayer = { isPlaying = false, currentSound = nil, currentPlaylist = nil, playlists = {}, currentIndex = 0, volume = 0.5, folderName = ".msdoors", }
 print("[Msdoors] • [✅] Inicialização de Serviços")
+
 --[[ VERIFICAÇÃO DE JOGO ]]--
 local GAME_ID_ESPERADO = 5275822877
 local function getGameInfo()
@@ -108,11 +107,11 @@ Jogo verificado com sucesso!
     return true
 end
 verificarJogo()
---[[ NEW TABS ]]--
+
 
 local Window = Library:CreateWindow({
-    Title = "Msdoors v1",
-    Footer = "Game: Race Clicker | Build: 0.1.3",
+    Title = "Msdoors",
+    Footer = "Version: 1.3 | by rhyan57",
     Icon = "95869322194132",
     NotifySide = "Right",
     ShowCustomCursor = true
@@ -120,104 +119,258 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
-    Credits = Window:AddTab("Créditos", "brain-circuit"),
-    ["UI Settings"] = Window:AddTab("UI Settings", "bolt"),
+    GroupCredits = Window:AddTab("Créditos", "user"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
-local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
-local FarmGroup = Tabs.Main:AddLeftGroupbox("Farm")
-FarmGroup:AddLabel('<font color="#FF0000">AutoFarm</font>')
+local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
+CartsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</font>')
+local JeepsTab = Tabs.Main:AddLeftGroupbox("Jeeps")
+JeepsTab:AddLabel('<font color="#FF0000">This function may cause some lag for the player.</font>')
+local TeleportGroup = Tabs.Main:AddRightGroupbox("Teleportes")
+TeleportGroup:AddLabel('<font color="#9DABFF">Aba de teleportes</font>')
 
 
---[[ SCRIPT ]]--
-local destino = Vector3.new(-583062, 37, 77)
-local ativo = false
-local clicando = false
+-- Variáveis globais para controle
+getgenv().AutoClickDetectors = false
+getgenv().ClickSpeed = 0.3
+local autoDestroy = true
+local player = Players.LocalPlayer
 
-local function clicarTela()
-    while clicando do
-        for _ = 1, 10 do
-            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, nil, 0)game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, nil, 0)
-            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, nil, 0)
-            
-            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, nil, 0)
+local initialPosition = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position
+
+local function destroyAllBuyHatGamePassSign()
+    for _, child in ipairs(workspace:GetChildren()) do
+        if child.Name == "Buy Hat Game Pass Sign" then
+            print("[Msdoors] • A seguinte pasta será apagada para evitar bugs:", child.Name)
+            child:Destroy()
         end
-        task.wait(0.001)
     end
 end
 
-local function autoWin()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local velocidadeOriginal = humanoid.WalkSpeed
+workspace.ChildAdded:Connect(function(child)
+    if autoDestroy and child.Name == "Buy Hat Game Pass Sign" then
+        task.wait(0.1)
+        print("[Msdoors] • 'Buy Hat Game Pass Sign' encontrada e destruída:", child.Name)
+        child:Destroy()
+    end
+end)
 
-    humanoid.WalkSpeed = ativo and 1000000 or velocidadeOriginal
-
-    if ativo then
-        local distancia = (humanoidRootPart.Position - destino).Magnitude
-        local passos = math.ceil(distancia / 20)
-        for i = 1, passos do
-            if not ativo then break end
-            humanoidRootPart.CFrame = humanoidRootPart.CFrame:Lerp(CFrame.new(destino), i / passos)
-            task.wait(0.01)
+local function teleportToBuyHatGamePassSign()
+    local target = workspace:FindFirstChild("Buy Hat Game Pass Sign")
+    if target and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = target.CFrame + Vector3.new(0, 5, 0)
+        print("[Msdoors] Jogador teleportado para 'Buy Hat Game Pass Sign'.")
+        task.wait(3)
+        if initialPosition then
+            player.Character.HumanoidRootPart.CFrame = CFrame.new(initialPosition)
+            print("[Msdoors] • Jogador retornado à posição inicial.")
         end
-        if ativo then humanoidRootPart.CFrame = CFrame.new(destino) end
     else
-        humanoid.WalkSpeed = velocidadeOriginal
+        print("[Msdoors] • Pasta 'Buy Hat Game Pass Sign' não encontrada para teleporte.")
     end
 end
 
-local function verificarUI()
-    local player = game.Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui", 10)
-    local clickUI = playerGui:FindFirstChild("ClicksUI")
-    local clickHelper = clickUI and clickUI:FindFirstChild("ClickHelper")
-
-    if clickHelper and clickHelper:IsA("GuiObject") then
-        clickHelper:GetPropertyChangedSignal("Visible"):Connect(function()
-            if clickHelper.Visible then
-                ativo = false
-                clicando = true
-                clicarTela()
-        else
-                clicando = false
-                ativo = true
-                task.spawn(autoWin)
+local function interactWithClickDetectors()
+    while getgenv().AutoClickDetectors do
+        task.wait(getgenv().ClickSpeed)
+        pcall(function()
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("ClickDetector") then
+                    fireclickdetector(v)
+                end
             end
         end)
+    end
+end
+destroyAllBuyHatGamePassSign()
 
-        if clickHelper.Visible then
-            ativo = false
-            clicando = true
-            clicarTela()
-        else
-            ativo = true
-            task.spawn(autoWin)
+--// ON/PLAY CART \\--
+local Building = game:GetService("Workspace"):FindFirstChild("Building")
+local function getAllClickDetectors()
+    local clickDetectors = {}
+    if Building then
+        for _, descendant in ipairs(Building:GetDescendants()) do
+            if descendant:IsA("ClickDetector") and descendant.Parent and descendant.Parent.Name == "On" then
+                table.insert(clickDetectors, descendant)
+            end
         end
-    else
-        warn("[MsDoors] • ClickHelper não encontrado! Não será possível ativar o Autoclick.")
+    end
+    return clickDetectors
+end
+local function interactOnce()
+    local clickDetectors = getAllClickDetectors()
+    for _, clickDetector in ipairs(clickDetectors) do
+        pcall(function()
+            fireclickdetector(clickDetector)
+        end)
+    end
+end
+--// JEEP \\--
+getgenv().AutoSpamCarrinhos = false
+local function getAllCarrinhos()
+    local carrinhos = {}
+    for _, descendant in ipairs(workspace:GetDescendants()) do
+        if descendant:IsA("Model") and descendant.Name:lower():find("jeep") then
+            table.insert(carrinhos, descendant)
+        end
+    end
+    return carrinhos
+end
+local function interactWithCarrinho(carrinho)
+    for _, part in ipairs(carrinho:GetDescendants()) do
+        if part:IsA("ClickDetector") then
+            pcall(function()
+                fireclickdetector(part)
+            end)
+        end
+        if part:IsA("ProximityPrompt") then
+            pcall(function()
+                fireproximityprompt(part)
+            end)
+        end
+        if part:IsA("TouchTransmitter") or part.Name == "TouchInterest" then
+            pcall(function()
+                firetouchinterest(part.Parent, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+                task.wait(0.1)
+                firetouchinterest(part.Parent, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+            end)
+        end
     end
 end
 
-FarmGroup:AddToggle("AutofarmWin", {
-    Text = "Autofarm",
-    Default = false,
-    Tooltip = "Farm vitórias automaticamente.",
-    Callback = function(estado)
-        ativo = estado
-
-        if ativo then
-            verificarUI()
-            autoWin()
-        else
-            clicando = false
+local function interactWithAllCarrinhos()
+    while getgenv().AutoSpamCarrinhos do
+        local carrinhos = getAllCarrinhos()
+        for _, carrinho in ipairs(carrinhos) do
+            pcall(function()
+                interactWithCarrinho(carrinho)
+            end)
         end
-     end
+        task.wait(0.1) 
+    end
+end
+
+
+--// UP CARTS \\--
+getgenv().AutoClickDetectors1 = false
+local Building = game:GetService("Workspace"):FindFirstChild("Building")
+
+local function getAllClickDetectors()
+    local clickDetectors = {}
+    if Building then
+        for _, descendant in ipairs(Building:GetDescendants()) do
+            if descendant:IsA("ClickDetector") and descendant.Parent and descendant.Parent.Name == "Up" then
+                table.insert(clickDetectors, descendant)
+            end
+        end
+    end
+    return clickDetectors
+end
+
+local function spamClickDetectors()
+    while getgenv().AutoClickDetectors1 do
+        local clickDetectors = getAllClickDetectors()
+        for _, clickDetector in ipairs(clickDetectors) do
+            pcall(function()
+                fireclickdetector(clickDetector)
+            end)
+        end
+        task.wait(0.1)
+    end
+end
+
+
+CartsTab:AddToggle("BreakCarts", {
+    Text = "Break Carts",
+    Default = false,
+    Tooltip = "Isso fará com que todos carrinhos fiquem loucos!",
+    Callback = function(state)
+    getgenv().AutoClickDetectors = state
+        if state then
+      print("[Msdoors] • Break Carts ativado.")
+            spawn(interactWithClickDetectors)
+        else
+      print("[Msdoors] • Break Carts desativado.")
+        end
+    end
+})
+CartsTab:AddSlider("BreakCarts-velocity", {
+	Text = "Velocidade de Break",
+	Default = 0.3,
+	Min = 0.1,
+	Max = 2.1,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(value)
+     getgenv().ClickSpeed = value
+	end,
+
+	Tooltip = "Definir velocidade de cliques do break Carts.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+CartsTab:AddDivider()
+CartsTab:AddToggle("Spam-speed-carts", {
+    Text = "Speed for all carts",
+    Default = false,
+    Tooltip = "Isso fará com que todos carts fiquem aumentando sua velocidade infinitamente.",
+    Callback = function(state)
+            getgenv().AutoClickDetectors1 = state
+        if state then
+            spawn(spamClickDetectors)
+			else
+        end
+    end
+})
+
+CartsTab:AddButton({
+    Text = "Play/Off carts",
+    Func = function()
+    interactOnce()
+    end,
+    DoubleClick = false,
+    Tooltip = "Interage com todos carrinhos no botão play/stop"
 })
 
 
+
+JeepsTab:AddToggle("spam-jeeps", {
+    Text = "Spawn Infinite Jeeps(half slow)",
+    Default = false,
+    Tooltip = "Isso fará com que você foque spawnando Jeeps infinitamente enquanto ativo.",
+    Callback = function(state)
+    getgenv().AutoSpamCarrinhos = state
+        if state then
+            print("[Msdoors] • Spam jeeps ativo")
+            spawn(interactWithAllCarrinhos)
+        else
+            print("[Msdoors] • Spam jeeps pausado")
+        end
+    end
+})
+
+TeleportGroup:AddDropdown("teleport-droppdown", {
+	Values = { "Início", "Meio", "Fim" },
+	Default = 1,
+	Multi = false,
+	Text = "Teleporte",
+	Tooltip = "Teleporte para qualquer nivel!",
+	DisabledTooltip = "I am disabled!",
+	Searchable = true,
+	Callback = function(value)
+       if value == "Início" then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(233, 3, 7)
+        elseif value == "Meio" then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(271, 350, 466)
+        elseif value == "Fim" then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(163, 761, -1020)
+        end
+	end,
+	Disabled = false,
+	Visible = true
+})
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
@@ -225,8 +378,8 @@ GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font
 GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
 GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
 GroupCredits:AddButton({
-    Text = "Copiar Link",
-    Func = function()
+    Name = "Copiar Link",
+    Callback = function()
         local url = "https://dsc.gg/msdoors-gg"
         if syn then
             syn.request({
@@ -237,23 +390,22 @@ GroupCredits:AddButton({
             setclipboard(url)
             Library:Notify({
 		Title = "Link copiado!",
-		Description = "Seu executor não suporta redirecionar. link copiado.",
+		Description = "Seu executor não suporta redirecionar. link copiado.,
 		Time = 5,
 	})
 
         else
                         Library:Notify({
 		Title = "LOL",
-		Description = "Seu executor não suporta redirecionar ou copiar links.",
+		Description = "Seu executor não suporta redirecionar ou copiar links.,
 		Time = 5,
 	})
 
         end
-
-    end,
-    DoubleClick = false,
-    Tooltip = "Interage com todos carrinhos no botão play/stop"
+    end
 })
+
+
 
 
 -- UI Settings
@@ -301,27 +453,15 @@ MenuGroup:AddLabel("Menu bind")
 	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
-	Library:Notify({
-		Title = "Fechando...",
-		Description = "Aguarde estamos cuidando de tudo!.",
-		Time = 5,
-	})
-   AutofarmWin:SetValue(false)
-	task.wait(5)
-	_G.MsdoorsLoaded = false
-	_G.ObsidianaLib = false
 	Library:Unload()
-	print("[Msdoors] • Até outra hora 😉")
 end)
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("msdoors")
-SaveManager:SetFolder("msdoors/Race-Clicker")
-SaveManager:SetSubFolder("Race-Clicker")
+SaveManager:SetFolder("msdoors/carrinhointothegiganoob")
+SaveManager:SetSubFolder("carrinhointothegiganoob")
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
-_G.MsdoorsLoaded = true
-
