@@ -716,116 +716,116 @@ GroupCredits:AddButton({
     DoubleClick = false,
     Tooltip = "Interage com todos carrinhos no botão play/stop"
 })
+--// SISTEMA DE ADDONS \\--
 
---// ADDONS \\--
 task.spawn(function()
-
-    local AddonTab = Window:MakeTab({Name = "Addons [BETA]", Icon = "rbxassetid://4483345998", PremiumOnly = false})
-
-    if not isfolder(".msdoors/addons") then
-        makefolder(".msdoors/addons")
+    if not isfolder("msdoors/addons") then
+        print("[msdoors] A pasta de addons não existe. Criando...")
+        makefolder("msdoors/addons")
+        return
     end
 
-    local function AddAddonElement(Element)
-        if not Element or typeof(Element) ~= "table" then return end
+    local AddonTab, LastGroupbox = nil, "Right"
 
-        if Element.Type == "Label" then
-            AddonTab:AddLabel(Element.Arguments[1])
-        elseif Element.Type == "Toggle" then
-            AddonTab:AddToggle(Element.Name, {
-                Text = Element.Arguments.Text,
-                Default = Element.Arguments.Default or false,
-                Tooltip = Element.Arguments.Tooltip,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Button" then
-            AddonTab:AddButton({
-                Text = Element.Arguments.Text,
-                Func = Element.Arguments.Callback,
-                Tooltip = Element.Arguments.Tooltip,
-                DoubleClick = Element.Arguments.DoubleClick or false
-            })
-        elseif Element.Type == "Slider" then
-            AddonTab:AddSlider(Element.Name, {
-                Text = Element.Arguments.Text,
-                Default = Element.Arguments.Default,
-                Min = Element.Arguments.Min,
-                Max = Element.Arguments.Max,
-                Rounding = Element.Arguments.Rounding or 1,
-                Tooltip = Element.Arguments.Tooltip,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Input" then
-            AddonTab:AddInput(Element.Name, {
-                Default = Element.Arguments.Default,
-                Numeric = Element.Arguments.Numeric or false,
-                Finished = Element.Arguments.Finished or false,
-                Placeholder = Element.Arguments.Placeholder or "",
-                Tooltip = Element.Arguments.Tooltip,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Dropdown" then
-            AddonTab:AddDropdown(Element.Name, {
-                Values = Element.Arguments.Options,
-                Default = Element.Arguments.Default or 1,
-                Multi = Element.Arguments.Multi or false,
-                Text = Element.Arguments.Text,
-                Tooltip = Element.Arguments.Tooltip,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "ColorPicker" then
-            AddonTab:AddLabel(Element.Name):AddColorPicker(Element.Name, {
-                Default = Element.Arguments.Default or Color3.new(1, 1, 1),
-                Title = Element.Arguments.Title,
-                Tooltip = Element.Arguments.Tooltip,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "KeyPicker" then
-            AddonTab:AddLabel(Element.Name):AddKeyPicker(Element.Name, {
-                Default = Element.Arguments.Default or "None",
-                Mode = Element.Arguments.Mode or "Toggle",
-                Text = Element.Arguments.Text,
-                Tooltip = Element.Arguments.Tooltip,
-                Callback = Element.Arguments.Callback
-            })
-        else
-            warn("[MsDoors Addons] Elemento '" .. tostring(Element.Name) .. "' não foi carregado: Tipo de elemento inválido.")
+    local function createAddonTab(hasAddons)
+        if not AddonTab then
+            AddonTab = shared.Window:AddTab("Addons [BETA]")
+        end
+
+        AddonTab:UpdateWarningBox({
+            Visible = true,
+            Title = "AVISO",
+            Text = (if not hasAddons then 
+                "A pasta de addons está vazia!" 
+            else 
+                "Esta aba é para addons NÃO OFICIAIS. Tenha cuidado ao usar scripts de terceiros."
+            )
+        })
+    end
+
+    local function AddAddonElement(LinoriaElement, AddonName, Element)
+        if not LinoriaElement or typeof(Element) ~= "table" then return end
+
+        if typeof(Element.Type) == "string" then
+            if Element.Type:sub(1, 3) == "Add" then
+                Element.Type = Element.Type:sub(4)
+            end
+
+            if Element.Type == "Divider" then
+                return LinoriaElement:AddDivider()
+            elseif Element.Type == "DependencyBox" then
+                return LinoriaElement:AddDependencyBox()
+            elseif Element.Type == "Label" then
+                return LinoriaElement:AddLabel(Element.Arguments.Text or "Label", Element.Arguments.DoesWrap)
+            elseif Element.Type == "Toggle" then
+                return LinoriaElement:AddToggle(AddonName .. "_" .. Element.Name, Element.Arguments)
+            elseif Element.Type == "Button" then
+                return LinoriaElement:AddButton(Element.Arguments)
+            elseif Element.Type == "Slider" then
+                return LinoriaElement:AddSlider(AddonName .. "_" .. Element.Name, Element.Arguments)
+            elseif Element.Type == "Input" then
+                return LinoriaElement:AddInput(AddonName .. "_" .. Element.Name, Element.Arguments)
+            elseif Element.Type == "Dropdown" then
+                return LinoriaElement:AddDropdown(AddonName .. "_" .. Element.Name, Element.Arguments)
+            elseif Element.Type == "ColorPicker" then
+                return LinoriaElement:AddColorPicker(AddonName .. "_" .. Element.Name, Element.Arguments)
+            elseif Element.Type == "KeyPicker" then
+                return LinoriaElement:AddKeyPicker(AddonName .. "_" .. Element.Name, Element.Arguments)
+            end
+        end
+
+        warn("[msdoors] Elemento inválido: " .. tostring(Element.Name))
+    end
+
+    local function loadElements(LinoriaElement, Elements)
+        for _, Element in pairs(Elements) do
+            local NewElement = AddAddonElement(LinoriaElement, Element.AddonName, Element)
+            if Element.Elements then
+                loadElements(NewElement, Element.Elements)
+            end
         end
     end
 
     local containAddonsLoaded = false
+    createAddonTab(false)
 
-    for _, file in pairs(listfiles(".msdoors/addons")) do
-        print("[MsDoors Addons] Carregando addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "'...")
-        if file:sub(-4) ~= ".lua" then continue end
+    for _, file in pairs(listfiles("msdoors/addons")) do
+        print("[mspaint] Carregando addon '" .. string.gsub(file, "msdoors/addons/", "") .. "'...")
+        if not file:match("%.lua$") and not file:match("%.luau$") then
+            continue
+        end
 
         local success, errorMessage = pcall(function()
-            local fileContent = readfile(file)
-            local addon = loadstring(fileContent)()
+            local addonCode = readfile(file)
+            local addon = loadstring(addonCode)()
 
             if typeof(addon.Name) ~= "string" or typeof(addon.Elements) ~= "table" then
-                warn("[MsDoors Addons] Addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "' não carregado: Nome/Elementos inválidos.")
-                return 
+                warn("[mspaint] Addon inválido: " .. string.gsub(file, "mspaint/addons/", ""))
+                return
             end
 
             containAddonsLoaded = true
 
-            AddonTab:AddLabel("Addon: " .. addon.Name)
-            AddonTab:AddParagraph("Descrição", addon.Description or "Sem descrição.")
+            local AddonGroupbox = if LastGroupbox == "Right" then 
+                AddonTab:AddLeftGroupbox(addon.Name) 
+            else 
+                AddonTab:AddRightGroupbox(addon.Name)
+            
+            LastGroupbox = if LastGroupbox == "Right" then "Left" else "Right"
 
-            for _, element in pairs(addon.Elements) do
-                AddAddonElement(element)
+            if addon.Description then
+                AddonGroupbox:AddLabel(addon.Description, true)
             end
+
+            loadElements(AddonGroupbox, addon.Elements)
         end)
 
         if not success then
-            warn("[MsDoors Addons] Falha ao carregar addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "':", errorMessage)
+            warn("[msdoors] Falha ao carregar addon:", errorMessage)
         end
     end
 
-    if not containAddonsLoaded then
-        AddonTab:AddLabel("A pasta de addons está vazia. Adicione addons na pasta '.msdoors/addons' e reinicie o script.")
-    end
+    createAddonTab(containAddonsLoaded)
 end)
 
 
