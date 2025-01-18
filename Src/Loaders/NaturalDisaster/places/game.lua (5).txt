@@ -717,7 +717,116 @@ GroupCredits:AddButton({
     Tooltip = "Interage com todos carrinhos no botão play/stop"
 })
 
--- Addons
+--// ADDONS \\--
+task.spawn(function()
+
+    local AddonTab = Window:MakeTab({Name = "Addons [BETA]", Icon = "rbxassetid://4483345998", PremiumOnly = false})
+
+    if not isfolder(".msdoors/addons") then
+        makefolder(".msdoors/addons")
+    end
+
+    local function AddAddonElement(Element)
+        if not Element or typeof(Element) ~= "table" then return end
+
+        if Element.Type == "Label" then
+            AddonTab:AddLabel(Element.Arguments[1])
+        elseif Element.Type == "Toggle" then
+            AddonTab:AddToggle(Element.Name, {
+                Text = Element.Arguments.Text,
+                Default = Element.Arguments.Default or false,
+                Tooltip = Element.Arguments.Tooltip,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Button" then
+            AddonTab:AddButton({
+                Text = Element.Arguments.Text,
+                Func = Element.Arguments.Callback,
+                Tooltip = Element.Arguments.Tooltip,
+                DoubleClick = Element.Arguments.DoubleClick or false
+            })
+        elseif Element.Type == "Slider" then
+            AddonTab:AddSlider(Element.Name, {
+                Text = Element.Arguments.Text,
+                Default = Element.Arguments.Default,
+                Min = Element.Arguments.Min,
+                Max = Element.Arguments.Max,
+                Rounding = Element.Arguments.Rounding or 1,
+                Tooltip = Element.Arguments.Tooltip,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Input" then
+            AddonTab:AddInput(Element.Name, {
+                Default = Element.Arguments.Default,
+                Numeric = Element.Arguments.Numeric or false,
+                Finished = Element.Arguments.Finished or false,
+                Placeholder = Element.Arguments.Placeholder or "",
+                Tooltip = Element.Arguments.Tooltip,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Dropdown" then
+            AddonTab:AddDropdown(Element.Name, {
+                Values = Element.Arguments.Options,
+                Default = Element.Arguments.Default or 1,
+                Multi = Element.Arguments.Multi or false,
+                Text = Element.Arguments.Text,
+                Tooltip = Element.Arguments.Tooltip,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "ColorPicker" then
+            AddonTab:AddLabel(Element.Name):AddColorPicker(Element.Name, {
+                Default = Element.Arguments.Default or Color3.new(1, 1, 1),
+                Title = Element.Arguments.Title,
+                Tooltip = Element.Arguments.Tooltip,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "KeyPicker" then
+            AddonTab:AddLabel(Element.Name):AddKeyPicker(Element.Name, {
+                Default = Element.Arguments.Default or "None",
+                Mode = Element.Arguments.Mode or "Toggle",
+                Text = Element.Arguments.Text,
+                Tooltip = Element.Arguments.Tooltip,
+                Callback = Element.Arguments.Callback
+            })
+        else
+            warn("[MsDoors Addons] Elemento '" .. tostring(Element.Name) .. "' não foi carregado: Tipo de elemento inválido.")
+        end
+    end
+
+    local containAddonsLoaded = false
+
+    for _, file in pairs(listfiles(".msdoors/addons")) do
+        print("[MsDoors Addons] Carregando addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "'...")
+        if file:sub(-4) ~= ".lua" then continue end
+
+        local success, errorMessage = pcall(function()
+            local fileContent = readfile(file)
+            local addon = loadstring(fileContent)()
+
+            if typeof(addon.Name) ~= "string" or typeof(addon.Elements) ~= "table" then
+                warn("[MsDoors Addons] Addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "' não carregado: Nome/Elementos inválidos.")
+                return 
+            end
+
+            containAddonsLoaded = true
+
+            AddonTab:AddLabel("Addon: " .. addon.Name)
+            AddonTab:AddParagraph("Descrição", addon.Description or "Sem descrição.")
+
+            for _, element in pairs(addon.Elements) do
+                AddAddonElement(element)
+            end
+        end)
+
+        if not success then
+            warn("[MsDoors Addons] Falha ao carregar addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "':", errorMessage)
+        end
+    end
+
+    if not containAddonsLoaded then
+        AddonTab:AddLabel("A pasta de addons está vazia. Adicione addons na pasta '.msdoors/addons' e reinicie o script.")
+    end
+end)
 
 
 -- UI Settings
