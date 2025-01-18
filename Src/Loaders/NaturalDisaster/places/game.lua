@@ -361,12 +361,12 @@ end
 GamesTab:AddButton({
 	Text = "Conseguir bussola",
 	Func = function()
-if game.Workspace:FindFirstChild("compass", true) then -- Check for stealable GreenBalloon 
-	balloonClone = game.Workspace:FindFirstChild("compass", true):Clone() -- clone it 
+if game.Workspace:FindFirstChild("Compass", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("Compass", true):Clone() -- clone it 
 	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
 	print("[Msdoors] • Balão consedido!")
         Library:Notify({
-		Title = "BussolaConsedido!",
+		Title = "Bussola Consedida!",
 		Description = "Bussola cloanda com sucesso!",
 		Time = 5,
 	})
