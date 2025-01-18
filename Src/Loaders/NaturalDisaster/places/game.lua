@@ -331,6 +331,34 @@ game:GetService("Workspace")[game.Players.LocalPlayer.Name]:FindFirstChildOfClas
 	Visible = true,
 })
 
+GamesTab:AddDivider()
+GamesTab:AddButton({
+	Text = "Conseguir balão",
+	Func = function()
+if game.Workspace:FindFirstChild("GreenBalloon", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("GreenBalloon", true):Clone() -- clone it 
+	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
+	print("[Msdoors] • Balão consedido!")
+        Library:Notify({
+		Title = "Balão Consedido!",
+		Description = "Balão cloando com sucesso!",
+		Time = 5,
+	})
+else 
+	print("[Msdoors] • Balão não disponível!")
+        Library:Notify({
+		Title = "Balão não encontrado...",
+		Description = "Não á ninguém com o balão para Clone nesse servidor.",
+		Time = 5,
+	})
+end 
+	end,
+	DoubleClick = false,
+	Tooltip = "Clona o balão de algum player que o tem.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
 PlayersTab:AddToggle("Autofarmold", {
     Text = "Autofarm[OLD]",
     Default = false,
