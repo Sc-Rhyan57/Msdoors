@@ -359,7 +359,7 @@ end
 	Visible = true,
 })
 GamesTab:AddButton({
-	Text = "Conseguir bússola",
+	Text = "Conseguir bussola",
 	Func = function()
 if game.Workspace:FindFirstChild("compass", true) then -- Check for stealable GreenBalloon 
 	balloonClone = game.Workspace:FindFirstChild("compass", true):Clone() -- clone it 
@@ -381,6 +381,33 @@ end
 	end,
 	DoubleClick = false,
 	Tooltip = "Clona a bussola de algum player que o tem.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+GamesTab:AddButton({
+	Text = "Conseguir maçã",
+	Func = function()
+if game.Workspace:FindFirstChild("RedApple", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("RedApple", true):Clone() -- clone it 
+	balloonClone.Parent = game:GetService("RedApple").LocalPlayer.Backpack
+	print("[Msdoors] • maçã consedida!")
+        Library:Notify({
+		Title = "maçã Consedida!",
+		Description = "maçã consedida com sucesso!",
+		Time = 5,
+	})
+else 
+	print("[Msdoors] • maçã não disponível!")
+        Library:Notify({
+		Title = "maça não encontrada...",
+		Description = "Não á ninguém com Uma maçã para Clone nesse servidor.",
+		Time = 5,
+	})
+end 
+	end,
+	DoubleClick = false,
+	Tooltip = "Clona a maçã de algum player que o tem.",
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
 	Visible = true,
