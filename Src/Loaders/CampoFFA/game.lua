@@ -55,7 +55,7 @@ local Window = Library:CreateWindow({
     Title = "Msdoors v1",
     Footer = "Game: Campos de Armas[FFA] | Build: 0.1.3",
     Icon = "95869322194132",
-    NotifySide = "Right"
+    NotifySide = "Right",
     ShowCustomCursor = true
 })
 
