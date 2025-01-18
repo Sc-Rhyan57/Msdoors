@@ -390,14 +390,14 @@ GroupCredits:AddButton({
             setclipboard(url)
             Library:Notify({
 		Title = "Link copiado!",
-		Description = "Seu executor não suporta redirecionar. link copiado.,
+		Description = "Seu executor não suporta redirecionar. link copiado.",
 		Time = 5,
 	})
 
         else
                         Library:Notify({
 		Title = "LOL",
-		Description = "Seu executor não suporta redirecionar ou copiar links.,
+		Description = "Seu executor não suporta redirecionar ou copiar links.",
 		Time = 5,
 	})
 
