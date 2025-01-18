@@ -390,7 +390,7 @@ GamesTab:AddButton({
 	Func = function()
 if game.Workspace:FindFirstChild("RedApple", true) then -- Check for stealable GreenBalloon 
 	balloonClone = game.Workspace:FindFirstChild("RedApple", true):Clone() -- clone it 
-	balloonClone.Parent = game:GetService("RedApple").LocalPlayer.Backpack
+	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
 	print("[Msdoors] • maçã consedida!")
         Library:Notify({
 		Title = "maçã Consedida!",
