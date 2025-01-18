@@ -679,7 +679,25 @@ MenuGroup:AddLabel("Menu bind")
 	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
+	AutofarmNew:SetValue(false)
+	Autofarmold:SetValue(false)
+	Escolhermapaold:SetValue(false)
+	Warnofdisastersinchat:SetValue(false)
+	WarnOfdisasters:SetValue(false)
+	Walkonwaternew:SetValue(false)
+	Solidislandnew:SetValue(false)
+	SpeedPlayer:SetValue(1)
+	gravityplayernatutal:SetValue(196)
+	Library:Notify({
+		Title = "Fechando...",
+		Description = "Aguarde estamos cuidando de tudo!.",
+		Time = 5,
+	})
+	task.wait(5)
+	_G.MsdoorsLoaded = false
+	_G.ObsidianaLib = false
 	Library:Unload()
+	print("[Msdoors] • Até outra hora 😉")
 end)
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
