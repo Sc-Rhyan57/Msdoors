@@ -686,8 +686,8 @@ MenuGroup:AddButton("Unload", function()
 	Toggles.WarnOfdisasters:SetValue(false)
 	Toggles.Walkonwaternew:SetValue(false)
 	Toggles.Solidislandnew:SetValue(false)
-	SpeedPlayer:SetValue(1)
-	gravityplayernatutal:SetValue(196)
+	Options.SpeedPlayer:SetValue(1)
+	Options.gravityplayernatutal:SetValue(196)
 	Library:Notify({
 		Title = "Fechando...",
 		Description = "Aguarde estamos cuidando de tudo!.",
