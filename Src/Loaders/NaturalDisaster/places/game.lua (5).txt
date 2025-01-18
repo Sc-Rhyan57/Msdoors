@@ -727,7 +727,6 @@ task.spawn(function()
 
     local AddonTab, LastGroupbox = nil, "Right"
 
-    -- Cria a aba de addons
     local function createAddonTab(hasAddons)
         if not AddonTab then
             AddonTab = Window:AddTab("Addons [BETA]")
@@ -742,52 +741,8 @@ task.spawn(function()
                 "Esta aba é para addons NÃO OFICIAIS. Tenha cuidado ao usar scripts de terceiros."
             )
         })
-
-        -- Adiciona input para URL e botão para baixar addons
-        AddonTab:AddInput("AddonURLInput", {
-            Placeholder = "Insira o link do addon",
-            Text = "URL do Addon",
-            Tooltip = "Adicione o link de um addon para carregá-lo",
-        })
-
-        AddonTab:AddButton({
-            Text = "Baixar e Adicionar Addon",
-            Func = function()
-                local url = AddonTab.Options.AddonURLInput:GetValue()
-                if not url or url == "" then
-                    AddonTab:Notify({
-                        Title = "Erro",
-                        Description = "Insira uma URL válida!",
-                        Time = 3,
-                    })
-                    return
-                end
-
-                task.spawn(function()
-                    local success, response = pcall(game.HttpGet, game, url)
-                    if success then
-                        local fileName = "msdoors/addons/" .. url:match("[^/]+$") .. "_ADDON.lua"
-                        writefile(fileName, response)
-
-                        AddonTab:Notify({
-                            Title = "Sucesso",
-                            Description = "Addon salvo como: " .. fileName,
-                            Time = 3,
-                        })
-                    else
-                        warn("[msdoors] Falha ao baixar addon:", response)
-                        AddonTab:Notify({
-                            Title = "Erro",
-                            Description = "Não foi possível baixar o addon!",
-                            Time = 3,
-                        })
-                    end
-                end)
-            end,
-        })
     end
 
-    -- Função para adicionar elementos de addons
     local function AddAddonElement(LinoriaElement, AddonName, Element)
         if not LinoriaElement or typeof(Element) ~= "table" then return end
 
@@ -822,7 +777,6 @@ task.spawn(function()
         warn("[msdoors] Elemento inválido: " .. tostring(Element.Name))
     end
 
-    -- Função para carregar elementos
     local function loadElements(LinoriaElement, Elements)
         for _, Element in pairs(Elements) do
             local NewElement = AddAddonElement(LinoriaElement, Element.AddonName, Element)
@@ -835,9 +789,8 @@ task.spawn(function()
     local containAddonsLoaded = false
     createAddonTab(false)
 
-    -- Itera sobre os arquivos da pasta e carrega os addons
     for _, file in pairs(listfiles("msdoors/addons")) do
-        print("[msdoors] Carregando addon '" .. string.gsub(file, "msdoors/addons/", "") .. "'...")
+        print("[mspaint] Carregando addon '" .. string.gsub(file, "msdoors/addons/", "") .. "'...")
         if not file:match("%.lua$") and not file:match("%.luau$") then
             continue
         end
@@ -847,7 +800,7 @@ task.spawn(function()
             local addon = loadstring(addonCode)()
 
             if typeof(addon.Name) ~= "string" or typeof(addon.Elements) ~= "table" then
-                warn("[msdoors] Addon inválido: " .. string.gsub(file, "msdoors/addons/", ""))
+                warn("[mspaint] Addon inválido: " .. string.gsub(file, "mspaint/addons/", ""))
                 return
             end
 
@@ -874,6 +827,7 @@ task.spawn(function()
 
     createAddonTab(containAddonsLoaded)
 end)
+
 
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
