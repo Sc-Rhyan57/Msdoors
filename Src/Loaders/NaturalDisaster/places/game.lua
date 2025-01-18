@@ -331,7 +331,6 @@ game:GetService("Workspace")[game.Players.LocalPlayer.Name]:FindFirstChildOfClas
 	Visible = true,
 })
 
-GamesTab:AddDivider()
 GamesTab:AddButton({
 	Text = "Conseguir balão",
 	Func = function()
@@ -359,6 +358,8 @@ end
 	Disabled = false,
 	Visible = true,
 })
+GamesTab:AddDivider()
+
 PlayersTab:AddToggle("Autofarmold", {
     Text = "Autofarm[OLD]",
     Default = false,
