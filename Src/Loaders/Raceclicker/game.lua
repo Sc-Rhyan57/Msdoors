@@ -1,3 +1,5 @@
+--// <Race Clicker> | UPDATE EM BREVEL \\--
+
 --[[
                                                                                                                      
      ______  _______            ______       _____           _____            _____         _____            ______  
@@ -16,17 +18,19 @@
                                         Por Rhyan57 💜
   ]]--
 --[[ LIBRARY & API]]--
-if _G.OrionLibLoaded then
-    warn("[Msdoors] • Script já está carregado!")
+if _G.ObsidianaLib then
+    warn("[Msdoors] • Script já carregado!")
     return
 end
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-local OrionLib = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Library/OrionLibrary_msdoors.lua'))()
-local Window = OrionLib:MakeWindow({IntroText = "Msdoors | V1",Icon = "rbxassetid://100573561401335", IntroIcon = "rbxassetid://95869322194132", Name = "MsDoors | Race Clicker", HidePremium = false, SaveConfig = true, ConfigFolder = ".msdoors/places/hotel"})
-local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/MS-ESP/refs/heads/main/source.lua"))()
+
 print("[Msdoors] • [✅] Inialização da livraria e apis")
-_G.OrionLibLoaded = true
+_G.ObsidianaLib = true
 
 --[[ SERVIÇOS ]]--
 local Lighting = game:GetService("Lighting")
@@ -40,7 +44,11 @@ local PathfindingService = game:GetService("PathfindingService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
+local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
+local Noclip = nil
+local PathBeam = nil
+local VelocityHandler = nil
 print("[Msdoors] • [✅] Inicialização de Serviços")
 --[[ VERIFICAÇÃO DE JOGO ]]--
 local GAME_ID_ESPERADO = 9285238704
@@ -100,14 +108,26 @@ Jogo verificado com sucesso!
     return true
 end
 verificarJogo()
+--[[ NEW TABS ]]--
 
---[[ TABS ]]--
-local GroupPrincipal = Window:MakeTab({
-    Name = "Principal",
-    Icon = "rbxassetid://7733960981",
-    PremiumOnly = false
+local Window = Library:CreateWindow({
+    Title = "Msdoors v1",
+    Footer = "Game: Race Clicker | Build: 0.1.3",
+    Icon = "95869322194132",
+    NotifySide = "Right",
+    ShowCustomCursor = true
 })
-local FarmGroup = GroupPrincipal:AddSection({Name = "Automoção" })
+
+local Tabs = {
+    Main = Window:AddTab("Principal", "user"),
+    Credits = Window:AddTab("Créditos", "brain-circuit"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "bolt"),
+}
+local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
+
+local FarmGroup = Tabs.Main:AddLeftGroupbox("Farm")
+FarmGroup:AddLabel('<font color="#FF0000">AutoFarm</font>')
+
 
 --[[ SCRIPT ]]--
 local destino = Vector3.new(-583062, 37, 77)
@@ -181,9 +201,10 @@ local function verificarUI()
     end
 end
 
-FarmGroup:AddToggle({
-    Name = "Autofarm",
+FarmGroup:AddToggle("AutofarmWin", {
+    Text = "Autofarm",
     Default = false,
+    Tooltip = "Farm vitórias automaticamente.",
     Callback = function(estado)
         ativo = estado
 
@@ -193,116 +214,10 @@ FarmGroup:AddToggle({
         else
             clicando = false
         end
-    end
+     end
 })
 
---// ADDONS \\--
-task.spawn(function()
 
-    local AddonTab = Window:MakeTab({Name = "Addons [BETA]", Icon = "rbxassetid://7733799901", PremiumOnly = false})
-    AddonTab:AddLabel('<font color="#FF0000">This tab is for unofficial Msdoors addons! We are not responsible for anything!</font>')
-    
-    if not isfolder(".msdoors/addons") then
-        makefolder(".msdoors/addons")
-    end
-
-    local function AddAddonElement(Element)
-        if not Element or typeof(Element) ~= "table" then return end
-
-        if Element.Type == "Label" then
-            AddonTab:AddLabel(Element.Arguments[1])
-        elseif Element.Type == "Toggle" then
-            AddonTab:AddToggle({
-                Name = Element.Name,
-                Default = Element.Arguments.Default or false,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Button" then
-            AddonTab:AddButton({
-                Name = Element.Arguments.Name,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Slider" then
-            AddonTab:AddSlider({
-                Name = Element.Name,
-                Min = Element.Arguments.Min,
-                Max = Element.Arguments.Max,
-                Default = Element.Arguments.Default,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Input" then
-            AddonTab:AddTextbox({
-                Name = Element.Name,
-                Default = Element.Arguments.Default,
-                TextDisappear = true,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "Dropdown" then
-            AddonTab:AddDropdown({
-                Name = Element.Name,
-                Options = Element.Arguments.Options,
-                Default = Element.Arguments.Default,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "ColorPicker" then
-            AddonTab:AddColorPicker({
-                Name = Element.Name,
-                Default = Element.Arguments.Default,
-                Callback = Element.Arguments.Callback
-            })
-        elseif Element.Type == "KeyPicker" then
-            AddonTab:AddKeybind({
-                Name = Element.Name,
-                Default = Element.Arguments.Default,
-                Callback = Element.Arguments.Callback
-            })
-        else
-            warn("[MsDoors Addons] Elemento '" .. tostring(Element.Name) .. "' não foi carregado: Tipo de elemento inválido.")
-        end
-    end
-
-
-    local containAddonsLoaded = false
-
-    for _, file in pairs(listfiles(".msdoors/addons")) do
-        print("[MsDoors Addons] Carregando addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "'...")
-        if file:sub(-4) ~= ".lua" then continue end
-
-        local success, errorMessage = pcall(function()
-            local fileContent = readfile(file)
-            local addon = loadstring(fileContent)()
-
-            if typeof(addon.Name) ~= "string" or typeof(addon.Elements) ~= "table" then
-                warn("[MsDoors Addons] Addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "' não carregado: Nome/Elementos inválidos.")
-                return 
-            end
-
-            containAddonsLoaded = true
-
-            AddonTab:AddLabel("Addon: " .. addon.Name)
-            AddonTab:AddParagraph("Descrição", addon.Description or "Sem descrição.")
-
-            for _, element in pairs(addon.Elements) do
-                AddAddonElement(element)
-            end
-        end)
-
-        if not success then
-            warn("[MsDoors Addons] Falha ao carregar addon '" .. string.gsub(file, ".msdoors/addons/", "") .. "':", errorMessage)
-        end
-    end
-    
-
-    if not containAddonsLoaded then
-        AddonTab:AddLabel("A pasta de addons está vazia. Adicione addons na pasta '.msdoors/addons' e reinicie o script.")
-    end
-end)
-
-local GroupCredits = Window:MakeTab({
-    Name = "Msdoors",
-    Icon = "rbxassetid://7733765045",
-    PremiumOnly = false
-})
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
@@ -310,8 +225,8 @@ GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font
 GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
 GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
 GroupCredits:AddButton({
-    Name = "Copiar Link",
-    Callback = function()
+    Text = "Copiar Link",
+    Func = function()
         local url = "https://dsc.gg/msdoors-gg"
         if syn then
             syn.request({
@@ -320,43 +235,93 @@ GroupCredits:AddButton({
             })
         elseif setclipboard then
             setclipboard(url)
-            OrionLib:MakeNotification({
-                Name = "Link Copiado!",
-                Content = "Seu executor não suporta redirecionar. Link copiado.",
-                Time = 5
-            })
+            Library:Notify({
+		Title = "Link copiado!",
+		Description = "Seu executor não suporta redirecionar. link copiado.",
+		Time = 5,
+	})
+
         else
-            OrionLib:MakeNotification({
-                Name = "LOL",
-                Content = "Seu executor não suporta redirecionar ou copiar links.",
-                Time = 5
-            })
+                        Library:Notify({
+		Title = "LOL",
+		Description = "Seu executor não suporta redirecionar ou copiar links.",
+		Time = 5,
+	})
+
         end
-    end
-})
-GroupCredits:AddLabel('<font color="#FF0000">Script</font>')
-GroupCredits:AddButton({
-    Name = "Descarregar",
-    Callback = function()
-        for _, thread in pairs(getfenv()) do
-            if typeof(thread) == "thread" then
-                task.cancel(thread)
-            end
-        end
-      
-        notificationsEnabled = false
-        InstaInteractEnabled = false
-        AutoInteractEnabled = false
-        initialized = false
-        verificarEspObjetos = false
-        desativarESPObjetos()
-      
-        if OrionLib then
-            OrionLib:Destroy()
-        end
-        warn("[Msdoors] • Todos os sistemas foram desativados e a interface fechada.")
-    end
+
+    end,
+    DoubleClick = false,
+    Tooltip = "Interage com todos carrinhos no botão play/stop"
 })
 
-OrionLib:Init()
+
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Notify({
+		Title = "Fechando...",
+		Description = "Aguarde estamos cuidando de tudo!.",
+		Time = 5,
+	})
+   AutofarmWin:SetValue(false)
+	task.wait(5)
+	_G.MsdoorsLoaded = false
+	_G.ObsidianaLib = false
+	Library:Unload()
+	print("[Msdoors] • Até outra hora 😉")
+end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("msdoors")
+SaveManager:SetFolder("msdoors/Race-Clicker")
+SaveManager:SetSubFolder("Race-Clicker")
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
+
