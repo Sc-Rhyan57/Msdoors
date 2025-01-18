@@ -110,7 +110,7 @@ verificarJogo()
 
 
 local Window = Library:CreateWindow({
-    Title = "Msdoors",
+    Title = "Msdoors v1",
     Footer = "Version: 1.3 | by rhyan57",
     Icon = "95869322194132",
     NotifySide = "Right",
