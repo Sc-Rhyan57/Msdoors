@@ -119,9 +119,10 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
-    GroupCredits = Window:AddTab("Créditos", "user"),
+    Credits = Window:AddTab("Créditos", "user"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
+local GroupCredits = Tabs.Credits:AddLeftGroupbox("Carts")
 
 local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
 CartsTab:AddLabel('<font color="#FF0000">Use responsibly and with consent.</font>')
