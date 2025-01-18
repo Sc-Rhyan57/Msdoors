@@ -204,8 +204,6 @@ GroupExtras:AddButton({
 })
 
 
-})
-
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
