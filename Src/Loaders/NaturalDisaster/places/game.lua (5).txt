@@ -729,7 +729,7 @@ task.spawn(function()
 
     local function createAddonTab(hasAddons)
         if not AddonTab then
-            AddonTab = shared.Window:AddTab("Addons [BETA]")
+            AddonTab = Window:AddTab("Addons [BETA]")
         end
 
         AddonTab:UpdateWarningBox({
