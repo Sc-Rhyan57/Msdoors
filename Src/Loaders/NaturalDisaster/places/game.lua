@@ -331,6 +331,41 @@ game:GetService("Workspace")[game.Players.LocalPlayer.Name]:FindFirstChildOfClas
 	Visible = true,
 })
 
+PlayersTab:AddButton({
+	Text = "Sem dano de altura",
+	Func = function()
+	print("[Msdoors] • Dano de altura removido.")
+	local runsvc = game:GetService("RunService")
+local heartbeat = runsvc.Heartbeat
+local rstepped = runsvc.RenderStepped
+local lp = game.Players.LocalPlayer
+local novel = Vector3.zero
+local function nofalldamage(chr)
+    local root = chr:WaitForChild("HumanoidRootPart")
+    if root then
+        local con
+        con = heartbeat:Connect(function()
+            if not root.Parent then
+                con:Disconnect()
+            end
+            local oldvel = root.AssemblyLinearVelocity
+            root.AssemblyLinearVelocity = novel
+            rstepped:Wait()
+            root.AssemblyLinearVelocity = oldvel
+        end)
+    end
+end
+nofalldamage(lp.Character)
+lp.CharacterAdded:Connect(nofalldamage)
+
+	end,
+	DoubleClick = false,
+	Tooltip = "Remova totalmente o dano de altura!",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+GamesTab:AddDivider()
 GamesTab:AddButton({
 	Text = "Conseguir balão",
 	Func = function()
