@@ -748,7 +748,7 @@ GroupCredits:AddButton({
 
     end,
     DoubleClick = false,
-    Tooltip = "Interage com todos carrinhos no botão play/stop"
+    Tooltip = "Fechar Janela do script."
 })
 
 
