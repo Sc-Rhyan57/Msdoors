@@ -1145,13 +1145,13 @@ if not ScreenGui then
     ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "msdoors-water"
     ScreenGui.Parent = game.CoreGui
-    ScreenGui.Enabled = false
+    ScreenGui.Enabled = true
 end
 
 MenuGroup:AddToggle("msdoors-watermark", {
 	Text = "WaterMark Msdoors",
 	DisabledTooltip = "I am disabled!",
-	Default = false,
+	Default = true,
 	Disabled = false,
 	Visible = true,
 	Risky = false,
