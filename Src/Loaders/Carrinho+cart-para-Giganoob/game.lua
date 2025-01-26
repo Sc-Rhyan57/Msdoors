@@ -412,6 +412,26 @@ GroupCredits:AddButton({
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
 
+local ScreenGui = game.CoreGui:FindFirstChild("msdoors-water")
+if not ScreenGui then
+    ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "msdoors-water"
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.Enabled = true
+end
+
+MenuGroup:AddToggle("msdoors-watermark", {
+	Text = "WaterMark Msdoors",
+	DisabledTooltip = "I am disabled!",
+	Default = true,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(value)
+        ScreenGui.Enabled = value
+	end,
+})
+
 MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
 	Text = "Open Keybind Menu",
