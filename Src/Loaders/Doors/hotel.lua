@@ -16,10 +16,21 @@
                                         Por Rhyan57 💜
   ]]--
 --[[ LIBRARY & API]]--
-if _G.OrionLibLoaded then
-    warn("[Msdoors] • Script já está carregado!")
+--[[
+if _G.ObsidianaLib then
+    warn("[Msdoors] • Script já carregado!")
     return
 end
+]]--
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/MS-ESP/refs/heads/main/source.lua"))()
+local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
+
+print("[Msdoors] • [✅] Inialização da livraria e apis")
+_G.ObsidianaLib = true
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_DeletingFigure = false
 _G.msdoors_InvisFigure = false
@@ -27,12 +38,6 @@ _G.msdoors_InvisGrumbles = false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
-
-local OrionLib = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Library/OrionLibrary_msdoors.lua'))()
-local Window = OrionLib:MakeWindow({IntroText = "Msdoors | V1",Icon = "rbxassetid://100573561401335", IntroIcon = "rbxassetid://95869322194132", Name = "MsDoors | The Hotel", HidePremium = false, SaveConfig = true, ConfigFolder = ".msdoors/places/hotel"})
-local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
-local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/MS-ESP/refs/heads/main/source.lua"))()
-print("[Msdoors] • [✅] Inialização da livraria e apis")
 
 --[[ SERVIÇOS ]]--
 local Lighting = game:GetService("Lighting")
@@ -46,225 +51,75 @@ local PathfindingService = game:GetService("PathfindingService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
+local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
-local LatestRoom = ReplicatedStorage:WaitForChild("GameData"):WaitForChild("LatestRoom")
+local Script = { IsFools = false }
+local CanJumpEnabled = false
+
 print("[Msdoors] • [✅] Inicialização de Serviços")
 
 
---[[ SCRIPT ]]--
-local GroupPrincipal = Window:MakeTab({
-    Name = "Principal",
-    Icon = "rbxassetid://7733765045",
-    PremiumOnly = false
-})
-local AutomationGroup = GroupPrincipal:AddSection({Name = "Automation"})
-local PlayerGroup = GroupPrincipal:AddSection({Name = "Player"})
-
-
-local GroupExploits = Window:MakeTab({
-    Name = "Exploits",
-    Icon = "rbxassetid://7733765045",
-    PremiumOnly = false
-})
-local ByppasGroup = GroupExploits:AddSection({Name = "Byppas"})
-local TrollGroup = GroupExploits:AddSection({Name = "Troll"})
-
-local GroupVisual = Window:MakeTab({
-    Name = "Visual",
-    Icon = "rbxassetid://7733765045",
-    PremiumOnly = false
-})
-local NotificationGroup = GroupVisual:AddSection({Name = "Notification"})
-local PlayerGroup = GroupVisual:AddSection({Name = "Player"})
-local GameGroup = GroupVisual:AddSection({Name = "Game"})
-local EspGroup = GroupVisual:AddSection({Name = "Esp"})
-
-local GroupCredits = Window:MakeTab({
-    Name = "Msdoors",
-    Icon = "rbxassetid://7733765045",
-    PremiumOnly = false
+local Window = Library:CreateWindow({
+    Title = "Msdoors v1",
+    Footer = "Build: 0.1.3 | by rhyan57",
+    Icon = "95869322194132",
+    NotifySide = "Right",
+    ShowCustomCursor = true
 })
 
-GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
-GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
-GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
-GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
-GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
-GroupCredits:AddButton({
-    Name = "Copiar Link",
-    Callback = function()
-        local url = "https://dsc.gg/msdoors-gg"
-        if syn then
-            syn.request({
-                Url = url,
-                Method = "GET"
-            })
-        elseif setclipboard then
-            setclipboard(url)
-            OrionLib:MakeNotification({
-                Name = "Link Copiado!",
-                Content = "Seu executor não suporta redirecionar. Link copiado.",
-                Time = 5
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "LOL",
-                Content = "Seu executor não suporta redirecionar ou copiar links.",
-                Time = 5
-            })
-        end
-    end
-})
-GroupCredits:AddLabel('<font color="#FF0000">Script</font>')
-GroupCredits:AddButton({
-    Name = "Descarregar",
-    Callback = function()
-        for _, thread in pairs(getfenv()) do
-            if typeof(thread) == "thread" then
-                task.cancel(thread)
-            end
-        end
-      
-        notificationsEnabled = false
-        InstaInteractEnabled = false
-        AutoInteractEnabled = false
-        initialized = false
-        verificarEspObjetos = false
-        desativarESPObjetos()
-      
-        if OrionLib then
-            OrionLib:Destroy()
-        end
-        warn("[Msdoors] • Todos os sistemas foram desativados e a interface fechada.")
-    end
-})
+local Tabs = {
+    Main = Window:AddTab("Principal", "user"),
+    Visual = Window:AddTab("Visual", "user"),
+    Exploits = Window:AddTab("Exploits", "user"),
+    Credits = Window:AddTab("Créditos", "user"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+}
+local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
-ByppasGroup:AddButton({
-    Name = "Delete Figure",
-    Callback = function()
-        local room = game.Players.LocalPlayer:GetAttribute("CurrentRoom")
-        local crooms = workspace.CurrentRooms
-        local notsuccess = 0
-        
-        if _G.msdoors_DeletingFigure == false then
-            _G.msdoors_DeletingFigure = true
-            local Part = Instance.new("Part", workspace)
-            local Attachment1 = Instance.new("Attachment", Part)
-            Part.Anchored = true
-            Part.Position = Vector3.new(0,0,0)
-            Attachment1.Position = Vector3.new(0,-40000,0)
+local GroupPrincipal = Tabs.Main:AddLeftGroupbox("Player")
+GroupPrincipal:AddLabel('<font color="#00FF56">Funções do jogador</font>')
+local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
+
+local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
+local GroupNotification = Tabs.Visual:AddRightGroupbox("Notifications")
+local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
+
+local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
+GroupTroll:AddLabel('<font color="#FF0000">Funções para troll</font>')
+
+GroupPrincipal:AddToggle("Jump-Enabled", {
+	Text = "Ativar Pulo",
+	Tooltip = "Ativa o pulo",
+	DisabledTooltip = "I am disabled!",
+	Default = true,
+	Disabled = false,
+	Visible = true,
+	Risky = true,
+	Callback = function(value)
+        CanJumpEnabled = value
+        if Script.IsFools then return end
+        Character:SetAttribute("CanJump", value)
+        if value then
             
-            if crooms:WaitForChild(room):FindFirstChild("FigureSetup") then
-                if crooms:WaitForChild(room).FigureSetup.FigureRig:FindFirstChild("Root") then
-                    local figure = crooms:WaitForChild(room).FigureSetup.FigureRig
-                    local Torque = Instance.new("Torque")
-                    Torque.Parent = figure.Hitbox
-                    Torque.Torque = Vector3.new(100000,100000,100000)
-                    local AlignPosition = Instance.new("AlignPosition")
-                    local Attachment2 = Instance.new("Attachment")
-                    AlignPosition.Parent = figure.Hitbox
-                    Attachment2.Parent = figure.Hitbox
-                    Torque.Attachment0 = Attachment2
-                    AlignPosition.MaxForce = 9999999999999999
-                    AlignPosition.MaxVelocity = math.huge
-                    AlignPosition.Responsiveness = 100
-                    AlignPosition.Attachment0 = Attachment2
-                    AlignPosition.Attachment1 = Attachment1
-                    
-                    task.wait(1.5)
-                    Part:Destroy()
-                    Attachment1:Destroy()
-                    Torque:Destroy()
-                    AlignPosition:Destroy()
-                    Attachment2:Destroy()
-                    
-                    repeat 
-                        notsuccess = notsuccess + 1 
-                        task.wait(0.02) 
-                    until figure:FindFirstChild("Hitbox") == false or notsuccess == 100
-                    
-                    if notsuccess == 100 then
-                        OrionLib:MakeNotification({
-                            Name = "Error",
-                            Content = "Failed to delete figure",
-                            Time = 4
-                        })
-                    else
-                        OrionLib:MakeNotification({
-                            Name = "Success",
-                            Content = "Figure deleted successfully!",
-                            Time = 4
-                        })
-                    end
-                else
-                    OrionLib:MakeNotification({
-                        Name = "Error",
-                        Content = "Figure not found",
-                        Time = 3
-                    })
-                    Part:Destroy()
-                    Attachment1:Destroy()
-                end
-            else
-                OrionLib:MakeNotification({
-                    Name = "Error",
-                    Content = "Figure not found",
-                    Time = 3
-                })
-                Part:Destroy()
-                Attachment1:Destroy()
+        else
+           
+            if Humanoid then
+                Humanoid.WalkSpeed = 22
             end
-            _G.msdoors_DeletingFigure = false
         end
-    end
+	end,
 })
 
-ByppasGroup:AddToggle({
-    Name = "Delete Grumbles",
-    Default = false,
-    Callback = function(Value)
-        local room = game.Players.LocalPlayer:GetAttribute("CurrentRoom")
-        local crooms = workspace.CurrentRooms
-        
-        if Value then
-            if crooms:WaitForChild(room):FindFirstChild("_NestHandler") then
-                if crooms:WaitForChild(room):WaitForChild("_NestHandler"):FindFirstChild("Grumbles") then
-                    _G.msdoors_InvisGrumbles = true
-                    for i,v in ipairs(crooms:WaitForChild(room):WaitForChild("_NestHandler").Grumbles:GetChildren()) do 
-                        v.MainPart.GrumbleAttach.CFrame = CFrame.new(Vector3.new(0,500,0)) 
-                    end
-                else
-                    OrionLib:MakeNotification({
-                        Name = "Error",
-                        Content = "Grumbles not found",
-                        Time = 3
-                    })
-                end
-            else
-                OrionLib:MakeNotification({
-                    Name = "Error",
-                    Content = "Grumbles not found",
-                    Time = 3
-                })
-            end
-        else
-            if _G.msdoors_InvisGrumbles == true then
-                _G.msdoors_InvisGrumbles = false
-                if crooms:WaitForChild(room):FindFirstChild("_NestHandler") then
-                    if crooms:WaitForChild(room):WaitForChild("_NestHandler"):FindFirstChild("Grumbles") then
-                        for i,v in ipairs(crooms:WaitForChild(room):WaitForChild("_NestHandler").Grumbles:GetChildren()) do 
-                            v.MainPart.GrumbleAttach.CFrame = CFrame.new(Vector3.new(0,0,0)) 
-                        end
-                    end
-                end
-            end
-        end
-    end
-})
-TrollGroup:AddToggle({
-    Name = "Animação de Atordoar",
-    Default = false,
-    Callback = function(Value)
+
+GroupTroll:AddToggle("Troll-Stunned-animation", {
+	Text = "Stunned",
+	Tooltip = "Faz seu personagem ficar com uma animação de atordoação.",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
         local lplr = game.Players.LocalPlayer
         if Value then
             lplr.Character:SetAttribute('Stunned', true)
@@ -273,13 +128,18 @@ TrollGroup:AddToggle({
             lplr.Character:SetAttribute('Stunned', false)
             lplr.Character.Humanoid:SetAttribute('Stunned', false)
         end
-    end
+	end,
 })
 
-TrollGroup:AddToggle({
-    Name = "Animação de Pensamento",
-    Default = false,
-    Callback = function(Value)
+GroupTroll:AddToggle("Troll-Thoughts", {
+	Text = "Thoughts",
+	Tooltip = "Faz seu personagem ficar com uma animação de pensamento.",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
         local lplr = game.Players.LocalPlayer
         local thinkanims = {"18885101321", "18885098453", "18885095182"}
         
@@ -295,8 +155,298 @@ TrollGroup:AddToggle({
                 animtrack:Destroy()
             end
         end
-    end
+	end,
 })
+
+local DoorESPConfig = {
+    Types = {
+        Door = {
+            Name = "Porta",
+            Color = Color3.fromRGB(241, 196, 15)
+        }
+    },
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0,
+        TracerStartPosition = "Bottom",
+        ArrowCenterOffset = 300
+    }
+}
+
+local DoorESPManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false,
+    CurrentRoom = nil
+}
+
+function DoorESPManager:CreateESP(door, config)
+    local room = door.Parent.Parent
+    local doorNumber = tonumber(room.Name) + 1
+    local opened = room.Door:GetAttribute("Opened")
+    local locked = room:GetAttribute("RequiresKey")
+    
+    local doorState = opened and "[Aberta]" or (locked and "[Trancada]" or "")
+    local displayName = string.format("%s %d %s", config.Name, doorNumber, doorState)
+    
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = displayName,
+        Model = door,
+        MaxDistance = DoorESPConfig.Settings.MaxDistance,
+        
+        FillColor = config.Color,
+        OutlineColor = config.Color,
+        TextColor = config.Color,
+        TextSize = DoorESPConfig.Settings.TextSize,
+        
+        FillTransparency = DoorESPConfig.Settings.FillTransparency,
+        OutlineTransparency = DoorESPConfig.Settings.OutlineTransparency,
+        
+        Tracer = {
+            Enabled = true,
+            From = DoorESPConfig.Settings.TracerStartPosition,
+            Color = config.Color
+        },
+        
+        Arrow = {
+            Enabled = true,
+            CenterOffset = DoorESPConfig.Settings.ArrowCenterOffset,
+            Color = config.Color
+        }
+    })
+    
+    return espInstance, displayName
+end
+
+function DoorESPManager:AddESP(door)
+    if not door or self.ActiveESPs[door] then return end
+    
+    local config = DoorESPConfig.Types[door.Name]
+    if not config then return end
+    
+    local espInstance, displayName = self:CreateESP(door, table.clone(config))
+    if espInstance then
+        local room = door.Parent.Parent
+        local doorUpdateConnection
+        doorUpdateConnection = room.Door:GetAttributeChangedSignal("Opened"):Connect(function()
+            if self.ActiveESPs[door] then
+                self:RemoveESP(door)
+                self:AddESP(door)
+            else
+                doorUpdateConnection:Disconnect()
+            end
+        end)
+        
+        self.ActiveESPs[door] = espInstance
+    end
+end
+
+function DoorESPManager:RemoveESP(door)
+    if self.ActiveESPs[door] then
+        self.ActiveESPs[door].Destroy()
+        self.ActiveESPs[door] = nil
+    end
+end
+
+function DoorESPManager:ScanRoom()
+    if not self.IsEnabled then return end
+    
+    local currentRoom = workspace.CurrentRooms:FindFirstChild(game.Players.LocalPlayer:GetAttribute("CurrentRoom"))
+    if not currentRoom then return end
+    
+    if self.CurrentRoom ~= currentRoom then
+        self:ClearESPs()
+        self.CurrentRoom = currentRoom
+    end
+    
+    for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+        local door = room:FindFirstChild("Door")
+        if door and door:FindFirstChild("Door") then
+            self:AddESP(door.Door)
+        end
+    end
+end
+
+function DoorESPManager:ClearESPs()
+    for door, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function DoorESPManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanRoom()
+            wait(DoorESPConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function DoorESPManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
+
+local EntityESPConfig = {
+    Types = {
+        RushMoving = {
+            Name = "Rush",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        AmbushMoving = {
+            Name = "Ambush", 
+            Color = Color3.fromRGB(0, 255, 0)
+        },
+        Snare = {
+            Name = "Armadilha",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        FigureRig = {
+            Name = "Figure",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        A60 = {
+            Name = "A-60",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        A120 = {
+            Name = "A-120",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        GiggleCeiling = {
+            Name = "Giggle",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        GrumbleRig = {
+            Name = "Grumbo",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        BackdoorRush = {
+            Name = "Blitz",
+            Color = Color3.fromRGB(255, 0, 0)
+        },
+        Entity10 = {
+            Name = "Entidade 10",
+            Color = Color3.fromRGB(128, 128, 0)
+        }
+    },
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0,
+        TracerStartPosition = "Bottom",
+        ArrowCenterOffset = 300
+    }
+}
+
+local EntityESPManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false,
+    CurrentRoom = nil
+}
+
+function EntityESPManager:CreateESP(entity, config)
+    if not entity or not entity.PrimaryPart then return nil end
+    
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = config.Name,
+        Model = entity,
+        MaxDistance = EntityESPConfig.Settings.MaxDistance,
+        
+        FillColor = config.Color,
+        OutlineColor = config.Color,
+        TextColor = config.Color,
+        TextSize = EntityESPConfig.Settings.TextSize,
+        
+        FillTransparency = EntityESPConfig.Settings.FillTransparency,
+        OutlineTransparency = EntityESPConfig.Settings.OutlineTransparency,
+        
+        Tracer = {
+            Enabled = true,
+            From = EntityESPConfig.Settings.TracerStartPosition,
+            Color = config.Color
+        },
+        
+        Arrow = {
+            Enabled = true,
+            CenterOffset = EntityESPConfig.Settings.ArrowCenterOffset,
+            Color = config.Color
+        }
+    })
+    
+    return espInstance
+end
+
+function EntityESPManager:AddESP(entity)
+    if not entity or self.ActiveESPs[entity] then return end
+    
+    local config = EntityESPConfig.Types[entity.Name]
+    if not config then return end
+    
+    local espInstance = self:CreateESP(entity, table.clone(config))
+    if espInstance then
+        self.ActiveESPs[entity] = espInstance
+    end
+end
+
+function EntityESPManager:RemoveESP(entity)
+    if self.ActiveESPs[entity] then
+        self.ActiveESPs[entity].Destroy()
+        self.ActiveESPs[entity] = nil
+    end
+end
+
+function EntityESPManager:ScanRoom()
+    if not self.IsEnabled then return end
+    
+    local currentRoom = workspace.CurrentRooms:FindFirstChild(game.Players.LocalPlayer:GetAttribute("CurrentRoom"))
+    if not currentRoom then return end
+    
+    if self.CurrentRoom ~= currentRoom then
+        self:ClearESPs()
+        self.CurrentRoom = currentRoom
+    end
+    
+    for _, descendant in pairs(workspace:GetDescendants()) do
+        if EntityESPConfig.Types[descendant.Name] then
+            self:AddESP(descendant)
+        end
+    end
+end
+
+function EntityESPManager:ClearESPs()
+    for entity, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function EntityESPManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanRoom()
+            wait(EntityESPConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function EntityESPManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
 
 
 local ObjectiveESPConfig = {
@@ -478,10 +628,14 @@ function ObjectiveESPManager:StopScanning()
     self:ClearESPs()
 end
 
-EspGroup:AddToggle({
-    Name = "esp de objetivo",
-    Default = false,
-    Callback = function(state)
+GroupEsp:AddToggle("Visual-esp-objective", {
+	Text = "Esp Objetivo",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(state)
         ObjectiveESPManager.IsEnabled = state
         
         if state then
@@ -489,7 +643,7 @@ EspGroup:AddToggle({
         else
             ObjectiveESPManager:StopScanning()
         end
-    end
+	end,
 })
 
 game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
@@ -498,10 +652,62 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
     end
 end)
 
-GameGroup:AddToggle({
-    Name = "No Ambience",
-    Default = false,
-    Callback = function(Value)
+GroupEsp:AddToggle("Visual-esp-entity", {
+	Text = "Esp Entidades",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(state)
+        ObjectiveESPManager.IsEnabled = state
+        EntityESPManager.IsEnabled = state
+        
+        if state then
+            EntityESPManager:StartScanning()
+        else
+            EntityESPManager:StopScanning()
+			end
+	end,
+})
+
+game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+    if EntityESPManager.IsEnabled then
+        EntityESPManager:ScanRoom()
+    end
+end)
+GroupEsp:AddToggle("Visual-esp-door", {
+	Text = "Esp Portas",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(state)
+        DoorESPManager.IsEnabled = state
+        
+        if state then
+            DoorESPManager:StartScanning()
+        else
+            DoorESPManager:StopScanning()
+	   end
+	end,
+})
+
+game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+    if DoorESPManager.IsEnabled then
+        DoorESPManager:ScanRoom()
+    end
+end)
+
+GroupVPlayer:AddToggle("Visual-no-ambience", {
+	Text = "No Ambience",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = true,
+	Callback = function(Value)
         if not game.SoundService:FindFirstChild("AmbienceRemove") then
             local ambiencerem = Instance.new("BoolValue")
             ambiencerem.Name = "AmbienceRemove"
@@ -535,22 +741,27 @@ GameGroup:AddToggle({
             end
             game.SoundService.AmbienceRemove.Value = false
         end
-    end
+
+	end,
 })
 
-GameGroup:AddToggle({
-    Name = "No Wardrobe Vignette",
-    Default = false,
-    Callback = function(Value)
+GroupVPlayer:AddToggle("Visual-No-Wardobre-Vignette", {
+	Text = "No Wardrobe Vignette",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
         local vignette = game:GetService("Players").LocalPlayer.PlayerGui.MainUI.MainFrame.HideVignette
         if Value then
             vignette.Size = UDim2.new(0,0,0,0)
         else
             vignette.Size = UDim2.new(1,0,1,0)
         end
-    end
+	end,
 })
--- Tabela de Entidades para notificação.
+
 local EntityTable = {
     ["Names"] = {"BackdoorRush", "BackdoorLookman", "RushMoving", "AmbushMoving", "Eyes", "JeffTheKiller", "A60", "A120"},
     ["NotifyReason"] = {
@@ -599,17 +810,19 @@ function NotifyEntity(entityName)
 end
 
 MonitorEntities()
-NotificationGroup:AddToggle({
-    Name = "Notificar Entidades",
-    Save = true,
-    Flag = "NotifyEntitys-toggle",
-    Default = false,
-    Callback = function(value)
+
+GroupNotification:AddToggle("Visual-Notifier-Entities", {
+	Text = "Notificar Entidades",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(value)
         if not initialized then
             initialized = true
             return
         end
-        
         notificationsEnabled = value
         local sound = Instance.new("Sound")
         sound.SoundId = value and "rbxassetid://4590657391" or "rbxassetid://4590662766"
@@ -619,7 +832,6 @@ NotificationGroup:AddToggle({
         sound.Ended:Connect(function()
             sound:Destroy()
         end)
-        
         MsdoorsNotify(
             "MsDoors",
             value and "Notificações de Entidades ativas!" or "Notificações de Entidades desativadas!",
@@ -628,8 +840,9 @@ NotificationGroup:AddToggle({
             value and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0),
             3
         )
-    end
+	end,
 })
+
 
 local Toggles = {}
 local InstaInteractEnabled = false
@@ -659,17 +872,19 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-AutomationGroup:AddToggle({
-    Name = "Instant Interaction",
-    Default = false,
-    Save = true,
-    Flag = "instantInteract-toggle",
-    Callback = function(value)
+GroupAuto:AddToggle("Main-Insta-Interact", {
+	Text = "Instant Interaction",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(value)
         InstaInteractEnabled = value
         UpdateProximityPrompts()
-    end
+	end,
 })
-AutomationGroup:AddLabel("")
+
 
 shared = {
     Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait(),
@@ -805,39 +1020,38 @@ local IgnoreSettings = {
     ["Skull Prompt"] = false
 }
 
-AutomationGroup:AddToggle({
-    Name = "Auto Interact",
-    Default = false,
-    Flag = "AutoInteract-toggle",
-    Callback = function(Value)
+GroupAuto:AddToggle("Auto-interact", {
+	Text = "Auto Interact",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
         AutoInteractEnabled = Value
-    end    
+	end,
 })
 
-AutomationGroup:AddDropdown({
-    Name = "Ignore List",
-    Default = {"Jeff Items"},
-    Options = {"Jeff Items", "Unlock w/ Lockpick", "Paintings", "Gold", "Light Source Items", "Skull Prompt"},
-    Callback = function(Value)
+GroupAuto:AddDropdown("Auto-interact-drop", {
+	Values = {"Jeff Items", "Unlock w/ Lockpick", "Paintings", "Gold", "Light Source Items", "Skull Prompt"},
+	Default = 1,
+	Multi = true,
+	Text = "Ignore list",
+	Tooltip = "This is a tooltip",
+	DisabledTooltip = "I am disabled!",
+	Searchable = false,
+	Callback = function(Value)
         for k, _ in pairs(IgnoreSettings) do
             IgnoreSettings[k] = false
         end
         for _, v in pairs(Value) do
             IgnoreSettings[v] = true
-        end
-    end,
-    Multi = true
+			end
+	end,
+	Disabled = false,
+	Visible = true, 
 })
 
-AutomationGroup:AddBind({
-    Name = "KeyBind",
-    Default = Enum.KeyCode.R,
-    Hold = false,
-    Callback = function()
-        AutoInteractEnabled = not AutoInteractEnabled
-    end    
-})
-AutomationGroup:AddLabel("")
 
 local function AutoInteractLoop()
     while true do
@@ -887,29 +1101,108 @@ InitializeScript()
 task.spawn(AutoInteractLoop)
 
 
-local Script = { IsFools = false }
-local Player = game.Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
-local CanJumpEnabled = false
-PlayerGroup:AddToggle({
-    Name = "Enable Jump",
-    Default = false,
-    Flag = "enableJump-toggle",
-    Callback = function(value)
-        CanJumpEnabled = value
-        if Script.IsFools then return end
-        Character:SetAttribute("CanJump", value)
-        if value then
-            
+GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
+GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
+GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
+GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
+GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
+GroupCredits:AddButton({
+    Text = "Copiar Link",
+    Func = function()
+        local url = "https://dsc.gg/msdoors-gg"
+        if syn then
+            syn.request({
+                Url = url,
+                Method = "GET"
+            })
+        elseif setclipboard then
+            setclipboard(url)
+            Library:Notify({
+		Title = "Link copiado!",
+		Description = "Seu executor não suporta redirecionar. link copiado.",
+		Time = 5,
+	})
+
         else
-           
-            if Humanoid then
-                Humanoid.WalkSpeed = 22
-            end
+                        Library:Notify({
+		Title = "LOL",
+		Description = "Seu executor não suporta redirecionar ou copiar links.",
+		Time = 5,
+	})
+
         end
-    end
+
+    end,
+    DoubleClick = false,
+    Tooltip = "Fechar Janelas"
 })
 
-_G.OrionLibLoaded = true
+
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Notify({
+		Title = "Fechando...",
+		Description = "Aguarde estamos cuidando de tudo!.",
+		Time = 5,
+	})
+	task.wait(5)
+	_G.MsdoorsLoaded = false
+	_G.ObsidianaLib = false
+	Library:Unload()
+	print("[Msdoors] • Até outra hora 😉")
+end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("msdoors")
+SaveManager:SetFolder("msdoors/Natural-disater")
+SaveManager:SetSubFolder("Natural-disaster")
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
+
