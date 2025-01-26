@@ -1,21 +1,30 @@
-# **Msdoors[`1.0.0`]**
-## **BUILD: 0.1.3**
-- ⭐ **APRESENTAÇÃO**
-> 📄 Um Script Simples que Source Code que usa Orion Lib para Funcionar, fique a vontade para Utilizar os códigos desse Script para fazer o seu.
+# **Msdoors**
+> ``Version: 1.1.0`` | ``Build: 0.1.3``
 
-- 🔔 **LEMBRETES**
-> 🟩 A Maioria dos códigos desse Script são do **MsPaint**, portanto você pode ver os códigos originais no [⭐ Repositório do MsPaint](https://github.com/Sc-Rhyan57/mspaint).
+> [!IMPORTANT]
+> **Esse script não é feito pela equipe do [Mspaint](https://mspaint.cc/), mas o dono do mesmo gosta muito da mspaint! :3**
 
-> 🟥 Eu e minha equipe não damos suporte para Scrips modificados desse Script, portanto se você estiver usando alguma cópia do Msdoors trate-se de falar com o dono do mesmo!
+![Minha Imagem](https://msdoors-gg.vercel.app/_next/image?url=%2Fmspaint.png&w=750&q=75)
 
-# 📂 **SCRIPT**
-> ``Logo Abaixo você tem acesso ao script de forma totalmente gratuita.``
+### **📍 VANTAGENS**
+- **Otimizado**,
+- **Sempre Atualizado**,
+- **Sistemas Novos toda semana**,
+- **Código Aberto**.
 
-# 🌟 **WEBSITE**
-> [ACESSAR WEBSITE](https://msdoors-gg.vercel.app/)
+### **🎮 GAMES SUPORTE**
+- **Doors**,
+- **Natural Disaster**
+- **Campos de Armas[FFA]**
+- e mais...
 
-# **Scripts**
-> **Msdoors Loadstring**
-```js
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/download/main.lua"))()
+### **🌐 WEBSITE**
+📍 [ **Msdoors Web**](https://msdoors-gg.vercel.app/)
+
+📍 [ **Msdoors Discord**](https://dsc.gg/Msdoors-gg)
+
+### **🔔 Versões**
+- **ATUAL**
+```luau
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/download/main"))()
 ```
