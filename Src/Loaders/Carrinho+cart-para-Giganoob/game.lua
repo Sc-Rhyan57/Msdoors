@@ -131,11 +131,6 @@ JeepsTab:AddLabel('<font color="#FF0000">This function may cause some lag for th
 local TeleportGroup = Tabs.Main:AddRightGroupbox("Teleportes")
 TeleportGroup:AddLabel('<font color="#9DABFF">Aba de teleportes</font>')
 
-CartsTab:UpdateWarningBox({
-            Visible = true,
-            Title = "ATENÇÃO",
-            Text =  "Msdoors deixará de dar suporte a este jogo em breve! entre no Discord para saber mais"
- })
 
 -- Variáveis globais para controle
 getgenv().AutoClickDetectors = false
