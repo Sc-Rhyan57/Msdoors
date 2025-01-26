@@ -122,6 +122,11 @@ local Tabs = {
     Credits = Window:AddTab("Créditos", "user"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
+Main:UpdateWarningBox({
+            Visible = true,
+            Title = "ATENÇÃO",
+            Text =  "Msdoors deixará de dar suporte a este jogo em breve! entre no Discord para saber mais"
+ })
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Carts")
 
 local CartsTab = Tabs.Main:AddLeftGroupbox("Carts")
