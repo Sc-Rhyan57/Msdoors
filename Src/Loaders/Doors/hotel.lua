@@ -16,12 +16,12 @@
                                         Por Rhyan57 💜
   ]]--
 --[[ LIBRARY & API]]--
---[[
+
+
 if _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
 end
-]]--
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
