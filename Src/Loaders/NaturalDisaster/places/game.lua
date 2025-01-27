@@ -208,7 +208,24 @@ local function teleportWithTween(targetCFrame)
             end
     end
 })
-
+GroupFarming:AddDivider()
+GroupFarming:AddToggle("Autofarmold", {
+    Text = "Autofarm[OLD]",
+    Default = false,
+    Tooltip = "Fique teleportando para o lobby durante a partida.",
+    Callback = function(state)
+    if state then
+            autofarmEvent = game:GetService("RunService").RenderStepped:Connect(function()
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-264, 195, 288)
+            end)
+        else
+            if autofarmEvent then
+                autofarmEvent:Disconnect()
+            end
+        end
+    end
+})
+	
 GroupFarming:AddButton({
 	Text = "Instant teleport safe",
 	Func = function()
@@ -446,24 +463,6 @@ end
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
 	Visible = true,
-})
-GamesTab:AddDivider()
-
-PlayersTab:AddToggle("Autofarmold", {
-    Text = "Autofarm[OLD]",
-    Default = false,
-    Tooltip = "Fique teleportando para o lobby durante a partida.",
-    Callback = function(state)
-    if state then
-            autofarmEvent = game:GetService("RunService").RenderStepped:Connect(function()
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-264, 195, 288)
-            end)
-        else
-            if autofarmEvent then
-                autofarmEvent:Disconnect()
-            end
-        end
-    end
 })
 
 PlayersTab:AddSlider("SpeedPlayer", {
