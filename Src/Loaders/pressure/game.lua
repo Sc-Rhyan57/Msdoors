@@ -390,11 +390,12 @@ GroupEsp:AddToggle("Esp-doors-pressure", {
     end,
 })
 
+
 local Msdoors_KeyCard_Configs = {
     Types = {
         NormalKeyCard = {
             Name = "KeyCard",
-            Color = Color3.fromRGB(0,255,0),
+            Color = Color3.fromRGB(250, 250, 250),
             MaxDistance = 1000,
             TextSize = 17,
             ShowTracer = true,
@@ -404,7 +405,7 @@ local Msdoors_KeyCard_Configs = {
         },
     },
     GlobalSettings = {
-        Enabled = true,
+        Enabled = false,
         DefaultMaxDistance = 1000,
         DefaultTextSize = 16,
         DefaultColor = Color3.fromRGB(255, 255, 255),
@@ -472,7 +473,7 @@ local function Msdoors_KeyCard_HandleObject(part)
     Msdoors_KeyCard_Update(part)
     
     spawn(function()
-        while wait(config.UpdateRate) do
+        while Msdoors_KeyCard_Configs.GlobalSettings.Enabled and wait(config.UpdateRate) do
             if not part or not part.Parent then
                 if Msdoors_KeyCard_ActiveObjects[part] then
                     ESPLibrary:Remove(part)
@@ -489,32 +490,39 @@ local function Msdoors_KeyCard_ToggleSystem(enabled)
     Msdoors_KeyCard_Configs.GlobalSettings.Enabled = enabled
     
     if not Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
-        -- Remove todos os ESPs ativos
         for part, _ in pairs(Msdoors_KeyCard_ActiveObjects) do
             ESPLibrary:Remove(part)
         end
         Msdoors_KeyCard_ActiveObjects = {}
-    else
+	else
         for _, part in pairs(workspace:GetDescendants()) do
-            Msdoors_KeyCard_HandleObject(part)
+            if Msdoors_KeyCard_ShouldAdd(part) then
+                Msdoors_KeyCard_HandleObject(part)
+            end
         end
     end
 end
 
 for _, part in pairs(workspace:GetDescendants()) do
-    Msdoors_KeyCard_HandleObject(part)
+    if Msdoors_KeyCard_ShouldAdd(part) then
+        Msdoors_KeyCard_HandleObject(part)
+    end
 end
-workspace.DescendantAdded:Connect(Msdoors_KeyCard_HandleObject)
+
+workspace.DescendantAdded:Connect(function(part)
+    if Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
+        Msdoors_KeyCard_HandleObject(part)
+    end
+end)
 
 GroupEsp:AddToggle("Esp-KeyCard", {
-    Text = "KeyCard",
-    Tooltip = "Esp KeyCards.",
+    Text = "KeyCard ESP",
+    Tooltip = "Ativar/Desativar ESP de KeyCards",
     Default = false,
     Callback = function(Value)
         Msdoors_KeyCard_ToggleSystem(Value)
     end,
 })
-
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
