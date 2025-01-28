@@ -151,7 +151,7 @@ GroupPlayer:AddSlider("speed-boost-pressure", {
 	Visible = true,
 })
 
-LeftGroupBox:AddToggle("free-cam-pressure", {
+GroupCamera:AddToggle("free-cam-pressure", {
 	Text = "Camera livre",
 	Tooltip = "Câmera Livre",
 	DisabledTooltip = "I am disabled!",
