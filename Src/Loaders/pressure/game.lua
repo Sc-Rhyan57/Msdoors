@@ -1,1 +1,1 @@
-ui.updateStatus("Em breve disponível!")
+warn("SCRIPT NÃO DISPONÍVEL PARA PRESSURE NO MOMENTO!")
