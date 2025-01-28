@@ -50,8 +50,9 @@ local Noclip = nil
 local PathBeam = nil
 local VelocityHandler = nil
 print("[Msdoors] • [✅] Inicialização de Serviços")
+
 --[[ VERIFICAÇÃO DE JOGO ]]--
-local GAME_ID_ESPERADO = 4367208330‎
+local GAME_ID_ESPERADO = 4367208330
 local function getGameInfo()
     local success, gameInfo = pcall(function()
         return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
@@ -108,6 +109,7 @@ Jogo verificado com sucesso!
     return true
 end
 verificarJogo()
+
 --[[ NEW TABS ]]--
 
 local Window = Library:CreateWindow({
