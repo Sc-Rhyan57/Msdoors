@@ -120,7 +120,28 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
+    Exploits = Window:AddTab("Exploits", "user"),
     Credits = Window:AddTab("Créditos", "brain-circuit"),
     ["UI Settings"] = Window:AddTab("UI Settings", "bolt"),
 }
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
+
+local GroupPlayer = Tabs.Main:AddLeftGroupbox("Player")
+local GroupPlayer = Tabs.Main:AddRightGroupbox("Player")
+
+
+GroupPlayer:AddSlider("speed-boost-pressure", {
+	Text = "Velocidade",
+	Default = 20,
+	Min = 1,
+	Max = 75,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(Value)
+         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+	end,
+	Tooltip = "I am a slider!",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
