@@ -265,6 +265,136 @@ GroupCamera:AddSlider("field-of-view-pressure", {
 	Visible = true,
 })
 
+
+local Msdoors_doorsEsp_Configs = {
+    Types = {
+        NormalDoor = {
+            Name = "Porta",
+            Color = Color3.fromRGB(125, 125, 125),
+            MaxDistance = 1000,
+            TextSize = 17,
+            ShowTracer = true,
+            ShowHighlight = true,
+            ShowDistance = true,
+            UpdateRate = 0.1
+        },
+    },
+    GlobalSettings = {
+        Enabled = true,
+        DefaultMaxDistance = 1000,
+        DefaultTextSize = 16,
+        DefaultColor = Color3.fromRGB(255, 255, 255),
+        RefreshRate = 0.1
+    }
+}
+
+local Msdoors_doorsEsp_ActiveObjects = {}
+
+local function Msdoors_doorsEsp_FormatDistance(distance)
+    return string.format("%.1f", distance)
+end
+
+local function Msdoors_doorsEsp_ShouldAdd(part)
+    for typeName, _ in pairs(Msdoors_doorsEsp_Configs.Types) do
+        if part.Name == typeName then
+            return true
+        end
+    end
+    return false
+end
+
+local function Msdoors_doorsEsp_GetConfig(part)
+    return Msdoors_doorsEsp_Configs.Types[part.Name] or {
+        Name = part.Name,
+        Color = Msdoors_doorsEsp_Configs.GlobalSettings.DefaultColor,
+        MaxDistance = Msdoors_doorsEsp_Configs.GlobalSettings.DefaultMaxDistance,
+        TextSize = Msdoors_doorsEsp_Configs.GlobalSettings.DefaultTextSize,
+        ShowTracer = true,
+        ShowHighlight = true,
+        ShowDistance = true,
+        UpdateRate = Msdoors_doorsEsp_Configs.GlobalSettings.RefreshRate
+    }
+end
+
+local function Msdoors_doorsEsp_Update(part)
+    local config = Msdoors_doorsEsp_GetConfig(part)
+    
+    if Msdoors_doorsEsp_ActiveObjects[part] then
+        ESPLibrary:Remove(part)
+        Msdoors_doorsEsp_ActiveObjects[part] = nil
+    end
+    
+    if Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
+        Msdoors_doorsEsp_ActiveObjects[part] = ESPLibrary:Add({
+            Name = config.Name,
+            Model = part,
+            Color = config.Color,
+            MaxDistance = config.MaxDistance,
+            TextSize = config.TextSize,
+            ESPType = config.ShowHighlight and "Highlight" or "Box",
+            FillColor = config.Color,
+            OutlineColor = config.Color,
+            Tracer = {
+                Enabled = config.ShowTracer,
+                Color = config.Color
+            },
+            CustomText = config.ShowDistance and function(model)
+                local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - model.Position).Magnitude
+                return string.format("%s [%sm]", config.Name, Msdoors_doorsEsp_FormatDistance(distance))
+            end or nil
+        })
+    end
+end
+
+local function Msdoors_doorsEsp_HandleObject(part)
+    if not Msdoors_doorsEsp_ShouldAdd(part) then return end
+    
+    local config = Msdoors_doorsEsp_GetConfig(part)
+    Msdoors_doorsEsp_Update(part)
+    
+    spawn(function()
+        while wait(config.UpdateRate) do
+            if not part or not part.Parent then
+                if Msdoors_doorsEsp_ActiveObjects[part] then
+                    ESPLibrary:Remove(part)
+                    Msdoors_doorsEsp_ActiveObjects[part] = nil
+                end
+                break
+            end
+            Msdoors_doorsEsp_Update(part)
+        end
+    end)
+end
+local function Msdoors_doorsEsp_ToggleSystem(enabled)
+    Msdoors_doorsEsp_Configs.GlobalSettings.Enabled = enabled
+    
+    if not Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
+        -- Remove todos os ESPs ativos
+        for part, _ in pairs(Msdoors_doorsEsp_ActiveObjects) do
+            ESPLibrary:Remove(part)
+        end
+        Msdoors_doorsEsp_ActiveObjects = {}
+    else
+        for _, part in pairs(workspace:GetDescendants()) do
+            Msdoors_doorsEsp_HandleObject(part)
+        end
+    end
+end
+
+for _, part in pairs(workspace:GetDescendants()) do
+    Msdoors_doorsEsp_HandleObject(part)
+end
+workspace.DescendantAdded:Connect(Msdoors_doorsEsp_HandleObject)
+
+GroupEsp:AddToggle("Esp-doors-pressure", {
+    Text = "Portas",
+    Tooltip = "Esp Portas",
+    Default = true,
+    Callback = function(Value)
+        Msdoors_doorsEsp_ToggleSystem(Value)
+    end,
+})
+
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
 GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
