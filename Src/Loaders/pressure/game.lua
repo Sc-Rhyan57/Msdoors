@@ -265,7 +265,6 @@ GroupCamera:AddSlider("field-of-view-pressure", {
 	Visible = true,
 })
 
-
 local Msdoors_doorsEsp_Configs = {
     Types = {
         NormalDoor = {
@@ -280,7 +279,7 @@ local Msdoors_doorsEsp_Configs = {
         },
     },
     GlobalSettings = {
-        Enabled = true,
+        Enabled = false,
         DefaultMaxDistance = 1000,
         DefaultTextSize = 16,
         DefaultColor = Color3.fromRGB(255, 255, 255),
@@ -288,6 +287,7 @@ local Msdoors_doorsEsp_Configs = {
     }
 }
 
+local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/mstudio45/MSESP/refs/heads/main/source.luau"))()
 local Msdoors_doorsEsp_ActiveObjects = {}
 
 local function Msdoors_doorsEsp_FormatDistance(distance)
@@ -295,10 +295,8 @@ local function Msdoors_doorsEsp_FormatDistance(distance)
 end
 
 local function Msdoors_doorsEsp_ShouldAdd(part)
-    for typeName, _ in pairs(Msdoors_doorsEsp_Configs.Types) do
-        if part.Name == typeName then
-            return true
-        end
+    if part.Name == "NormalDoor" and part.Parent and part.Parent.Name == "Entrances" then
+        return true
     end
     return false
 end
@@ -318,12 +316,10 @@ end
 
 local function Msdoors_doorsEsp_Update(part)
     local config = Msdoors_doorsEsp_GetConfig(part)
-    
     if Msdoors_doorsEsp_ActiveObjects[part] then
         ESPLibrary:Remove(part)
         Msdoors_doorsEsp_ActiveObjects[part] = nil
     end
-    
     if Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
         Msdoors_doorsEsp_ActiveObjects[part] = ESPLibrary:Add({
             Name = config.Name,
@@ -348,11 +344,9 @@ end
 
 local function Msdoors_doorsEsp_HandleObject(part)
     if not Msdoors_doorsEsp_ShouldAdd(part) then return end
-    
-    local config = Msdoors_doorsEsp_GetConfig(part)
     Msdoors_doorsEsp_Update(part)
-    
     spawn(function()
+        local config = Msdoors_doorsEsp_GetConfig(part)
         while wait(config.UpdateRate) do
             if not part or not part.Parent then
                 if Msdoors_doorsEsp_ActiveObjects[part] then
@@ -365,11 +359,10 @@ local function Msdoors_doorsEsp_HandleObject(part)
         end
     end)
 end
+
 local function Msdoors_doorsEsp_ToggleSystem(enabled)
     Msdoors_doorsEsp_Configs.GlobalSettings.Enabled = enabled
-    
     if not Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
-        -- Remove todos os ESPs ativos
         for part, _ in pairs(Msdoors_doorsEsp_ActiveObjects) do
             ESPLibrary:Remove(part)
         end
@@ -381,19 +374,21 @@ local function Msdoors_doorsEsp_ToggleSystem(enabled)
     end
 end
 
-for _, part in pairs(workspace:GetDescendants()) do
-    Msdoors_doorsEsp_HandleObject(part)
-end
-workspace.DescendantAdded:Connect(Msdoors_doorsEsp_HandleObject)
+workspace.DescendantAdded:Connect(function(part)
+    if Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
+        Msdoors_doorsEsp_HandleObject(part)
+    end
+end)
 
 GroupEsp:AddToggle("Esp-doors-pressure", {
     Text = "Portas",
     Tooltip = "Esp Portas",
-    Default = true,
+    Default = false,
     Callback = function(Value)
         Msdoors_doorsEsp_ToggleSystem(Value)
     end,
 })
+
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
