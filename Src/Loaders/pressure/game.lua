@@ -127,7 +127,7 @@ local Tabs = {
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
 local GroupPlayer = Tabs.Main:AddLeftGroupbox("Player")
-local GroupPlayer = Tabs.Main:AddRightGroupbox("Player")
+local GroupCamera = Tabs.Main:AddRightGroupbox("Camera")
 
 
 GroupPlayer:AddSlider("speed-boost-pressure", {
@@ -140,7 +140,23 @@ GroupPlayer:AddSlider("speed-boost-pressure", {
 	Callback = function(Value)
          game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
 	end,
-	Tooltip = "I am a slider!",
+	Tooltip = "Regule a velocidade de movimento do jogador.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+
+GroupCamera:AddSlider("field-of-view-pressure", {
+	Text = "FOV",
+	Default = 70,
+	Min = 50,
+	Max = 120,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(Value)
+         game:GetService("Workspace").CurrentCamera.FieldOfView = Value
+	end,
+	Tooltip = "Regule o Fov da camera ",
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
 	Visible = true,
