@@ -120,11 +120,14 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
+    Visual = Window:AddTab("Visuals", "user"),
     Exploits = Window:AddTab("Exploits", "user"),
     Credits = Window:AddTab("Créditos", "brain-circuit"),
     ["UI Settings"] = Window:AddTab("UI Settings", "bolt"),
 }
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
+
+local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
 
 local GroupPlayer = Tabs.Main:AddLeftGroupbox("Player")
 local GroupCamera = Tabs.Main:AddRightGroupbox("Camera")
@@ -258,4 +261,428 @@ GroupCamera:AddSlider("field-of-view-pressure", {
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
 	Visible = true,
+})
+
+local NormalDoorConfig = {
+    Types = {
+        NormalDoor = {
+            Name = "Porta",
+            Color = Color3.fromRGB(0, 255, 0) -- Verde
+        }
+    },
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0
+    }
+}
+
+local NormalDoorManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false
+}
+
+function NormalDoorManager:CreateESP(door, config)
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = config.Name,
+        Model = door,
+        MaxDistance = NormalDoorConfig.Settings.MaxDistance,
+        
+        FillColor = config.Color,
+        OutlineColor = config.Color,
+        TextColor = config.Color,
+        TextSize = NormalDoorConfig.Settings.TextSize,
+        
+        FillTransparency = NormalDoorConfig.Settings.FillTransparency,
+        OutlineTransparency = NormalDoorConfig.Settings.OutlineTransparency
+    })
+    return espInstance
+end
+
+function NormalDoorManager:AddESP(door)
+    if not door or self.ActiveESPs[door] then return end
+    
+    local config = NormalDoorConfig.Types[door.Name]
+    if not config then return end
+    
+    local espInstance = self:CreateESP(door, config)
+    if espInstance then
+        self.ActiveESPs[door] = espInstance
+    end
+end
+
+function NormalDoorManager:RemoveESP(door)
+    if self.ActiveESPs[door] then
+        self.ActiveESPs[door].Destroy()
+        self.ActiveESPs[door] = nil
+    end
+end
+
+function NormalDoorManager:ScanWorkspace()
+    if not self.IsEnabled then return end
+    
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "NormalDoor" then
+            self:AddESP(obj)
+        end
+    end
+end
+
+function NormalDoorManager:ClearESPs()
+    for obj, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function NormalDoorManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanWorkspace()
+            wait(NormalDoorConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function NormalDoorManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
+
+local EncounterGeneratorConfig = {
+    Types = {
+        EncounterGenerator = {
+            Name = "Gerador",
+            Color = Color3.fromRGB(0, 255, 0) -- Verde
+        }
+    },
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0
+    }
+}
+
+local EncounterGeneratorManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false
+}
+
+function EncounterGeneratorManager:CreateESP(generator, config)
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = config.Name,
+        Model = generator,
+        MaxDistance = EncounterGeneratorConfig.Settings.MaxDistance,
+        
+        FillColor = config.Color,
+        OutlineColor = config.Color,
+        TextColor = config.Color,
+        TextSize = EncounterGeneratorConfig.Settings.TextSize,
+        
+        FillTransparency = EncounterGeneratorConfig.Settings.FillTransparency,
+        OutlineTransparency = EncounterGeneratorConfig.Settings.OutlineTransparency
+    })
+    return espInstance
+end
+
+function EncounterGeneratorManager:AddESP(generator)
+    if not generator or self.ActiveESPs[generator] then return end
+    
+    local config = EncounterGeneratorConfig.Types[generator.Name]
+    if not config then return end
+    
+    local espInstance = self:CreateESP(generator, config)
+    if espInstance then
+        self.ActiveESPs[generator] = espInstance
+    end
+end
+
+function EncounterGeneratorManager:RemoveESP(generator)
+    if self.ActiveESPs[generator] then
+        self.ActiveESPs[generator].Destroy()
+        self.ActiveESPs[generator] = nil
+    end
+end
+
+function EncounterGeneratorManager:ScanWorkspace()
+    if not self.IsEnabled then return end
+    
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "EncounterGenerator" then
+            self:AddESP(obj)
+        end
+    end
+end
+
+function EncounterGeneratorManager:ClearESPs()
+    for obj, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function EncounterGeneratorManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanWorkspace()
+            wait(EncounterGeneratorConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function EncounterGeneratorManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
+
+local ItemLockerConfig = {
+    Types = {
+        ItemLocker = {
+            Name = "Armário de Itens",
+            Color = Color3.fromRGB(241, 196, 15) -- Amarelo
+        }
+    },
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0
+    }
+}
+
+local ItemLockerManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false
+}
+
+function ItemLockerManager:CreateESP(locker, config)
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = config.Name,
+        Model = locker,
+        MaxDistance = ItemLockerConfig.Settings.MaxDistance,
+        
+        FillColor = config.Color,
+        OutlineColor = config.Color,
+        TextColor = config.Color,
+        TextSize = ItemLockerConfig.Settings.TextSize,
+        
+        FillTransparency = ItemLockerConfig.Settings.FillTransparency,
+        OutlineTransparency = ItemLockerConfig.Settings.OutlineTransparency
+    })
+    return espInstance
+end
+
+function ItemLockerManager:AddESP(locker)
+    if not locker or self.ActiveESPs[locker] then return end
+    
+    local config = ItemLockerConfig.Types[locker.Name]
+    if not config then return end
+    
+    local espInstance = self:CreateESP(locker, config)
+    if espInstance then
+        self.ActiveESPs[locker] = espInstance
+    end
+end
+
+function ItemLockerManager:RemoveESP(locker)
+    if self.ActiveESPs[locker] then
+        self.ActiveESPs[locker].Destroy()
+        self.ActiveESPs[locker] = nil
+    end
+end
+
+function ItemLockerManager:ScanWorkspace()
+    if not self.IsEnabled then return end
+    
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "ItemLocker" then
+            self:AddESP(obj)
+        end
+    end
+end
+
+function ItemLockerManager:ClearESPs()
+    for obj, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function ItemLockerManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanWorkspace()
+            wait(ItemLockerConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function ItemLockerManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
+
+local MonsterLockerConfig = {
+    Types = {
+        MonsterLocker = {
+            Name = "Armário (Monstro)",
+            Color = Color3.fromRGB(128, 0, 128) -- Roxo
+        }
+    },
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0
+    }
+}
+
+local MonsterLockerManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false
+}
+
+function MonsterLockerManager:CreateESP(locker, config)
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = config.Name,
+        Model = locker,
+        MaxDistance = MonsterLockerConfig.Settings.MaxDistance,
+        
+        FillColor = config.Color,
+        OutlineColor = config.Color,
+        TextColor = config.Color,
+        TextSize = MonsterLockerConfig.Settings.TextSize,
+        
+        FillTransparency = MonsterLockerConfig.Settings.FillTransparency,
+        OutlineTransparency = MonsterLockerConfig.Settings.OutlineTransparency
+    })
+    return espInstance
+end
+
+function MonsterLockerManager:AddESP(locker)
+    if not locker or self.ActiveESPs[locker] then return end
+    
+    local config = MonsterLockerConfig.Types[locker.Name]
+    if not config then return end
+    
+    local espInstance = self:CreateESP(locker, config)
+    if espInstance then
+        self.ActiveESPs[locker] = espInstance
+    end
+end
+
+function MonsterLockerManager:RemoveESP(locker)
+    if self.ActiveESPs[locker] then
+        self.ActiveESPs[locker].Destroy()
+        self.ActiveESPs[locker] = nil
+    end
+end
+
+function MonsterLockerManager:ScanWorkspace()
+    if not self.IsEnabled then return end
+    
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "MonsterLocker" then
+            self:AddESP(obj)
+        end
+    end
+end
+
+function MonsterLockerManager:ClearESPs()
+    for obj, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function MonsterLockerManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanWorkspace()
+            wait(MonsterLockerConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function MonsterLockerManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
+
+GroupEsp:AddToggle("monsterlocker-esp-pressure", {
+    Text = "Esp Armário(Monstro)",
+    Default = false,
+    Callback = function(state)
+        MonsterLockerManager.IsEnabled = state
+        
+        if state then
+            MonsterLockerManager:StartScanning()
+        else
+            MonsterLockerManager:StopScanning()
+        end
+    end
+})
+
+GroupEsp:AddToggle("itemlocker-esp-pressure", {
+    Text = "esp Armário de itens",
+    Default = false,
+    Callback = function(state)
+        ItemLockerManager.IsEnabled = state
+        
+        if state then
+            ItemLockerManager:StartScanning()
+        else
+            ItemLockerManager:StopScanning()
+        end
+    end
+})
+
+GroupEsp:AddToggle("Gerador-esp-pressure", {
+    Text = "Esp Gerador",
+    Default = false,
+    Callback = function(state)
+        EncounterGeneratorManager.IsEnabled = state
+        
+        if state then
+            EncounterGeneratorManager:StartScanning()
+        else
+            EncounterGeneratorManager:StopScanning()
+        end
+    end
+})
+
+GroupEsp:AddToggle("esp-doors-Pressure", {
+    Text = "Esp Portas",
+    Default = false,
+    Callback = function(state)
+        NormalDoorManager.IsEnabled = state
+        
+        if state then
+            NormalDoorManager:StartScanning()
+        else
+            NormalDoorManager:StopScanning()
+        end
+    end
 })
