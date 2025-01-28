@@ -146,8 +146,106 @@ GroupPlayer:AddSlider("speed-boost-pressure", {
 	Visible = true,
 })
 
+LeftGroupBox:AddToggle("free-cam-pressure", {
+	Text = "Camera livre",
+	Tooltip = "Câmera Livre",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(state)
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        local runService = game:GetService("RunService")
+        local camera = workspace.CurrentCamera
+        local speed = 1
+        local touchControls = {}
+
+        local function isMobile()
+            return UserInputService.TouchEnabled and not UserInputService.MouseEnabled
+        end
+
+        if state then
+            camera.CameraType = Enum.CameraType.Scriptable
+            if isMobile() then
+                _G.Freecam = runService.RenderStepped:Connect(function()
+                    local moveDirection = Vector3.new()
+                    if touchControls["MoveForward"] then
+                        moveDirection = moveDirection + camera.CFrame.LookVector
+                    end
+                    if touchControls["MoveBackward"] then
+                        moveDirection = moveDirection - camera.CFrame.LookVector
+                    end
+                    if touchControls["MoveLeft"] then
+                        moveDirection = moveDirection - camera.CFrame.RightVector
+                    end
+                    if touchControls["MoveRight"] then
+                        moveDirection = moveDirection + camera.CFrame.RightVector
+                    end
+                    if touchControls["MoveUp"] then
+                        moveDirection = moveDirection + camera.CFrame.UpVector
+                    end
+                    if touchControls["MoveDown"] then
+                        moveDirection = moveDirection - camera.CFrame.UpVector
+                    end
+
+                    camera.CFrame = camera.CFrame + moveDirection * speed
+                end)
+
+                UserInputService.TouchStarted:Connect(function(touch, gameProcessedEvent)
+                    if not gameProcessedEvent then
+                        if touch.Position.Y < workspace.CurrentCamera.ViewportSize.Y / 2 then
+                            touchControls["MoveForward"] = true
+                        else
+                            touchControls["MoveBackward"] = true
+                        end
+                    end
+                end)
+
+                UserInputService.TouchEnded:Connect(function(touch, gameProcessedEvent)
+                    if not gameProcessedEvent then
+                        touchControls["MoveForward"] = false
+                        touchControls["MoveBackward"] = false
+                    end
+                end)
+            else
+                _G.Freecam = runService.RenderStepped:Connect(function()
+                    local moveDirection = Vector3.new()
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        moveDirection = moveDirection + camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        moveDirection = moveDirection - camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                        moveDirection = moveDirection - camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                        moveDirection = moveDirection + camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Q) then
+                        moveDirection = moveDirection - camera.CFrame.UpVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.E) then
+                        moveDirection = moveDirection + camera.CFrame.UpVector
+                    end
+
+                    camera.CFrame = camera.CFrame + moveDirection * speed
+                end)
+            end
+        else
+            if _G.Freecam then
+                _G.Freecam:Disconnect()
+                _G.Freecam = nil
+            end
+            camera.CameraType = Enum.CameraType.Custom
+        end
+     end,
+})
+
 GroupCamera:AddSlider("field-of-view-pressure", {
-	Text = "FOV",
+	Text = "Field Of View",
 	Default = 70,
 	Min = 50,
 	Max = 120,
