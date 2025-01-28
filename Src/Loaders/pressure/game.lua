@@ -273,7 +273,7 @@ local Msdoors_doorsEsp_Configs = {
             MaxDistance = 1000,
             TextSize = 17,
             ShowTracer = true,
-            ShowHighlight = true,
+            ShowHighlight = false,
             ShowDistance = true,
             UpdateRate = 0.1
         },
