@@ -1,3 +1,4 @@
+
 --// <PRESSURE> | UPDATE EM BREVEL \\--
 
 --[[
@@ -386,6 +387,131 @@ GroupEsp:AddToggle("Esp-doors-pressure", {
     Default = false,
     Callback = function(Value)
         Msdoors_doorsEsp_ToggleSystem(Value)
+    end,
+})
+
+local Msdoors_KeyCard_Configs = {
+    Types = {
+        NormalKeyCard = {
+            Name = "KeyCard",
+            Color = Color3.fromRGB(0,255,0),
+            MaxDistance = 1000,
+            TextSize = 17,
+            ShowTracer = true,
+            ShowHighlight = true,
+            ShowDistance = true,
+            UpdateRate = 0.1
+        },
+    },
+    GlobalSettings = {
+        Enabled = true,
+        DefaultMaxDistance = 1000,
+        DefaultTextSize = 16,
+        DefaultColor = Color3.fromRGB(255, 255, 255),
+        RefreshRate = 0.1
+    }
+}
+
+local Msdoors_KeyCard_ActiveObjects = {}
+
+local function Msdoors_KeyCard_FormatDistance(distance)
+    return string.format("%.1f", distance)
+end
+
+local function Msdoors_KeyCard_ShouldAdd(part)
+    return part.Name == "NormalKeyCard" and part:FindFirstAncestor("Rooms") ~= nil
+end
+
+local function Msdoors_KeyCard_GetConfig(part)
+    return Msdoors_KeyCard_Configs.Types[part.Name] or {
+        Name = part.Name,
+        Color = Msdoors_KeyCard_Configs.GlobalSettings.DefaultColor,
+        MaxDistance = Msdoors_KeyCard_Configs.GlobalSettings.DefaultMaxDistance,
+        TextSize = Msdoors_KeyCard_Configs.GlobalSettings.DefaultTextSize,
+        ShowTracer = true,
+        ShowHighlight = true,
+        ShowDistance = true,
+        UpdateRate = Msdoors_KeyCard_Configs.GlobalSettings.RefreshRate
+    }
+end
+
+local function Msdoors_KeyCard_Update(part)
+    local config = Msdoors_KeyCard_GetConfig(part)
+    
+    if Msdoors_KeyCard_ActiveObjects[part] then
+        ESPLibrary:Remove(part)
+        Msdoors_KeyCard_ActiveObjects[part] = nil
+    end
+    
+    if Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
+        Msdoors_KeyCard_ActiveObjects[part] = ESPLibrary:Add({
+            Name = config.Name,
+            Model = part,
+            Color = config.Color,
+            MaxDistance = config.MaxDistance,
+            TextSize = config.TextSize,
+            ESPType = config.ShowHighlight and "Highlight" or "Box",
+            FillColor = config.Color,
+            OutlineColor = config.Color,
+            Tracer = {
+                Enabled = config.ShowTracer,
+                Color = config.Color
+            },
+            CustomText = config.ShowDistance and function(model)
+                local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - model.Position).Magnitude
+                return string.format("%s [%sm]", config.Name, Msdoors_KeyCard_FormatDistance(distance))
+            end or nil
+        })
+    end
+end
+
+local function Msdoors_KeyCard_HandleObject(part)
+    if not Msdoors_KeyCard_ShouldAdd(part) then return end
+    
+    local config = Msdoors_KeyCard_GetConfig(part)
+    Msdoors_KeyCard_Update(part)
+    
+    spawn(function()
+        while wait(config.UpdateRate) do
+            if not part or not part.Parent then
+                if Msdoors_KeyCard_ActiveObjects[part] then
+                    ESPLibrary:Remove(part)
+                    Msdoors_KeyCard_ActiveObjects[part] = nil
+                end
+                break
+            end
+            Msdoors_KeyCard_Update(part)
+        end
+    end)
+end
+
+local function Msdoors_KeyCard_ToggleSystem(enabled)
+    Msdoors_KeyCard_Configs.GlobalSettings.Enabled = enabled
+    
+    if not Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
+        -- Remove todos os ESPs ativos
+        for part, _ in pairs(Msdoors_KeyCard_ActiveObjects) do
+            ESPLibrary:Remove(part)
+        end
+        Msdoors_KeyCard_ActiveObjects = {}
+    else
+        for _, part in pairs(workspace:GetDescendants()) do
+            Msdoors_KeyCard_HandleObject(part)
+        end
+    end
+end
+
+for _, part in pairs(workspace:GetDescendants()) do
+    Msdoors_KeyCard_HandleObject(part)
+end
+workspace.DescendantAdded:Connect(Msdoors_KeyCard_HandleObject)
+
+GroupEsp:AddToggle("Esp-KeyCard", {
+    Text = "KeyCard",
+    Tooltip = "Esp KeyCards.",
+    Default = false,
+    Callback = function(Value)
+        Msdoors_KeyCard_ToggleSystem(Value)
     end,
 })
 
