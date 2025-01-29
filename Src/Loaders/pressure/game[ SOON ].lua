@@ -267,298 +267,269 @@ GroupCamera:AddSlider("field-of-view-pressure", {
 })
 
 
-local Msdoors_doorsEsp_Configs = {
-    Types = {
-        NormalDoor = {
-            Name = "Porta",
-            Color = Color3.fromRGB(125, 125, 125),
-            MaxDistance = 1000,
-            TextSize = 17,
-            ShowTracer = true,
-            ShowHighlight = false,
-            ShowDistance = true,
-            UpdateRate = 0.1
-        },
-    },
-    GlobalSettings = {
-        Enabled = false,
-        DefaultMaxDistance = 1000,
-        DefaultTextSize = 16,
-        DefaultColor = Color3.fromRGB(125, 125, 125),
-        RefreshRate = 0.1
-    }
+local DoorESPConfig = {
+    Name = "Porta",
+    Color = Color3.fromRGB(125, 125, 125),
+    MaxDistance = 5000,
+    TextSize = 16,
+    FillTransparency = 0.75,
+    OutlineTransparency = 0,
+    UpdateRate = 0.1,
+    MaxVisibleESPs = 10
 }
 
-local Msdoors_doorsEsp_ActiveObjects = {}
-local UpdateConnections = {}
+local DoorManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    UpdateConnection = nil
+}
 
-local function Msdoors_doorsEsp_FormatDistance(distance)
-    return string.format("%.1f", distance)
+local function getDistance(part)
+    local character = game.Players.LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") or not part then return math.huge end
+    return (character.HumanoidRootPart.Position - part.Position).Magnitude
 end
 
-local function Msdoors_doorsEsp_ShouldAdd(part)
-    return part.Name == "NormalDoor" and part:FindFirstAncestor("Entrances") ~= nil
+function DoorManager:CreateESP(part)
+    local esp = ESPLibrary:Add({
+        Name = DoorESPConfig.Name,
+        Model = part,
+        Color = DoorESPConfig.Color,
+        MaxDistance = DoorESPConfig.MaxDistance,
+        TextSize = DoorESPConfig.TextSize,
+        ESPType = "Box",
+        FillColor = DoorESPConfig.Color,
+        OutlineColor = DoorESPConfig.Color,
+        FillTransparency = DoorESPConfig.FillTransparency,
+        OutlineTransparency = DoorESPConfig.OutlineTransparency,
+        Tracer = {
+            Enabled = true,
+            Color = DoorESPConfig.Color
+        },
+        CustomText = function(model)
+            if not model or not model.Parent then return "" end
+            local distance = getDistance(model)
+            return string.format("%s [%d m]", DoorESPConfig.Name, math.floor(distance))
+        end
+    })
+    return esp
 end
 
-local function Msdoors_doorsEsp_GetConfig(part)
-    return Msdoors_doorsEsp_Configs.Types[part.Name] or {
-        Name = part.Name,
-        Color = Msdoors_doorsEsp_Configs.GlobalSettings.DefaultColor,
-        MaxDistance = Msdoors_doorsEsp_Configs.GlobalSettings.DefaultMaxDistance,
-        TextSize = Msdoors_doorsEsp_Configs.GlobalSettings.DefaultTextSize,
-        ShowTracer = true,
-        ShowHighlight = false,
-        ShowDistance = true,
-        UpdateRate = Msdoors_doorsEsp_Configs.GlobalSettings.RefreshRate
-    }
-end
-
-local function Msdoors_doorsEsp_Update(part)
-    if not part or not part.Parent then return end
+function DoorManager:UpdateVisibleESPs()
+    if not self.IsEnabled then return end
     
-    local config = Msdoors_doorsEsp_GetConfig(part)
+    local allESPs = {}
+    for part, esp in pairs(self.ActiveESPs) do
+        local distance = getDistance(part)
+        table.insert(allESPs, {part = part, esp = esp, distance = distance})
+    end
+    table.sort(allESPs, function(a, b) return a.distance < b.distance end)
     
-    if Msdoors_doorsEsp_ActiveObjects[part] then
+    for part, esp in pairs(self.ActiveESPs) do
+        esp.Enabled = false
+    end
+    
+    for i = 1, math.min(#allESPs, DoorESPConfig.MaxVisibleESPs) do
+        local espData = allESPs[i]
+        espData.esp.Enabled = true
+    end
+end
+
+function DoorManager:AddESP(part)
+    if part.Name ~= "NormalDoor" or not part:FindFirstAncestor("Entrances") then return end
+    if self.ActiveESPs[part] then return end
+    
+    self.ActiveESPs[part] = self:CreateESP(part)
+    self:UpdateVisibleESPs()
+end
+
+function DoorManager:RemoveESP(part)
+    if self.ActiveESPs[part] then
         ESPLibrary:Remove(part)
-        Msdoors_doorsEsp_ActiveObjects[part] = nil
-    end
-    
-    if Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
-        Msdoors_doorsEsp_ActiveObjects[part] = ESPLibrary:Add({
-            Name = config.Name,
-            Model = part,
-            Color = config.Color,
-            MaxDistance = config.MaxDistance,
-            TextSize = config.TextSize,
-            ESPType = "Box",
-            FillColor = config.Color,
-            OutlineColor = config.Color,
-            Tracer = {
-                Enabled = config.ShowTracer,
-                Color = config.Color
-            },
-            CustomText = config.ShowDistance and function(model)
-                if not model or not model.Parent then return "" end
-                local character = game.Players.LocalPlayer.Character
-                if not character or not character:FindFirstChild("HumanoidRootPart") then return "" end
-                local distance = (character.HumanoidRootPart.Position - model.Position).Magnitude
-                return string.format("%s [%sm]", config.Name, Msdoors_doorsEsp_FormatDistance(distance))
-            end or nil
-        })
+        self.ActiveESPs[part] = nil
     end
 end
 
-local function Msdoors_doorsEsp_HandleObject(part)
-    if not Msdoors_doorsEsp_ShouldAdd(part) then return end
+function DoorManager:ClearESPs()
+    for part, _ in pairs(self.ActiveESPs) do
+        self:RemoveESP(part)
+    end
+    self.ActiveESPs = {}
+end
+
+function DoorManager:Start()
+    self.IsEnabled = true
     
-    if UpdateConnections[part] then
-        UpdateConnections[part]:Disconnect()
-        UpdateConnections[part] = nil
+    for _, part in pairs(workspace:GetDescendants()) do
+        self:AddESP(part)
     end
     
-    local config = Msdoors_doorsEsp_GetConfig(part)
-    Msdoors_doorsEsp_Update(part)
+    if self.UpdateConnection then
+        self.UpdateConnection:Disconnect()
+    end
     
-    UpdateConnections[part] = game:GetService("RunService").Heartbeat:Connect(function()
-        if Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
-            if not part or not part.Parent then
-                if Msdoors_doorsEsp_ActiveObjects[part] then
-                    ESPLibrary:Remove(part)
-                    Msdoors_doorsEsp_ActiveObjects[part] = nil
-                end
-                if UpdateConnections[part] then
-                    UpdateConnections[part]:Disconnect()
-                    UpdateConnections[part] = nil
-                end
-                return
-            end
-            Msdoors_doorsEsp_Update(part)
+    self.UpdateConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        self:UpdateVisibleESPs()
+    end)
+    
+    workspace.DescendantAdded:Connect(function(part)
+        if self.IsEnabled then
+            self:AddESP(part)
         end
     end)
 end
 
-local function Msdoors_doorsEsp_ToggleSystem(enabled)
-    Msdoors_doorsEsp_Configs.GlobalSettings.Enabled = enabled
-    
-    if not enabled then
-        for part, _ in pairs(Msdoors_doorsEsp_ActiveObjects) do
-            ESPLibrary:Remove(part)
-        end
-        for _, connection in pairs(UpdateConnections) do
-            connection:Disconnect()
-        end
-        Msdoors_doorsEsp_ActiveObjects = {}
-        UpdateConnections = {}
-    else
-        for _, part in pairs(workspace:GetDescendants()) do
-            if Msdoors_doorsEsp_ShouldAdd(part) then
-                Msdoors_doorsEsp_HandleObject(part)
-            end
-        end
+function DoorManager:Stop()
+    self.IsEnabled = false
+    if self.UpdateConnection then
+        self.UpdateConnection:Disconnect()
+        self.UpdateConnection = nil
     end
+    self:ClearESPs()
 end
 
-local descendantConnection
-descendantConnection = workspace.DescendantAdded:Connect(function(part)
-    if Msdoors_doorsEsp_Configs.GlobalSettings.Enabled then
-        Msdoors_doorsEsp_HandleObject(part)
-    end
-end)
-
-GroupEsp:AddToggle("Esp-doors-pressure", {
-    Text = "Portas",
-    Tooltip = "Esp Portas",
+GroupEsp:AddToggle("Esp-Door", {
+    Text = "ESP Portas",
     Default = false,
     Callback = function(Value)
-        Msdoors_doorsEsp_ToggleSystem(Value)
+        if Value then
+            DoorManager:Start()
+        else
+            DoorManager:Stop()
+        end
     end,
 })
 
-
-local Msdoors_KeyCard_Configs = {
-    Types = {
-        NormalKeyCard = {
-            Name = "KeyCard",
-            Color = Color3.fromRGB(0, 255, 0), 
-            MaxDistance = 1000,
-            TextSize = 17,
-            ShowTracer = true,
-            ShowHighlight = true,
-            ShowDistance = true,
-            UpdateRate = 0.1
-        },
-    },
-    GlobalSettings = {
-        Enabled = false,
-        DefaultMaxDistance = 1000,
-        DefaultTextSize = 16,
-        DefaultColor = Color3.fromRGB(0, 255, 0),
-        RefreshRate = 0.1
-    }
+local KeyCardESPConfig = {
+    Name = "KeyCard",
+    Color = Color3.fromRGB(0, 255, 0),
+    MaxDistance = 5000,
+    TextSize = 16,
+    FillTransparency = 0.75,
+    OutlineTransparency = 0,
+    UpdateRate = 0.1,
+    MaxVisibleESPs = 10
 }
 
-local Msdoors_KeyCard_ActiveObjects = {}
-local UpdateConnections = {} 
+local KeyCardManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    UpdateConnection = nil
+}
 
-local function Msdoors_KeyCard_FormatDistance(distance)
-    return string.format("%.1f", distance)
+local function getDistance(part)
+    local character = game.Players.LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") or not part then return math.huge end
+    return (character.HumanoidRootPart.Position - part.Position).Magnitude
 end
 
-local function Msdoors_KeyCard_ShouldAdd(part)
-    return part.Name == "NormalKeyCard" and part:FindFirstAncestor("Rooms") ~= nil
+function KeyCardManager:CreateESP(part)
+    local esp = ESPLibrary:Add({
+        Name = KeyCardESPConfig.Name,
+        Model = part,
+        Color = KeyCardESPConfig.Color,
+        MaxDistance = KeyCardESPConfig.MaxDistance,
+        TextSize = KeyCardESPConfig.TextSize,
+        ESPType = "Box",
+        FillColor = KeyCardESPConfig.Color,
+        OutlineColor = KeyCardESPConfig.Color,
+        FillTransparency = KeyCardESPConfig.FillTransparency,
+        OutlineTransparency = KeyCardESPConfig.OutlineTransparency,
+        Tracer = {
+            Enabled = true,
+            Color = KeyCardESPConfig.Color
+        },
+        CustomText = function(model)
+            if not model or not model.Parent then return "" end
+            local distance = getDistance(model)
+            return string.format("%s [%d m]", KeyCardESPConfig.Name, math.floor(distance))
+        end
+    })
+    return esp
 end
 
-local function Msdoors_KeyCard_GetConfig(part)
-    return Msdoors_KeyCard_Configs.Types[part.Name] or {
-        Name = part.Name,
-        Color = Msdoors_KeyCard_Configs.GlobalSettings.DefaultColor,
-        MaxDistance = Msdoors_KeyCard_Configs.GlobalSettings.DefaultMaxDistance,
-        TextSize = Msdoors_KeyCard_Configs.GlobalSettings.DefaultTextSize,
-        ShowTracer = true,
-        ShowHighlight = true,
-        ShowDistance = true,
-        UpdateRate = Msdoors_KeyCard_Configs.GlobalSettings.RefreshRate
-    }
-end
-
-local function Msdoors_KeyCard_Update(part)
-    if not part or not part.Parent then return end
+function KeyCardManager:UpdateVisibleESPs()
+    if not self.IsEnabled then return end
     
-    local config = Msdoors_KeyCard_GetConfig(part)
+    local allESPs = {}
+    for part, esp in pairs(self.ActiveESPs) do
+        local distance = getDistance(part)
+        table.insert(allESPs, {part = part, esp = esp, distance = distance})
+    end
+    table.sort(allESPs, function(a, b) return a.distance < b.distance end)
     
-    if Msdoors_KeyCard_ActiveObjects[part] then
+    for part, esp in pairs(self.ActiveESPs) do
+        esp.Enabled = false
+    end
+    
+    for i = 1, math.min(#allESPs, KeyCardESPConfig.MaxVisibleESPs) do
+        local espData = allESPs[i]
+        espData.esp.Enabled = true
+    end
+end
+
+function KeyCardManager:AddESP(part)
+    if part.Name ~= "NormalKeyCard" or not part:FindFirstAncestor("Rooms") then return end
+    if self.ActiveESPs[part] then return end
+    
+    self.ActiveESPs[part] = self:CreateESP(part)
+    self:UpdateVisibleESPs()
+end
+
+function KeyCardManager:RemoveESP(part)
+    if self.ActiveESPs[part] then
         ESPLibrary:Remove(part)
-        Msdoors_KeyCard_ActiveObjects[part] = nil
-    end
-    
-    if Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
-        Msdoors_KeyCard_ActiveObjects[part] = ESPLibrary:Add({
-            Name = config.Name,
-            Model = part,
-            Color = config.Color,
-            MaxDistance = config.MaxDistance,
-            TextSize = config.TextSize,
-            ESPType = config.ShowHighlight and "Highlight" or "Box",
-            FillColor = config.Color,
-            OutlineColor = config.Color,
-            Tracer = {
-                Enabled = config.ShowTracer,
-                Color = config.Color
-            },
-            CustomText = config.ShowDistance and function(model)
-                if not model or not model.Parent then return "" end
-                local character = game.Players.LocalPlayer.Character
-                if not character or not character:FindFirstChild("HumanoidRootPart") then return "" end
-                local distance = (character.HumanoidRootPart.Position - model.Position).Magnitude
-                return string.format("%s [%sm]", config.Name, Msdoors_KeyCard_FormatDistance(distance))
-            end or nil
-        })
+        self.ActiveESPs[part] = nil
     end
 end
 
-local function Msdoors_KeyCard_HandleObject(part)
-    if not Msdoors_KeyCard_ShouldAdd(part) then return end
+function KeyCardManager:ClearESPs()
+    for part, _ in pairs(self.ActiveESPs) do
+        self:RemoveESP(part)
+    end
+    self.ActiveESPs = {}
+end
+
+function KeyCardManager:Start()
+    self.IsEnabled = true
     
-    if UpdateConnections[part] then
-        UpdateConnections[part]:Disconnect()
-        UpdateConnections[part] = nil
+    for _, part in pairs(workspace:GetDescendants()) do
+        self:AddESP(part)
     end
     
-    local config = Msdoors_KeyCard_GetConfig(part)
-    Msdoors_KeyCard_Update(part)
+    if self.UpdateConnection then
+        self.UpdateConnection:Disconnect()
+    end
     
-    UpdateConnections[part] = game:GetService("RunService").Heartbeat:Connect(function()
-        if Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
-            if not part or not part.Parent then
-                if Msdoors_KeyCard_ActiveObjects[part] then
-                    ESPLibrary:Remove(part)
-                    Msdoors_KeyCard_ActiveObjects[part] = nil
-                end
-                if UpdateConnections[part] then
-                    UpdateConnections[part]:Disconnect()
-                    UpdateConnections[part] = nil
-                end
-                return
-            end
-            Msdoors_KeyCard_Update(part)
+    self.UpdateConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        self:UpdateVisibleESPs()
+    end)
+    
+    workspace.DescendantAdded:Connect(function(part)
+        if self.IsEnabled then
+            self:AddESP(part)
         end
     end)
 end
 
-local function Msdoors_KeyCard_ToggleSystem(enabled)
-    Msdoors_KeyCard_Configs.GlobalSettings.Enabled = enabled
-    
-    if not enabled then
-        for part, _ in pairs(Msdoors_KeyCard_ActiveObjects) do
-            ESPLibrary:Remove(part)
-        end
-        for _, connection in pairs(UpdateConnections) do
-            connection:Disconnect()
-        end
-        Msdoors_KeyCard_ActiveObjects = {}
-        UpdateConnections = {}
-	else
-        for _, part in pairs(workspace:GetDescendants()) do
-            if Msdoors_KeyCard_ShouldAdd(part) then
-                Msdoors_KeyCard_HandleObject(part)
-            end
-        end
+function KeyCardManager:Stop()
+    self.IsEnabled = false
+    if self.UpdateConnection then
+        self.UpdateConnection:Disconnect()
+        self.UpdateConnection = nil
     end
+    self:ClearESPs()
 end
 
-local descendantConnection
-descendantConnection = workspace.DescendantAdded:Connect(function(part)
-    if Msdoors_KeyCard_Configs.GlobalSettings.Enabled then
-        Msdoors_KeyCard_HandleObject(part)
-    end
-end)
-
-GroupEsp:AddToggle("Esp-KeyCard", {
-    Text = "KeyCard ESP",
-    Tooltip = "Ativar/Desativar ESP de KeyCards",
+GroupEsp:AddToggle("Esp-KeyCard-pressure", {
+    Text = "ESP KeyCard",
     Default = false,
     Callback = function(Value)
-        Msdoors_KeyCard_ToggleSystem(Value)
+        if Value then
+            KeyCardManager:Start()
+        else
+            KeyCardManager:Stop()
+        end
     end,
 })
 
