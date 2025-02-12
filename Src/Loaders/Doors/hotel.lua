@@ -39,6 +39,9 @@ _G.msdoors_InvisGrumbles = false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
+getgenv().AntiSeekManager = {
+    IsEnabled = false
+}
 
 --[[ SERVIÇOS ]]--
 local Lighting = game:GetService("Lighting")
@@ -1104,10 +1107,6 @@ local function AutoInteractLoop()
 end
 InitializeScript()
 task.spawn(AutoInteractLoop)
-
-getgenv().AntiSeekManager = {
-    IsEnabled = false
-}
 
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti-Seek Obstructions",
