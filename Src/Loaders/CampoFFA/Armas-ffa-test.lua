@@ -1,9 +1,54 @@
+--// <Natural Disaster> | UPDATE EM BREVEL \\--
 
+--[[
+                                                                                                                     
+     ______  _______            ______       _____           _____            _____         _____            ______  
+    |      \/       \       ___|\     \  ___|\    \     ____|\    \      ____|\    \    ___|\    \       ___|\     \ 
+   /          /\     \     |    |\     \|    |\    \   /     /\    \    /     /\    \  |    |\    \     |    |\     \
+  /     /\   / /\     |    |    |/____/||    | |    | /     /  \    \  /     /  \    \ |    | |    |    |    |/____/|
+ /     /\ \_/ / /    /| ___|    \|   | ||    | |    ||     |    |    ||     |    |    ||    |/____/  ___|    \|   | |
+|     |  \|_|/ /    / ||    \    \___|/ |    | |    ||     |    |    ||     |    |    ||    |\    \ |    \    \___|/ 
+|     |       |    |  ||    |\     \    |    | |    ||\     \  /    /||\     \  /    /||    | |    ||    |\     \    
+|\____\       |____|  /|\ ___\|_____|   |____|/____/|| \_____\/____/ || \_____\/____/ ||____| |____||\ ___\|_____|   
+| |    |      |    | / | |    |     |   |    /    | | \ |    ||    | / \ |    ||    | /|    | |    || |    |     |   
+ \|____|      |____|/   \|____|_____|   |____|____|/   \|____||____|/   \|____||____|/ |____| |____| \|____|_____|   
+    \(          )/         \(    )/       \(    )/        \(    )/         \(    )/      \(     )/      \(    )/     
+     '          '           '    '         '    '          '    '           '    '        '     '        '    '      
+                                                                                                                     
+                                        Por Rhyan57 💜
+  ]]--
+--[[ LIBRARY & API]]--
+if _G.ObsidianaLib then
+    warn("[Msdoors] • Script já carregado!")
+    return
+end
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/mstudio45/MSESP/refs/heads/main/source.luau"))()
+
+print("[Msdoors] • [✅] Inialização da livraria e apis")
+_G.ObsidianaLib = true
+
+--[[ SERVIÇOS ]]--
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+local TextChatService = game:GetService("TextChatService")
+local UserInputService = game:GetService("UserInputService")
+local PathfindingService = game:GetService("PathfindingService")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
+local HttpService = game:GetService("HttpService")
 local Camera = Workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
+print("[Msdoors] • [✅] Inicialização de Serviços")
+
+
 
 local aimbotEnabled = false
 local aimbotPart = "Head"
@@ -18,6 +63,7 @@ aimDot.Visible = false
 aimDot.Radius = 6
 aimDot.Color = Color3.new(1, 0, 0)
 aimDot.Filled = true
+
 local rotationAngle = 0
 RunService.RenderStepped:Connect(function()
     if aimbotEnabled then
