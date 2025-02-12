@@ -88,6 +88,9 @@ local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 GroupTroll:AddLabel('<font color="#FF0000">Funções para troll</font>')
 
+local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
+GroupPrincipal:AddLabel('<font color="#00FF56">Funções do floor atual</font>')
+
 GroupPrincipal:AddToggle("Jump-Enabled", {
 	Text = "Ativar Pulo",
 	Tooltip = "Ativa o pulo",
@@ -1101,6 +1104,49 @@ end
 InitializeScript()
 task.spawn(AutoInteractLoop)
 
+getgenv().AntiSeekManager = {
+    IsEnabled = false
+}
+
+GroupHotel:AddToggle("AntiSeekObstructions", {
+    Text = "Anti-Seek Obstructions",
+    Default = false,
+    Callback = function(state)
+        AntiSeekManager.IsEnabled = state
+        AntiSeekManager:ScanNearbyRooms(state)
+    end
+})
+
+function AntiSeekManager:ScanNearbyRooms(state)
+    local player = game.Players.LocalPlayer
+    local currentRoomNumber = player:GetAttribute("CurrentRoom")
+
+    if not currentRoomNumber then return end
+
+    for i = 0, 2 do
+        local room = workspace.CurrentRooms:FindFirstChild(tostring(currentRoomNumber + i))
+        if room then
+            self:ToggleSeekObstacles(room, state)
+        end
+    end
+end
+
+function AntiSeekManager:ToggleSeekObstacles(room, state)
+    for _, v in pairs(room:GetDescendants()) do
+        if v.Name == "ChandelierObstruction" or v.Name == "Seek_Arm" then
+            for _, obj in pairs(v:GetDescendants()) do
+                if obj:IsA("BasePart") then
+                    obj.CanTouch = not state
+                end
+            end
+        end
+    end
+end
+game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+    if AntiSeekManager.IsEnabled then
+        AntiSeekManager:ScanNearbyRooms(true)
+    end
+end)
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
