@@ -90,7 +90,7 @@ local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 GroupTroll:AddLabel('<font color="#FF0000">Funções para troll</font>')
 
 local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
-GroupPrincipal:AddLabel('<font color="#00FF56">Funções do floor atual</font>')
+GroupHotel:AddLabel('<font color="#00FF56">Funções do floor atual</font>')
 
 GroupPrincipal:AddToggle("Jump-Enabled", {
 	Text = "Ativar Pulo",
