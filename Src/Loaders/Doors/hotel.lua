@@ -1105,6 +1105,39 @@ end
 InitializeScript()
 task.spawn(AutoInteractLoop)
 
+GroupHotel:AddToggle("AntiA90", {
+    Text = "Anti-A90",
+    Tooltip = "Impede que o A90 ative seus efeitos.",
+    Default = false,
+    Callback = function(Value)
+        G.msdoors_anti_A90 = Value
+        if not Script.MainGame then return end
+        local function checkAndRenameModule(child)
+            if G.msdoors_anti_A90 and (child.Name == "A90" or child.Name == "_A90") then
+                child.Name = "_A90"
+            end
+        end
+        for _, child in pairs(Script.MainGame:GetChildren()) do
+            checkAndRenameModule(child)
+        end
+        if G.msdoors_anti_A90 then
+            if not G.antiA90Connection then
+                G.antiA90Connection = Script.MainGame.ChildAdded:Connect(checkAndRenameModule)
+            end
+        else
+            if G.antiA90Connection then
+                G.antiA90Connection:Disconnect()
+                G.antiA90Connection = nil
+            end
+
+            local module = Script.MainGame:FindFirstChild("_A90", true)
+            if module then
+                module.Name = "A90"
+            end
+        end
+    end
+})
+
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti-Seek Obstructions",
     Default = false,
