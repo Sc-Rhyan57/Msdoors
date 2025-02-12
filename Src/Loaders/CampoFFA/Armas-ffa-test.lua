@@ -1,4 +1,4 @@
---// <Natural Disaster> | UPDATE EM BREVEL \\--
+--// <Campos de Armas[FFA]> | UPDATE EM BREVEL \\--
 
 --[[
                                                                                                                      
@@ -49,6 +49,23 @@ local Camera = Workspace.CurrentCamera
 print("[Msdoors] • [✅] Inicialização de Serviços")
 
 
+local Window = Library:CreateWindow({
+    Title = "Msdoors v1",
+    Footer = "Game: Campos de Armas[FFA] | Build: 0.1.3",
+    Icon = "95869322194132",
+    NotifySide = "Right",
+    ShowCustomCursor = true
+})
+
+local Tabs = {
+    Main = Window:AddTab("Principal", "user"),
+    Credits = Window:AddTab("Créditos", "brain-circuit"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "bolt"),
+}
+local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
+
+local ExploitsTab = Tabs.Main:AddRightGroupbox("Exploits")
+ExploitsTab:AddLabel('<font color="#FF0000">Coisas como Aimbot.</font>')
 
 local aimbotEnabled = false
 local aimbotPart = "Head"
@@ -117,82 +134,182 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
---// CRÉDITOS \\--
-local CreditsTab = Window:MakeTab({
-    Name = "Créditos - Msdoors",
-    Icon = "rbxassetid://7743875759",
-    PremiumOnly = false
+ExploitsTab:AddToggle("Aimbot", {
+    Text = "Aimbot",
+    Default = false,
+    Callback = function(state)
+    aimbotEnabled = value
+    end
 })
-local CdSc = CreditsTab:AddSection({
-    Name = "Créditos"
+ExploitsTab:AddDropdown("Aim-At", {
+	Values = { "Head", "Torso" },
+	Default = 1,
+	Multi = false,
+	Text = "aim at",
+	Tooltip = "Selecione em qual parte do corpo o msdoors deve mirar",
+	DisabledTooltip = "I am disabled!",
+	Searchable = false,
+	Callback = function(option)
+		aimbotPart = option
+	end,
+	Disabled = false,
+	Visible = true,
 })
-
-CdSc:AddParagraph("Rhyan57", "• Criador e fundador do Msdoors.")
-CdSc:AddParagraph("SeekAlegriaFla", "• Ajudante e coletor de files.")
-
-local ExploitsTab = Window:MakeTab({
-    Name = "Exploits",
-    Icon = "rbxassetid://7743873633",
-    PremiumOnly = false
+ExploitsTab:AddSlider("Aimbot-maximum-distance", {
+	Text = "Maximum Distance",
+	Default = 500,
+	Min = 100,
+	Max = 1000,
+	Rounding = 50,
+	Compact = false,
+	Callback = function(value)
+        maxDistance = value
+	end,
+	Tooltip = "Distância Máxima que o msdoors deve começar a rastrear.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true
 })
-
-ExploitsTab:AddToggle({
-    Name = "Ativar Aimbot",
+ExploitsTab:AddToggle("Ignore-my-team", {
+    Text = "Ignore my team",
     Default = false,
     Callback = function(value)
-        aimbotEnabled = value
-        OrionLib:MakeNotification({
-            Name = value and "Aimbot Ativado" or "Aimbot Desativado",
-            Content = value and "Agora o Aimbot está ativo!" or "O Aimbot foi desativado!",
-            Time = 5
-        })
+    ignoreTeams = value
     end
 })
-
-ExploitsTab:AddDropdown({
-    Name = "Parte do Corpo para Mira",
-    Default = "Head",
-    Options = { "Head", "Torso" },
-    Callback = function(option)
-        aimbotPart = option
-    end
-})
-
-ExploitsTab:AddSlider({
-    Name = "Distância Máxima",
-    Min = 100,
-    Max = 1000,
-    Default = 500,
-    Increment = 50,
-    Callback = function(value)
-        maxDistance = value
-    end
-})
-
-
-ExploitsTab:AddToggle({
-    Name = "Ignorar Jogadores do Mesmo Time",
-    Default = true,
-    Callback = function(value)
-        ignoreTeams = value
-    end
-})
-
 ExploitsTab:AddButton({
-	Name = "Expandir Hitbox doa inimigos",
-	Callback = function()
-      		print("[Msdoors] • Hitbox dos jogadores expandidas.")
+	Text = "Expandir Hitbox",
+	Func = function()
           loadstring(game:HttpGet("https://mscripts.vercel.app/scfiles/hitbox-expander.lua"))()
-  	end    
+	end,
+	DoubleClick = true,
+	Tooltip = "Expande a hitbox de todos.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
 })
 
 
-local VisualsTab = Window:MakeTab({
-    Name = "Visuais",
-    Icon = "rbxassetid://7743873633",
-    PremiumOnly = false
+GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
+GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
+GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
+GroupCredits:AddLabel('<font color="#00FFFF">Redes</font>')
+GroupCredits:AddLabel('• Discord: <font color="#9DABFF">https://dsc.gg/msdoors-gg</font>')
+GroupCredits:AddButton({
+    Text = "Copiar Link",
+    Func = function()
+        local url = "https://dsc.gg/msdoors-gg"
+        if syn then
+            syn.request({
+                Url = url,
+                Method = "GET"
+            })
+        elseif setclipboard then
+            setclipboard(url)
+            Library:Notify({
+		Title = "Link copiado!",
+		Description = "Seu executor não suporta redirecionar. link copiado.",
+		Time = 5,
+	})
+
+        else
+                        Library:Notify({
+		Title = "LOL",
+		Description = "Seu executor não suporta redirecionar ou copiar links.",
+		Time = 5,
+	})
+
+        end
+
+    end,
+    DoubleClick = false,
+    Tooltip = "Fechar Janela do script."
 })
 
 
-OrionLib:Init()
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+local ScreenGui = game.CoreGui:FindFirstChild("msdoors-water")
+if not ScreenGui then
+    ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "msdoors-water"
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.Enabled = true
+end
+
+MenuGroup:AddToggle("msdoors-watermark", {
+	Text = "WaterMark Msdoors",
+	DisabledTooltip = "I am disabled!",
+	Default = true,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(value)
+        ScreenGui.Enabled = value
+	end,
+})
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Notify({
+		Title = "Fechando...",
+		Description = "Aguarde estamos cuidando de tudo!.",
+		Time = 5,
+	})
+	task.wait(5)
+	_G.MsdoorsLoaded = false
+	_G.ObsidianaLib = false
+	Library:Unload()
+	print("[Msdoors] • Até outra hora 😉")
+end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("msdoors")
+SaveManager:SetFolder("msdoors/Natural-disater")
+SaveManager:SetSubFolder("Natural-disaster")
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
