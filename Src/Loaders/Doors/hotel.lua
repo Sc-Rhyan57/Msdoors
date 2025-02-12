@@ -69,6 +69,7 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab("Principal", "user"),
+    Hotel = Window:AddTab("Hotel", ""),
     Visual = Window:AddTab("Visual", "user"),
     Exploits = Window:AddTab("Exploits", "user"),
     Credits = Window:AddTab("Créditos", "user"),
