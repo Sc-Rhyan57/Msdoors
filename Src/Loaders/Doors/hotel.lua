@@ -1042,7 +1042,6 @@ GroupAuto:AddDropdown("Auto-interact-drop", {
 	Default = 1,
 	Multi = true,
 	Text = "Ignore list",
-	Tooltip = "This is a tooltip",
 	DisabledTooltip = "I am disabled!",
 	Searchable = false,
 	Callback = function(Value)
@@ -1111,18 +1110,22 @@ GroupHotel:AddToggle("AntiA90", {
     Default = false,
     Callback = function(Value)
         G.msdoors_anti_A90 = Value
+
         if not Script.MainGame then return end
-        local function checkAndRenameModule(child)
-            if G.msdoors_anti_A90 and (child.Name == "A90" or child.Name == "_A90") then
-                child.Name = "_A90"
+
+        local function checkAndRenameModule(instance)
+            if G.msdoors_anti_A90 and (instance.Name == "A90" or instance.Name == "_A90") then
+                instance.Name = "_A90"
             end
         end
-        for _, child in pairs(Script.MainGame:GetChildren()) do
-            checkAndRenameModule(child)
+
+        for _, descendant in pairs(Script.MainGame:GetDescendants()) do
+            checkAndRenameModule(descendant)
         end
+
         if G.msdoors_anti_A90 then
             if not G.antiA90Connection then
-                G.antiA90Connection = Script.MainGame.ChildAdded:Connect(checkAndRenameModule)
+                G.antiA90Connection = Script.MainGame.DescendantAdded:Connect(checkAndRenameModule)
             end
         else
             if G.antiA90Connection then
