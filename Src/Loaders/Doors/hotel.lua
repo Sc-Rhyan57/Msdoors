@@ -1,3 +1,4 @@
+print("Não mano esse não é o mspaint, esse é o msdoors feito por rhyan57!")
 --[[
                                                                                                                      
      ______  _______            ______       _____           _____            _____         _____            ______  
