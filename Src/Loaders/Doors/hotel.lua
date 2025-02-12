@@ -33,9 +33,6 @@ local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com
 print("[Msdoors] • [✅] Inialização da livraria e apis")
 _G.ObsidianaLib = true
 --[[ VARIAVEIS GLOBAIS ]]--
-_G.msdoors_DeletingFigure = false
-_G.msdoors_InvisFigure = false
-_G.msdoors_InvisGrumbles = false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
