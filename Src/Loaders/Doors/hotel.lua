@@ -68,11 +68,11 @@ local Window = Library:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab("Principal", "user"),
-    Hotel = Window:AddTab("Hotel", ""),
-    Visual = Window:AddTab("Visual", "user"),
-    Exploits = Window:AddTab("Exploits", "user"),
-    Credits = Window:AddTab("Créditos", "user"),
+    Main = Window:AddTab("Principal", "house"),
+    Hotel = Window:AddTab("Hotel", "hotel"),
+    Visual = Window:AddTab("Visual", "view"),
+    Exploits = Window:AddTab("Exploits", "bomb"),
+    Credits = Window:AddTab("Créditos", "axe"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
