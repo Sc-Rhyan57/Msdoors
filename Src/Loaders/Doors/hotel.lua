@@ -793,14 +793,6 @@ GroupNotification:AddToggle("Visual-Notifier-Entities", {
             return
         end
         notificationsEnabled = value
-        local sound = Instance.new("Sound")
-        sound.SoundId = value and "rbxassetid://4590657391" or "rbxassetid://4590662766"
-        sound.Volume = 1
-        sound.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-        sound:Play()
-        sound.Ended:Connect(function()
-            sound:Destroy()
-        end)
         MsdoorsNotify(
             "MsDoors",
             value and "Notificações de Entidades ativas!" or "Notificações de Entidades desativadas!",
@@ -1001,6 +993,7 @@ GroupAuto:AddToggle("Auto-interact", {
 	end,
 })
 
+--// Este sistema de auto interact é originalmente dá mspaint \\--
 GroupAuto:AddDropdown("Auto-interact-drop", {
 	Values = {"Jeff Items", "Unlock w/ Lockpick", "Paintings", "Gold", "Light Source Items", "Skull Prompt"},
 	Default = 1,
@@ -1298,43 +1291,6 @@ GroupTroll:AddToggle("Troll-Thoughts", {
 	end,
 })
 
-local function updatePrompts()
-    for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
-        if Script.Functions.PromptCondition(prompt) then
-            prompt.RequiresLineOfSight = not _G.msdoors_promptclip
-            prompt.MaxActivationDistance = prompt:GetAttribute("Distance") and (prompt:GetAttribute("Distance") * _G.msdoors_prompreach) or prompt.MaxActivationDistance
-        end
-    end
-end
-
-GroupReach:AddToggle("PromptClip", {
-    Text = "Prompt Clip",
-    Default = _G.msdoors_promptclip,
-    Callback = function(value)
-        _G.msdoors_promptclip = value
-        updatePrompts()
-    end
-})
-
-GroupReach:AddSlider("PromptReachMultiplier", {
-    Text = "Prompt Reach Multiplier",
-    Default = _G.msdoors_prompreach,
-    Min = 1,
-    Max = 2,
-    Rounding = 1,
-    Callback = function(value)
-        _G.msdoors_prompreach = value
-        updatePrompts()
-    end
-})
-
-workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
-    if descendant:IsA("ProximityPrompt") and Script.Functions.PromptCondition(descendant) then
-        updatePrompts()
-    end
-end)
-
-updatePrompts()
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
