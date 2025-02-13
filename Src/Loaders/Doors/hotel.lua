@@ -39,7 +39,8 @@ _G.msdoors_antidread = _G.msdoors_antidread or false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
-_G.msdoors_watermark = true
+_G.msdoors_promptclip = _G.msdoors_promptclip or false
+_G.msdoors_prompreach = _G.msdoors_prompreach or 1
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -83,6 +84,8 @@ local Tabs = {
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
 local GroupPrincipal = Tabs.Main:AddLeftGroupbox("Player")
+local GroupReach = Tabs.Main:AddLeftGroupbox("Alcance")
+
 GroupPrincipal:AddLabel('<font color="#00FF56">Funções do jogador</font>')
 local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
 
@@ -1294,6 +1297,44 @@ GroupTroll:AddToggle("Troll-Thoughts", {
         end
 	end,
 })
+
+local function updatePrompts()
+    for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
+        if Script.Functions.PromptCondition(prompt) then
+            prompt.RequiresLineOfSight = not _G.msdoors_promptclip
+            prompt.MaxActivationDistance = prompt:GetAttribute("Distance") and (prompt:GetAttribute("Distance") * _G.msdoors_prompreach) or prompt.MaxActivationDistance
+        end
+    end
+end
+
+GroupReach:AddToggle("PromptClip", {
+    Text = "Prompt Clip",
+    Default = _G.msdoors_promptclip,
+    Callback = function(value)
+        _G.msdoors_promptclip = value
+        updatePrompts()
+    end
+})
+
+GroupReach:AddSlider("PromptReachMultiplier", {
+    Text = "Prompt Reach Multiplier",
+    Default = _G.msdoors_prompreach,
+    Min = 1,
+    Max = 2,
+    Rounding = 1,
+    Callback = function(value)
+        _G.msdoors_prompreach = value
+        updatePrompts()
+    end
+})
+
+workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("ProximityPrompt") and Script.Functions.PromptCondition(descendant) then
+        updatePrompts()
+    end
+end)
+
+updatePrompts()
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
