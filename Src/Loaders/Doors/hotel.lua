@@ -39,6 +39,7 @@ _G.msdoors_antidread = _G.msdoors_antidread or false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
+_G.msdoors_watermark = true
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -1333,6 +1334,29 @@ GroupCredits:AddButton({
 
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
+local Watermark = game.CoreGui:FindFirstChild("Watermark")
+if Watermark then
+    local TextLabel = Watermark:FindFirstChild("TextLabel")
+    if TextLabel then
+        _G.msdoors_watermark = true
+
+        MenuGroup:AddToggle("msdoors-watermark", {
+            Text = "WaterMark Msdoors",
+            DisabledTooltip = "I am disabled!",
+            Default = true,
+            Disabled = false,
+            Visible = true,
+            Risky = false,
+            Callback = function(value)
+                _G.msdoors_watermark = value
+                TextLabel.Visible = value
+            end,
+        })
+	else
+    end
+else
+    warn("[Msdoors] • Watermark não encontrado!")
+end
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
