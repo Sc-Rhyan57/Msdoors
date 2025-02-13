@@ -33,6 +33,9 @@ local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com
 print("[Msdoors] • [✅] Inialização da livraria e apis")
 _G.ObsidianaLib = true
 --[[ VARIAVEIS GLOBAIS ]]--
+_G.msdoors_antia90 = _G.msdoors_antia90 or false
+_G.msdoors_antiscreech = _G.msdoors_antiscreech or false
+_G.msdoors_antidread = _G.msdoors_antidread or false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
@@ -1183,6 +1186,148 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
         AntiSeekManager:ScanNearbyRooms(true)
     end
 end)
+
+--// ANTI ENTITY \\--
+local function toggleA90(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then
+        return
+    end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then
+        return
+    end
+
+    local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+
+    if not a90 then
+        return
+    end
+
+    if enabled then
+        if a90.Name == "A90" then
+            a90.Name = "A90_MSDOORS_DISABLE"
+        end
+    else
+        if a90.Name == "A90_MSDOORS_DISABLE" then
+            a90.Name = "A90"
+        end
+    end
+end
+
+local function toggleScreech(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then
+        return
+    end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then
+        return
+    end
+
+    local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
+
+    if not screech then
+        warn("[Msdoors] • Screech não encontrado!")
+        return
+    end
+
+    if enabled then
+        if screech.Name == "Screech" then
+            screech.Name = "Screech_MSDOORS_DISABLE"
+        end
+    else
+        if screech.Name == "Screech_MSDOORS_DISABLE" then
+            screech.Name = "Screech"
+        end
+    end
+end
+
+local function toggleDread(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then
+        return
+    end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then
+        return
+    end
+
+    local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
+
+    if not dread then
+        warn("[Msdoors] • Dread não encontrado!")
+        return
+    end
+
+    if enabled then
+        if dread.Name == "Dread" then
+            dread.Name = "Dread_MSDOORS_DISABLE"
+        end
+    else
+        if dread.Name == "Dread_MSDOORS_DISABLE" then
+            dread.Name = "Dread"
+        end
+    end
+end
+
+
+GroupAntiEntity:AddToggle("Anti-A90", {
+	Text = "Anti A90",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antia90,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antia90 = Value
+        toggleA90(Value)
+	end,
+})
+
+GroupAntiEntity:AddToggle("Anti-Dread", {
+	Text = "Anti Dread",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antidread,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antidread = Value
+        toggleDread(Value)
+	end,
+})
+
+GroupAntiEntity:AddToggle("Anti-Screech", {
+	Text = "Anti Screech",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antiscreech,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antiscreech = Value
+        toggleScreech(Value)
+	end,
+})
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
