@@ -46,7 +46,9 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
-local musicPlayer = { isPlaying = false, currentSound = nil, currentPlaylist = nil, playlists = {}, currentIndex = 0, volume = 0.5, folderName = ".msdoors", }
+
+--[[ Variáveis globais ]]--
+_G.msdoors_watermark = true
 print("[Msdoors] • [✅] Inicialização de Serviços")
 
 --[[ VERIFICAÇÃO DE JOGO ]]--
@@ -412,25 +414,29 @@ GroupCredits:AddButton({
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
 
-local ScreenGui = game.CoreGui:FindFirstChild("msdoors-water")
-if not ScreenGui then
-    ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "msdoors-water"
-    ScreenGui.Parent = game.CoreGui
-    ScreenGui.Enabled = true
-end
+local Watermark = game.CoreGui:FindFirstChild("Watermark")
+if Watermark then
+    local TextLabel = Watermark:FindFirstChild("TextLabel")
+    if TextLabel then
+        _G.msdoors_watermark = true
 
-MenuGroup:AddToggle("msdoors-watermark", {
-	Text = "WaterMark Msdoors",
-	DisabledTooltip = "I am disabled!",
-	Default = true,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(value)
-        ScreenGui.Enabled = value
-	end,
-})
+        MenuGroup:AddToggle("msdoors-watermark", {
+            Text = "WaterMark Msdoors",
+            DisabledTooltip = "I am disabled!",
+            Default = true,
+            Disabled = false,
+            Visible = true,
+            Risky = false,
+            Callback = function(value)
+                _G.msdoors_watermark = value
+                TextLabel.Visible = value
+            end,
+        })
+	else
+    end
+else
+    warn("[Msdoors] • Watermark não encontrado!")
+end
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
