@@ -61,6 +61,9 @@ _G.msdoors_desastre = {
     hudDisplayTime = 5 
 }
 _G.msdoors_watermark = true
+_G.RemoveSandstormUI = false
+_G.RemoveBlizzardUI = false
+_G.RemoveAds = false
 
 print("[Msdoors] • [✅] Inicialização de Serviços")
 --[[ VERIFICAÇÃO DE JOGO ]]--
@@ -293,45 +296,70 @@ TeleportsTab:AddButton({
 	Visible = true,
 })
 
-VisualsTab:AddButton({
-	Text = "Remove SandstormUI",
-	Func = function()
-		print("[Msdoors] • Apagando Ui: SandStormGui")
-                        game.Players.LocalPlayer.PlayerGui.SandStormGui:Destroy()
-	end,
-	DoubleClick = false,
-	Tooltip = "removerá a Gui de SandStorm da tela.",
-	DisabledTooltip = "I am disabled!",
-	Disabled = false,
-	Visible = true,
+local function monitorAndRemove()
+    while task.wait(1) do
+        if _G.RemoveSandstormUI then
+            local sandstormGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("SandStormGui")
+            if sandstormGui then
+                print("[Msdoors] • Apagando Ui: SandStormGui")
+                sandstormGui:Destroy()
+            end
+        end
+
+        if _G.RemoveBlizzardUI then
+            local blizzardGui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("BlizzardGui")
+            if blizzardGui then
+                print("[Msdoors] • Apagando Ui: BlizzardGui")
+                blizzardGui:Destroy()
+            end
+        end
+
+        if _G.RemoveAds then
+            local workspaceItems = {
+                game:GetService("Workspace"):FindFirstChild("BillboardAd"),
+                game:GetService("Workspace"):FindFirstChild("Main Portal Template "),
+                game:GetService("Workspace"):FindFirstChild("ReturnPortal")
+            }
+            
+            for _, item in ipairs(workspaceItems) do
+                if item then
+                    print("[Msdoors] • Apagando:", item.Name)
+                    item:Destroy()
+                end
+            end
+        end
+    end
+end
+task.spawn(monitorAndRemove)
+
+VisualsTab:AddToggle("remove_sandstorm_ui", {
+    Text = "Remove SandstormUI",
+    Default = false,
+    Callback = function(value)
+        _G.RemoveSandstormUI = value
+    end,
+    Tooltip = "Removerá a GUI de SandStorm da tela automaticamente.",
+    DisabledTooltip = "I am disabled!",
 })
 
-VisualsTab:AddButton({
-	Text = "Remove BlizzardGui",
-	Func = function()
-		print("[Msdoors] • Apagando Ui: BlizzardGui")
-                            game.Players.LocalPlayer.PlayerGui.BlizzardGui:Destroy()
-	end,
-	DoubleClick = false,
-	Tooltip = "removerá a Gui de Blizzard da tela.",
-	DisabledTooltip = "I am disabled!",
-	Disabled = false,
-	Visible = true,
+VisualsTab:AddToggle("remove_blizzard_ui", {
+    Text = "Remove BlizzardGui",
+    Default = false,
+    Callback = function(value)
+        _G.RemoveBlizzardUI = value
+    end,
+    Tooltip = "Removerá a GUI de Blizzard da tela automaticamente.",
+    DisabledTooltip = "I am disabled!",
 })
 
-VisualsTab:AddButton({
-	Text = "Remove Ads",
-	Func = function()
-	print("[Msdoors] • Apagando placar de anúncios")
-        game:GetService("Workspace").BillboardAd:Destroy()
-        game:GetService("Workspace")["Main Portal Template "]:Destroy()
-        game:GetService("Workspace").ReturnPortal:Destroy()
-	end,
-	DoubleClick = false,
-	Tooltip = "removerá o placar de anúncios do mapa visualmente..",
-	DisabledTooltip = "I am disabled!",
-	Disabled = false,
-	Visible = true,
+VisualsTab:AddToggle("remove_ads", {
+    Text = "Remove Ads",
+    Default = false,
+    Callback = function(value)
+        _G.RemoveAds = value
+    end,
+    Tooltip = "Removerá o placar de anúncios e portais do mapa.",
+    DisabledTooltip = "I am disabled!",
 })
 
 PlayersTab:AddButton({
