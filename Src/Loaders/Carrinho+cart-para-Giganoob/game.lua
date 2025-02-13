@@ -413,27 +413,6 @@ GroupCredits:AddButton({
 
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
-
-local Watermark = game.CoreGui:WaitForChild("Watermark", 8)
-if Watermark then
-    local TextLabel = Watermark:FindFirstChild("TextLabel")
-    if TextLabel then
-        _G.msdoors_watermark = true
-
-        MenuGroup:AddToggle("msdoors-watermark", {
-            Text = "WaterMark Msdoors",
-            Default = true,
-            Callback = function(value)
-                _G.msdoors_watermark = value
-                TextLabel.Visible = value
-            end,
-        })
-    else
-    end
-else
-    warn("[Msdoors] • Watermark não encontrado dentro do CoreGui!")
-end
-
 MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
 	Text = "Open Keybind Menu",
