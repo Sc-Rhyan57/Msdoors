@@ -89,6 +89,9 @@ local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 GroupTroll:AddLabel('<font color="#FF0000">Funções para troll</font>')
 
+local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
+GroupAntiEntity:AddLabel('<font color="#FF0000">remover entidades</font>')
+
 local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
 GroupHotel:AddLabel('<font color="#00FF56">Funções do floor atual</font>')
 
