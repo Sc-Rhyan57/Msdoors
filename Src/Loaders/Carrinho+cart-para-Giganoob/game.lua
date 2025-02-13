@@ -414,7 +414,7 @@ GroupCredits:AddButton({
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
 
-local Watermark = game.CoreGui:WaitForChild("Watermark", 8
+local Watermark = game.CoreGui:WaitForChild("Watermark", 8)
 if Watermark then
     local TextLabel = Watermark:FindFirstChild("TextLabel")
     if TextLabel then
