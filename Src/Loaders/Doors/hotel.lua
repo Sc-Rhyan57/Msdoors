@@ -102,7 +102,7 @@ GroupPrincipal:AddToggle("Jump-Enabled", {
 	Text = "Ativar Pulo",
 	Tooltip = "Ativa o pulo",
 	DisabledTooltip = "I am disabled!",
-	Default = true,
+	Default = false,
 	Disabled = false,
 	Visible = true,
 	Risky = true,
@@ -122,52 +122,6 @@ GroupPrincipal:AddToggle("Jump-Enabled", {
 })
 
 
-GroupTroll:AddToggle("Troll-Stunned-animation", {
-	Text = "Stunned",
-	Tooltip = "Faz seu personagem ficar com uma animação de atordoação.",
-	DisabledTooltip = "I am disabled!",
-	Default = false,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(Value)
-        local lplr = game.Players.LocalPlayer
-        if Value then
-            lplr.Character:SetAttribute('Stunned', true)
-            lplr.Character.Humanoid:SetAttribute('Stunned', true)
-        else
-            lplr.Character:SetAttribute('Stunned', false)
-            lplr.Character.Humanoid:SetAttribute('Stunned', false)
-        end
-	end,
-})
-
-GroupTroll:AddToggle("Troll-Thoughts", {
-	Text = "Thoughts",
-	Tooltip = "Faz seu personagem ficar com uma animação de pensamento.",
-	DisabledTooltip = "I am disabled!",
-	Default = false,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(Value)
-        local lplr = game.Players.LocalPlayer
-        local thinkanims = {"18885101321", "18885098453", "18885095182"}
-        
-        if Value then
-            local animation = Instance.new("Animation")
-            animation.AnimationId = "rbxassetid://" .. thinkanims[math.random(1, #thinkanims)]
-            animtrack = lplr.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
-            animtrack.Looped = true
-            animtrack:Play()
-        else
-            if animtrack then
-                animtrack:Stop()
-                animtrack:Destroy()
-            end
-        end
-	end,
-})
 
 local DoorESPConfig = {
     Types = {
@@ -1110,42 +1064,6 @@ end
 InitializeScript()
 task.spawn(AutoInteractLoop)
 
-GroupHotel:AddToggle("AntiA90", {
-    Text = "Anti-A90",
-    Tooltip = "Impede que o A90 ative seus efeitos.",
-    Default = false,
-    Callback = function(Value)
-        G.msdoors_anti_A90 = Value
-
-        if not Script.MainGame then return end
-
-        local function checkAndRenameModule(instance)
-            if G.msdoors_anti_A90 and (instance.Name == "A90" or instance.Name == "_A90") then
-                instance.Name = "_A90"
-            end
-        end
-
-        for _, descendant in pairs(Script.MainGame:GetDescendants()) do
-            checkAndRenameModule(descendant)
-        end
-
-        if G.msdoors_anti_A90 then
-            if not G.antiA90Connection then
-                G.antiA90Connection = Script.MainGame.DescendantAdded:Connect(checkAndRenameModule)
-            end
-        else
-            if G.antiA90Connection then
-                G.antiA90Connection:Disconnect()
-                G.antiA90Connection = nil
-            end
-
-            local module = Script.MainGame:FindFirstChild("_A90", true)
-            if module then
-                module.Name = "A90"
-            end
-        end
-    end
-})
 
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti-Seek Obstructions",
@@ -1329,6 +1247,53 @@ GroupAntiEntity:AddToggle("Anti-Screech", {
 	end,
 })
 
+GroupTroll:AddToggle("Troll-Stunned-animation", {
+	Text = "Stunned",
+	Tooltip = "Faz seu personagem ficar com uma animação de atordoação.",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        local lplr = game.Players.LocalPlayer
+        if Value then
+            lplr.Character:SetAttribute('Stunned', true)
+            lplr.Character.Humanoid:SetAttribute('Stunned', true)
+        else
+            lplr.Character:SetAttribute('Stunned', false)
+            lplr.Character.Humanoid:SetAttribute('Stunned', false)
+        end
+	end,
+})
+
+GroupTroll:AddToggle("Troll-Thoughts", {
+	Text = "Thoughts",
+	Tooltip = "Faz seu personagem ficar com uma animação de pensamento.",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        local lplr = game.Players.LocalPlayer
+        local thinkanims = {"18885101321", "18885098453", "18885095182"}
+        
+        if Value then
+            local animation = Instance.new("Animation")
+            animation.AnimationId = "rbxassetid://" .. thinkanims[math.random(1, #thinkanims)]
+            animtrack = lplr.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
+            animtrack.Looped = true
+            animtrack:Play()
+        else
+            if animtrack then
+                animtrack:Stop()
+                animtrack:Destroy()
+            end
+        end
+	end,
+})
+
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
 GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
@@ -1368,25 +1333,6 @@ GroupCredits:AddButton({
 
 -- UI Settings
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
-local ScreenGui = game.CoreGui:FindFirstChild("msdoors-water")
-if not ScreenGui then
-    ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "msdoors-water"
-    ScreenGui.Parent = game.CoreGui
-    ScreenGui.Enabled = true
-end
-
-MenuGroup:AddToggle("msdoors-watermark", {
-	Text = "WaterMark Msdoors",
-	DisabledTooltip = "I am disabled!",
-	Default = true,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(value)
-        ScreenGui.Enabled = value
-	end,
-})
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
