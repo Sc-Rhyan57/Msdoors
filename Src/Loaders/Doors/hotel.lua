@@ -27,7 +27,7 @@ local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/mstudio45/MSESP/refs/heads/main/source.luau"))()
+local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/MSESP/refs/heads/main/source.lua"))()
 local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
 
 print("[Msdoors] • [✅] Inialização da livraria e apis")
@@ -1306,7 +1306,7 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-GroupAuto:AddSlider("Main-MaxActivationDistance", {
+GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
     Min = 0,
     Max = 2,
