@@ -41,10 +41,6 @@ _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
 _G.MaxActivationDistance = _G.MaxActivationDistance or 7
 _G.PromptClip = _G.PromptClip or false
-_G.DoorReachEnabled = _G.DoorReachEnabled or false
-_G.PromptReachMultiplier = _G.PromptReachMultiplier or 1
-
-
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -1310,41 +1306,6 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-GroupReach:AddToggle("DoorReach", {
-    Text = "Alcance da porta",
-    Default = _G.DoorReachEnabled,
-    Callback = function(value)
-        _G.DoorReachEnabled = value
-        UpdateProximityPrompts()
-    end
-})
-
-local function UpdateProximityPrompts()
-    for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
-        if Script.Functions.PromptCondition(prompt) then
-            if not prompt:GetAttribute("Distance") then 
-                prompt:SetAttribute("Distance", prompt.MaxActivationDistance) 
-            end
-
-            prompt.MaxActivationDistance = prompt:GetAttribute("Distance") * (_G.DoorReachEnabled and _G.PromptReachMultiplier or 1)
-        end
-    end
-end
-
-Options.PromptReachMultiplier:OnChanged(function(value)
-    _G.PromptReachMultiplier = value
-    UpdateProximityPrompts()
-end)
-
-workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
-    if descendant:IsA("ProximityPrompt") and Script.Functions.PromptCondition(descendant) then
-        if not descendant:GetAttribute("Distance") then 
-            descendant:SetAttribute("Distance", descendant.MaxActivationDistance) 
-        end
-
-        descendant.MaxActivationDistance = descendant:GetAttribute("Distance") * (_G.DoorReachEnabled and _G.PromptReachMultiplier or 1)
-    end
-end)
 
 GroupReach:AddToggle("Main-PromptClip", {
     Text = "Prompt Clip",
