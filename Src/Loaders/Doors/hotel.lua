@@ -1291,6 +1291,50 @@ GroupTroll:AddToggle("Troll-Thoughts", {
 	end,
 })
 
+local function updatePrompts()
+    for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
+        if prompt:IsA("ProximityPrompt") and Script.Functions and Script.Functions.PromptCondition(prompt) then
+            if not prompt:GetAttribute("Distance") then
+                prompt:SetAttribute("Distance", prompt.MaxActivationDistance)
+            end
+            prompt.RequiresLineOfSight = not _G.msdoors_promptclip
+            prompt.MaxActivationDistance = prompt:GetAttribute("Distance") * _G.msdoors_prompreach
+        end
+    end
+end
+
+GroupReach:AddToggle("PromptClip", {
+    Text = "Prompt Clip",
+    Default = _G.msdoors_promptclip,
+    Callback = function(value)
+        _G.msdoors_promptclip = value
+        updatePrompts()
+    end
+})
+
+GroupReach:AddSlider("PromptReachMultiplier", {
+    Text = "Prompt Reach Multiplier",
+    Default = _G.msdoors_prompreach,
+    Min = 1,
+    Max = 2,
+    Rounding = 1,
+    Callback = function(value)
+        _G.msdoors_prompreach = value
+        updatePrompts()
+    end
+})
+
+workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("ProximityPrompt") and Script.Functions and Script.Functions.PromptCondition(descendant) then
+        if not descendant:GetAttribute("Distance") then
+            descendant:SetAttribute("Distance", descendant.MaxActivationDistance)
+        end
+        descendant.RequiresLineOfSight = not _G.msdoors_promptclip
+        descendant.MaxActivationDistance = descendant:GetAttribute("Distance") * _G.msdoors_prompreach
+    end
+end)
+
+updatePrompts()
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
