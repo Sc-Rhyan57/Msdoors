@@ -1221,49 +1221,31 @@ GroupAntiEntity:AddToggle("Anti-A90", {
 })
 
 GroupAntiEntity:AddToggle("AntiEyes", {
-    Text = "Anti-Eyes",
+    Text = "Anti Eyes",
     Default = _G.msdoors_antieyes,
     Callback = function(value)
         _G.msdoors_antieyes = value
 
         local Workspace = game:GetService("Workspace")
         local ReplicatedStorage = game:GetService("ReplicatedStorage")
-        local originalStates = {}
 
-        local function UpdateEyes(state)
+        local function AntiEyes()
             for _, eye in pairs(Workspace:GetChildren()) do
                 if eye.Name == "Eyes" or eye.Name == "BackdoorLookman" then
-                    if state then
-                        if not originalStates[eye] then
-                            originalStates[eye] = eye:Clone()
-                        end
+                    if _G.msdoors_antieyes then
                         ReplicatedStorage.RemotesFolder.MotorReplication:FireServer(-649)
-                    else
-                        if originalStates[eye] and eye then
-                            eye:Destroy()
-                            originalStates[eye]:Clone().Parent = Workspace
-                        end
                     end
-                end
-            end
-        end
-
-        local function OnNewEye(descendant)
-            if descendant:IsA("Model") and (descendant.Name == "Eyes" or descendant.Name == "BackdoorLookman") then
-                if _G.msdoors_antieyes then
-                    if not originalStates[descendant] then
-                        originalStates[descendant] = descendant:Clone()
-                    end
-                    ReplicatedStorage.RemotesFolder.MotorReplication:FireServer(-649)
                 end
             end
         end
 
         if _G.msdoors_antieyes then
-            UpdateEyes(true)
-            Workspace.ChildAdded:Connect(OnNewEye)
-        else
-            UpdateEyes(false)
+            task.spawn(function()
+                while _G.msdoors_antieyes do
+                    AntiEyes()
+                    task.wait()
+                end
+            end)
         end
     end
 })
