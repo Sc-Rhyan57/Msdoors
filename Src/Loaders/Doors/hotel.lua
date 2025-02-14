@@ -29,8 +29,9 @@ local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/MSESP/refs/heads/main/source.lua"))()
 local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Services.lua"))()
 _G.ObsidianaLib = true
+
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
 _G.msdoors_antiscreech = _G.msdoors_antiscreech or false
@@ -44,21 +45,6 @@ _G.msdoors_antieyes = _G.msdoors_antieyes or false
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
-
---[[ SERVIÇOS ]]--
-local Lighting = game:GetService("Lighting")
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
-local TextChatService = game:GetService("TextChatService")
-local UserInputService = game:GetService("UserInputService")
-local PathfindingService = game:GetService("PathfindingService")
-local ProximityPromptService = game:GetService("ProximityPromptService")
-local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
-local HttpService = game:GetService("HttpService")
-local LocalPlayer = Players.LocalPlayer
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
