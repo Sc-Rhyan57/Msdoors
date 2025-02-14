@@ -30,7 +30,6 @@ local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/MSESP/refs/heads/main/source.lua"))()
 local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
 
-print("[Msdoors] • [✅] Inialização da livraria e apis")
 _G.ObsidianaLib = true
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
@@ -60,11 +59,6 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
-local Script = { IsFools = false }
-local CanJumpEnabled = false
-
-print("[Msdoors] • [✅] Inicialização de Serviços")
-
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
@@ -74,6 +68,7 @@ local Window = Library:CreateWindow({
     ShowCustomCursor = true
 })
 
+
 local Tabs = {
     Main = Window:AddTab("Principal", "house"),
     Hotel = Window:AddTab("Hotel", "hotel"),
@@ -82,26 +77,52 @@ local Tabs = {
     Credits = Window:AddTab("Créditos", "axe"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
+
+--// CRÉDITS PAGE \\--
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 
+--// MAIN PAGE \\--
 local GroupPlayer = Tabs.Main:AddLeftGroupbox("Player")
 local GroupReach = Tabs.Main:AddLeftGroupbox("Alcance")
-
-GroupPlayer:AddLabel('<font color="#00FF56">Funções do jogador</font>')
 local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
+local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
+--// VISUAL PAGE \\--
 local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
 local GroupNotification = Tabs.Visual:AddRightGroupbox("Notifications")
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
+--// EXPLOITS PAGE \\--
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
-GroupTroll:AddLabel('<font color="#FF0000">Funções para troll</font>')
-
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
-GroupAntiEntity:AddLabel('<font color="#FF0000">remover entidades</font>')
 
+--// FLOOR PAGE \\--
 local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
-GroupHotel:AddLabel('<font color="#00FF56">Funções do floor atual</font>')
+
+
+GroupMisc:AddButton({
+    Text = "Reviver",
+    Func = function()
+        game:GetService("ReplicatedStorage").RemotesFolder.Revive:FireServer()
+    end,
+    DoubleClick = true
+})
+
+GroupMisc:AddButton({
+    Text = "Jogar novamente",
+    Func = function()
+        game:GetService("ReplicatedStorage").RemotesFolder.PlayAgain:FireServer()
+    end,
+    DoubleClick = true
+})
+
+GroupMisc:AddButton({
+    Text = "Retornar ao lobby",
+    Func = function()
+        game:GetService("ReplicatedStorage").RemotesFolder.Lobby:FireServer()
+    end,
+    DoubleClick = true
+})
 
 local DoorESPConfig = {
     Types = {
@@ -956,6 +977,7 @@ local IgnoreSettings = {
     ["Light Source Items"] = false,
     ["Skull Prompt"] = false
 }
+--// Este sistema de auto interact é originalmente dá mspaint \\--
 
 GroupAuto:AddToggle("Auto-interact", {
 	Text = "Auto Interact",
@@ -969,7 +991,6 @@ GroupAuto:AddToggle("Auto-interact", {
 	end,
 })
 
---// Este sistema de auto interact é originalmente dá mspaint \\--
 GroupAuto:AddDropdown("Auto-interact-drop", {
 	Values = {"Jeff Items", "Unlock w/ Lockpick", "Paintings", "Gold", "Light Source Items", "Skull Prompt"},
 	Default = 1,
