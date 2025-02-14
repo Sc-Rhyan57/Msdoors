@@ -1,4 +1,4 @@
-return {
+_G.msdoors_services = {
     Lighting = game:GetService("Lighting"),
     Players = game:GetService("Players"),
     ReplicatedStorage = game:GetService("ReplicatedStorage"),
