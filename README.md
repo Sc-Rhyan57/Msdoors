@@ -4,6 +4,9 @@
 > [!IMPORTANT]
 > **Esse script não é feito pela equipe do [Mspaint](https://mspaint.cc/), mas o dono do mesmo gosta muito da mspaint! :3**
 
+> [!NOTE]
+> Oi Upio, se você estiver vendo isso, não isso não é uma cópia do seu script é só uma inspiração [ em lua ].
+
 ![Preview msdoors](https://msdoors-gg.vercel.app/_next/image?url=%2Fmspaint.png&w=750&q=75)
 
 ### **📍 VANTAGENS**
