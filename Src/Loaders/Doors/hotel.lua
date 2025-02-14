@@ -102,33 +102,6 @@ GroupAntiEntity:AddLabel('<font color="#FF0000">remover entidades</font>')
 local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
 GroupHotel:AddLabel('<font color="#00FF56">Funções do floor atual</font>')
 
-GroupPlayer:AddToggle("EnableJump", {
-    Text = "Habilitar Pulo",
-    Default = false
-}):OnChanged(function(value)
-    local character = LocalPlayer.Character
-    if character then
-        character:SetAttribute("CanJump", value)
-    end
-end)
-
-GroupPlayer:AddSlider("JumpBoost", {
-    Text = "Impulso de Pulo",
-    Default = 5,
-    Min = 0,
-    Max = 50,
-    Rounding = 0,
-    Compact = true
-}):OnChanged(function(value)
-    local character = LocalPlayer.Character
-    if character and Toggles.EnableJump.Value then
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.JumpHeight = value
-        end
-    end
-end)
-
 local DoorESPConfig = {
     Types = {
         Door = {
@@ -1063,6 +1036,32 @@ end
 InitializeScript()
 task.spawn(AutoInteractLoop)
 
+GroupPlayer:AddToggle("EnableJump", {
+    Text = "Habilitar Pulo",
+    Default = false
+}):OnChanged(function(value)
+    local character = LocalPlayer.Character
+    if character then
+        character:SetAttribute("CanJump", value)
+    end
+end)
+
+GroupPlayer:AddSlider("JumpBoost", {
+    Text = "Impulso de Pulo",
+    Default = 5,
+    Min = 0,
+    Max = 50,
+    Rounding = 0,
+    Compact = true
+}):OnChanged(function(value)
+    local character = LocalPlayer.Character
+    if character and Toggles.EnableJump.Value then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.JumpHeight = value
+        end
+    end
+end)
 
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti-Seek Obstructions",
@@ -1307,7 +1306,7 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-GroupAuto:AddToggle("Main-PromptClip", {
+GroupReach:AddToggle("Main-PromptClip", {
     Text = "Prompt Clip",
     Default = _G.PromptClip,
     Callback = function(value)
