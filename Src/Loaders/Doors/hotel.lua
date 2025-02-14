@@ -39,9 +39,7 @@ _G.msdoors_antidread = _G.msdoors_antidread or false
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
-_G.msdoors_promptclip = _G.msdoors_promptclip or false
-_G.msdoors_prompreach = _G.msdoors_prompreach or 1
-_G.MaxActivationDistance = _G.MaxActivationDistance or 1
+_G.MaxActivationDistance = _G.MaxActivationDistance or 7
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -1308,8 +1306,8 @@ end)
 
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
-    Min = 0,
-    Max = 2,
+    Min = 7,
+    Max = 10,
     Default = _G.MaxActivationDistance,
     Increment = 0.1,
     Callback = function(value)
