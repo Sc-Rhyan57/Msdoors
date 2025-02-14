@@ -40,6 +40,7 @@ _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
 _G.MaxActivationDistance = _G.MaxActivationDistance or 7
+_G.PromptClip = _G.PromptClip or false
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -1293,6 +1294,29 @@ GroupTroll:AddToggle("Troll-Thoughts", {
 local function UpdateProximityPrompts()
     for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
         if prompt:IsA("ProximityPrompt") then
+            prompt.RequiresLineOfSight = not _G.PromptClip
+        end
+    end
+end
+
+workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("ProximityPrompt") then
+        descendant.RequiresLineOfSight = not _G.PromptClip
+    end
+end)
+
+GroupAuto:AddToggle("Main-PromptClip", {
+    Text = "Prompt Clip",
+    Default = _G.PromptClip,
+    Callback = function(value)
+        _G.PromptClip = value
+        UpdateProximityPrompts()
+    end,
+})
+
+local function UpdateProximityPrompts()
+    for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
+        if prompt:IsA("ProximityPrompt") then
             prompt.MaxActivationDistance = _G.MaxActivationDistance
         end
     end
@@ -1315,6 +1339,7 @@ GroupReach:AddSlider("Main-MaxActivationDistance", {
         UpdateProximityPrompts()
     end,
 })
+
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
