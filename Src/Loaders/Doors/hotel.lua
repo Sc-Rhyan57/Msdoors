@@ -29,9 +29,22 @@ local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/MSESP/refs/heads/main/source.lua"))()
 local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Services.lua"))()
 _G.ObsidianaLib = true
 
+--[[ SERVICES ]]--
+    Lighting = game:GetService("Lighting"),
+    Players = game:GetService("Players"),
+    ReplicatedStorage = game:GetService("ReplicatedStorage"),
+    RunService = game:GetService("RunService"),
+    SoundService = game:GetService("SoundService"),
+    TextChatService = game:GetService("TextChatService"),
+    UserInputService = game:GetService("UserInputService"),
+    PathfindingService = game:GetService("PathfindingService"),
+    ProximityPromptService = game:GetService("ProximityPromptService"),
+    TweenService = game:GetService("TweenService"),
+    Workspace = game:GetService("Workspace"),
+    HttpService = game:GetService("HttpService"),
+    LocalPlayer = game:GetService("Players").LocalPlayer
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
 _G.msdoors_antiscreech = _G.msdoors_antiscreech or false
@@ -45,6 +58,7 @@ _G.msdoors_antieyes = _G.msdoors_antieyes or false
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
+
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
