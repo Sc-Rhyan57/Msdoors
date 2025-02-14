@@ -41,6 +41,7 @@ _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
 _G.msdoors_promptclip = _G.msdoors_promptclip or false
 _G.msdoors_prompreach = _G.msdoors_prompreach or 1
+_G.MaxActivationDistance = _G.MaxActivationDistance or 1
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -1291,50 +1292,31 @@ GroupTroll:AddToggle("Troll-Thoughts", {
 	end,
 })
 
-local function updatePrompts()
+local function UpdateProximityPrompts()
     for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
-        if prompt:IsA("ProximityPrompt") and Script.Functions and Script.Functions.PromptCondition(prompt) then
-            if not prompt:GetAttribute("Distance") then
-                prompt:SetAttribute("Distance", prompt.MaxActivationDistance)
-            end
-            prompt.RequiresLineOfSight = not _G.msdoors_promptclip
-            prompt.MaxActivationDistance = prompt:GetAttribute("Distance") * _G.msdoors_prompreach
+        if prompt:IsA("ProximityPrompt") then
+            prompt.MaxActivationDistance = _G.MaxActivationDistance
         end
     end
 end
 
-GroupReach:AddToggle("PromptClip", {
-    Text = "Prompt Clip",
-    Default = _G.msdoors_promptclip,
-    Callback = function(value)
-        _G.msdoors_promptclip = value
-        updatePrompts()
-    end
-})
-
-GroupReach:AddSlider("PromptReachMultiplier", {
-    Text = "Prompt Reach Multiplier",
-    Default = _G.msdoors_prompreach,
-    Min = 1,
-    Max = 2,
-    Rounding = 1,
-    Callback = function(value)
-        _G.msdoors_prompreach = value
-        updatePrompts()
-    end
-})
-
 workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
-    if descendant:IsA("ProximityPrompt") and Script.Functions and Script.Functions.PromptCondition(descendant) then
-        if not descendant:GetAttribute("Distance") then
-            descendant:SetAttribute("Distance", descendant.MaxActivationDistance)
-        end
-        descendant.RequiresLineOfSight = not _G.msdoors_promptclip
-        descendant.MaxActivationDistance = descendant:GetAttribute("Distance") * _G.msdoors_prompreach
+    if descendant:IsA("ProximityPrompt") then
+        descendant.MaxActivationDistance = _G.MaxActivationDistance
     end
 end)
 
-updatePrompts()
+GroupAuto:AddSlider("Main-MaxActivationDistance", {
+    Text = "Prompt Reach Multiplier",
+    Min = 0,
+    Max = 2,
+    Default = _G.MaxActivationDistance,
+    Increment = 0.1,
+    Callback = function(value)
+        _G.MaxActivationDistance = value
+        UpdateProximityPrompts()
+    end,
+})
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
