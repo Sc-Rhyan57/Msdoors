@@ -58,12 +58,12 @@ local function monitorIsAlive()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
 
     if not humanoid then return end
-    while humanoid:GetAttribute("IsAlive") == nil do
+    while humanoid:GetAttribute("Alive") == nil do
         task.wait()
     end
 
-    humanoid:GetAttributeChangedSignal("IsAlive"):Connect(function()
-        if humanoid:GetAttribute("IsAlive") then
+    humanoid:GetAttributeChangedSignal("Alive"):Connect(function()
+        if humanoid:GetAttribute("Alive") then
             task.wait(1) 
             for globalVar, func in pairs(Msdoors) do
                 if globalVar then
