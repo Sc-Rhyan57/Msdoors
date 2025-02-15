@@ -43,41 +43,6 @@ getgenv().AntiSeekManager = {
 _G.ObsidianaLib = true
 
 
---// GAMBIARRA - REATIVAR FUNÇÕES QUANDO MORRER \\--
-local player = game.Players.LocalPlayer 
-
-local Msdoors = {
-    msdoors_anticutscenes = function() toggleCutscenes(true) end,
-    msdoors_antijumpscares = function() toggleJumpscares(true) end,
-    msdoors_antidread = function() toggleDread(true) end,
-    msdoors_antiscreech = function() toggleScreech(true) end,
-    msdoors_antia90 = function() toggleA90(true) end
-}
-
-local function monitorIsAlive()
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-    if not humanoid then return end
-
-    while humanoid:GetAttribute("Alive") == nil do
-        task.wait()
-    end
-
-    humanoid:GetAttributeChangedSignal("Alive"):Connect(function()
-        if humanoid:GetAttribute("Alive") then
-            task.wait(1) 
-            for globalVar, func in pairs(Msdoors) do
-                if _G[globalVar] then 
-                    func()
-                end
-            end
-        end
-    end)
-end
-
-monitorIsAlive()
-player.CharacterAdded:Connect(monitorIsAlive)
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
