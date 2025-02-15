@@ -69,7 +69,7 @@ local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
 local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
-local GroupNotification = Window:AddTabBox("Notificação")
+local GroupNotification = Tabs.Visual:AddTabBox("Notificação")
 
 local GroupNot = TabBox:AddTab("Notificar")
 local GroupNotC = TabBox:AddTab("Configurações")
