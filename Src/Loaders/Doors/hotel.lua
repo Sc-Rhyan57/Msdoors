@@ -42,6 +42,41 @@ getgenv().AntiSeekManager = {
 }
 _G.ObsidianaLib = true
 
+
+--// GAMBIARRA - REATIVAR FUNÇÕES QUANDO MORRER \\--
+local Msdoors = {
+    [_G.msdoors_anticutscenes] = function() toggleCutscenes(true) end,
+    [_G.msdoors_antijumpscares] = function() toggleJumpscares(true) end,
+    [_G.msdoors_antidread] = function() toggleDread(true) end,
+    [_G.msdoors_antiscreech] = function() toggleScreech(true) end,
+    [_G.msdoors_antia90] = function() toggleA90(true) end
+	
+}
+
+local function monitorIsAlive()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if not humanoid then return end
+    while humanoid:GetAttribute("IsAlive") == nil do
+        task.wait()
+    end
+
+    humanoid:GetAttributeChangedSignal("IsAlive"):Connect(function()
+        if humanoid:GetAttribute("IsAlive") then
+            task.wait(1) 
+            for globalVar, func in pairs(Msdoors) do
+                if globalVar then
+                    func()
+                end
+            end
+        end
+    end)
+end
+
+monitorIsAlive()
+player.CharacterAdded:Connect(monitorIsAlive)
+
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
     Footer = "Build: 0.1.3 | by rhyan57",
@@ -131,7 +166,8 @@ local EntityTable = {
 }
 
 local RoomTable = {
-    ["HaltHallway"] = { ["Image"] = "11331795398", ["Title"] = "Halt", ["Description"] = "Prepare-se para Halt!" }
+    ["HaltHallway"] = { ["Image"] = "11331795398", ["Title"] = "Halt", ["Description"] = "Prepare-se para Halt!" },
+    ["Hotel_SeekIntro"] = { ["Image"] = "11043368229", ["Title"] = "Seek", ["Description"] = "Prepare-se para Seek!" }
 }
 
 local notificationsEnabled = true
@@ -1495,7 +1531,7 @@ GroupAntiEntity:AddToggle("Anti-Screech", {
 	Visible = true,
 	Risky = false,
 	Callback = function(Value)
-        _G.msdoors_antiscreech = Value
+        _G.msdoors_antiscppreech = Value
         toggleScreech(Value)
 	end,
 })
@@ -1707,8 +1743,7 @@ local function toggleJumpscares(enabled)
 
     local initiator = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game")
     if not initiator then return end
-
-    -- Agora buscando dentro de RemoteListener
+	
     local remoteListener = initiator:FindFirstChild("RemoteListener")
     if not remoteListener then return end
 
