@@ -609,8 +609,7 @@ local ITEMESPConfig = {
 local ITEMESPManager = {
     ActiveESPs = {},
     IsEnabled = false,
-    IsChecking = false,
-    CurrentRoom = nil
+    IsChecking = false
 }
 
 function ITEMESPManager:CreateESP(object, itemName)
@@ -671,33 +670,14 @@ function ITEMESPManager:RemoveESP(object)
     end
 end
 
-function ITEMESPManager:ScanRoom()
+function ITEMESPManager:ScanDrops()
     if not self.IsEnabled then return end
 
-    local player = game.Players.LocalPlayer
-    local roomName = player:GetAttribute("CurrentRoom")
-    if not roomName then return end
-
-    local currentRoom = workspace.CurrentRooms:FindFirstChild(roomName)
-    if not currentRoom then return end
-
-    -- Se o jogador mudou de sala, limpar ESPs antigos
-    if self.CurrentRoom ~= currentRoom then
-        self:ClearESPs()
-        self.CurrentRoom = currentRoom
-    end
-
-    -- Procurar os itens dentro de "Workspace/Drops" que estão na mesma sala
     local dropsFolder = workspace:FindFirstChild("Drops")
     if not dropsFolder then return end
 
     for _, item in pairs(dropsFolder:GetChildren()) do
-        if item:IsA("Model") and item.PrimaryPart then
-            -- Verifica se o item está dentro da posição da sala
-            if currentRoom:IsAncestorOf(item) or (item.PrimaryPart.Position - currentRoom.Position).Magnitude < 50 then
-                self:AddESP(item)
-            end
-        end
+        self:AddESP(item)
     end
 end
 
@@ -714,7 +694,7 @@ function ITEMESPManager:StartScanning()
 
     spawn(function()
         while self.IsChecking do
-            self:ScanRoom()
+            self:ScanDrops()
             wait(ITEMESPConfig.Settings.UpdateInterval)
         end
     end)
@@ -742,13 +722,6 @@ GroupEsp:AddToggle("Visual-esp-item", {
         end
     end,
 })
-
--- Monitorar mudanças de sala
-game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
-    if ITEMESPManager.IsEnabled then
-        ITEMESPManager:ScanRoom()
-    end
-end)
 
 GroupEsp:AddToggle("Visual-esp-objective", {
 	Text = "Esp Objetivo",
