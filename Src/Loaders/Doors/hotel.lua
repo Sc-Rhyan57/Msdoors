@@ -44,6 +44,8 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
+local LocalPlayer = game.Players.LocalPlayer
+
 
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
@@ -1194,7 +1196,12 @@ GroupPlayer:AddToggle("EnableJump", {
 }):OnChanged(function(value)
     local character = LocalPlayer.Character
     if character then
-        character:SetAttribute("CanJump", value)
+        character:SetAttribute("CanJump", value) 
+        
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.JumpHeight = value and Toggles.JumpBoost.Value or 0
+        end
     end
 end)
 
@@ -1207,12 +1214,19 @@ GroupPlayer:AddSlider("JumpBoost", {
     Compact = true
 }):OnChanged(function(value)
     local character = LocalPlayer.Character
-    if character and Toggles.EnableJump.Value then
+    if character and character:GetAttribute("CanJump") then
         local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoid then
             humanoid.JumpHeight = value
         end
     end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function(character)
+    character:SetAttribute("CanJump", Toggles.EnableJump.Value)
+    
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.JumpHeight = Toggles.EnableJump.Value and Toggles.JumpBoost.Value or 0
 end)
 
 GroupHotel:AddToggle("AntiSeekObstructions", {
