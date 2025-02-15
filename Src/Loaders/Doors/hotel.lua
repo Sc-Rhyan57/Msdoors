@@ -128,9 +128,10 @@ local RoomTable = {
     ["HaltHallway"] = { ["Image"] = "11331795398", ["Title"] = "Halt", ["Description"] = "Prepare-se para Halt!" }
 }
 
-local notificationsEnabled = false
+local notificationsEnabled = true
 local chatEnabled = false
 local notifiedRooms = {}
+local notifiedEntities = {} -- Para rastrear entidades já notificadas por ID único
 
 _G.msdoors_chatActive = false
 
@@ -147,21 +148,28 @@ local function TrySendChatMessage(message)
     end
 end
 
+-- Função para gerar um ID único para cada entidade
+local function GetEntityUniqueId(entity)
+    return tostring(entity:GetFullName()) .. "_" .. tostring(entity.Position)
+end
+
 function MonitorEntities()
     game:GetService("RunService").Stepped:Connect(function()
         if notificationsEnabled then
-            local entitiesToNotify = {}
-
             for _, entityName in ipairs(EntityTable.Names) do
-                local entity = workspace:FindFirstChild(entityName)
-                if entity and not entity:GetAttribute("Notified") then
-                    entity:SetAttribute("Notified", true)
-                    table.insert(entitiesToNotify, entityName)
+                -- Procurar TODAS as instâncias da entidade, não apenas a primeira
+                local entities = workspace:GetChildren()
+                for _, entity in pairs(entities) do
+                    if entity.Name == entityName then
+                        local uniqueId = GetEntityUniqueId(entity)
+                        
+                        -- Verificar se esta instância específica já foi notificada
+                        if not notifiedEntities[uniqueId] then
+                            notifiedEntities[uniqueId] = true
+                            NotifyEntity(entityName)
+                        end
+                    end
                 end
-            end
-
-            for _, entityName in ipairs(entitiesToNotify) do
-                NotifyEntity(entityName)
             end
         end
     end)
@@ -170,6 +178,7 @@ end
 function NotifyEntity(entityName)
     local notificationData = EntityTable.NotifyReason[entityName]
     if notificationData then
+        -- Usar task.spawn para garantir que cada notificação seja independente
         task.spawn(function()
             MsdoorsNotify(
                 notificationData.Title,
@@ -226,6 +235,7 @@ function NotifyRoom(roomName)
     end
 end
 
+-- Iniciar o monitoramento
 MonitorEntities()
 MonitorRooms()
 
