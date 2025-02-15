@@ -163,18 +163,20 @@ end
 function NotifyEntity(entityName)
     local notificationData = EntityTable.NotifyReason[entityName]
     if notificationData then
-        MsdoorsNotify(
-            notificationData.Title,
-            notificationData.Description,
-            "",
-            "rbxassetid://" .. notificationData.Image,
-            Color3.fromRGB(255, 0, 0),
-            5
-        )
+        task.spawn(function()
+            MsdoorsNotify(
+                notificationData.Title,
+                notificationData.Description,
+                "",
+                "rbxassetid://" .. notificationData.Image,
+                Color3.fromRGB(255, 0, 0),
+                5
+            )
 
-        if _G.msdoors_chatActive then
-            TrySendChatMessage("[" .. notificationData.Title .. "] - " .. notificationData.Description)
-        end
+            if _G.msdoors_chatActive then
+                TrySendChatMessage("[" .. notificationData.Title .. "] - " .. notificationData.Description)
+            end
+        end)
     end
 end
 
@@ -200,18 +202,20 @@ end
 function NotifyRoom(roomName)
     local roomData = RoomTable[roomName]
     if roomData then
-        MsdoorsNotify(
-            roomData.Title,
-            roomData.Description,
-            "",
-            "rbxassetid://" .. roomData.Image,
-            Color3.fromRGB(0, 255, 255),
-            5
-        )
+        task.spawn(function()
+            MsdoorsNotify(
+                roomData.Title,
+                roomData.Description,
+                "",
+                "rbxassetid://" .. roomData.Image,
+                Color3.fromRGB(0, 255, 255),
+                5
+            )
 
-        if _G.msdoors_chatActive then
-            TrySendChatMessage("[" .. roomData.Title .. "] - " .. roomData.Description)
-        end
+            if _G.msdoors_chatActive then
+                TrySendChatMessage("[" .. roomData.Title .. "] - " .. roomData.Description)
+            end
+        end)
     end
 end
 
