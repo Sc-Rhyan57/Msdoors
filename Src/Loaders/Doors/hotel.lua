@@ -223,7 +223,6 @@ function NotifyRoom(roomName)
     end
 end
 
--- Iniciar o monitoramento
 MonitorEntities()
 MonitorRooms()
 
@@ -710,6 +709,18 @@ local ITEMESPConfig = {
     }
 }
 
+local ITEMESPConfig = {
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0,
+        TracerStartPosition = "Bottom",
+        ArrowCenterOffset = 300
+    }
+}
+
 local ITEMESPManager = {
     ActiveESPs = {},
     IsEnabled = false,
@@ -717,14 +728,14 @@ local ITEMESPManager = {
 }
 
 function ITEMESPManager:CreateESP(object, itemName)
-    if not object or not object.PrimaryPart then return nil end
+    if not object or not object.PrimaryPart or not object:IsDescendantOf(workspace) then return nil end
 
     local espInstance = ESPLibrary.ESP.Highlight({
         Name = itemName,
         Model = object,
         MaxDistance = ITEMESPConfig.Settings.MaxDistance,
         
-        FillColor = Color3.fromRGB(0, 255, 255), -- Cor Ciano
+        FillColor = Color3.fromRGB(0, 255, 255),
         OutlineColor = Color3.fromRGB(0, 255, 255),
         TextColor = Color3.fromRGB(0, 255, 255),
         TextSize = ITEMESPConfig.Settings.TextSize,
@@ -745,9 +756,8 @@ function ITEMESPManager:CreateESP(object, itemName)
         }
     })
 
-    -- Monitorar se o item for removido do Workspace
     object.AncestryChanged:Connect(function(_, parent)
-        if not parent then
+        if not parent or not object:IsDescendantOf(workspace) then
             self:RemoveESP(object)
         end
     end)
@@ -756,11 +766,18 @@ function ITEMESPManager:CreateESP(object, itemName)
 end
 
 function ITEMESPManager:AddESP(object, itemName)
-    if not object or self.ActiveESPs[object] then return end
+    if not object or self.ActiveESPs[object] or not object:IsDescendantOf(workspace) then return end
 
     local espInstance = self:CreateESP(object, itemName)
     if espInstance then
         self.ActiveESPs[object] = espInstance
+    end
+end
+
+function ITEMESPManager:RemoveESP(object)
+    if self.ActiveESPs[object] then
+        self.ActiveESPs[object]:Destroy()
+        self.ActiveESPs[object] = nil
     end
 end
 
@@ -772,8 +789,10 @@ function ITEMESPManager:ScanDrops()
 
     for _, item in pairs(dropsFolder:GetChildren()) do
         local itemName = item:GetAttribute("Tool_NameSingular") or item:GetAttribute("Pickup")
-        if itemName then
+        if itemName and item:IsDescendantOf(workspace) then
             self:AddESP(item, itemName)
+        elseif self.ActiveESPs[item] then
+            self:RemoveESP(item)
         end
     end
 end
@@ -784,8 +803,10 @@ function ITEMESPManager:ScanWorkspace()
     for _, object in pairs(workspace:GetDescendants()) do
         if object:GetAttribute("JustLoot") == true then
             local itemName = object:GetAttribute("Tool")
-            if itemName then
+            if itemName and object:IsDescendantOf(workspace) then
                 self:AddESP(object, itemName)
+            elseif self.ActiveESPs[object] then
+                self:RemoveESP(object)
             end
         end
     end
@@ -793,7 +814,7 @@ end
 
 function ITEMESPManager:ClearESPs()
     for object, esp in pairs(self.ActiveESPs) do
-        esp.Destroy()
+        esp:Destroy()
     end
     self.ActiveESPs = {}
 end
@@ -804,8 +825,8 @@ function ITEMESPManager:StartScanning()
 
     spawn(function()
         while self.IsChecking do
-            self:ScanDrops()     -- Verifica a pasta "Drops"
-            self:ScanWorkspace() -- Verifica todo o workspace
+            self:ScanDrops()
+            self:ScanWorkspace()
             wait(ITEMESPConfig.Settings.UpdateInterval)
         end
     end)
