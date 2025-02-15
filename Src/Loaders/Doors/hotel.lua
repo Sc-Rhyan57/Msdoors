@@ -44,7 +44,7 @@ _G.ObsidianaLib = true
 
 
 --// GAMBIARRA - REATIVAR FUNÇÕES QUANDO MORRER \\--
-local Msdoors = {
+--[[ local Msdoors = {
     [_G.msdoors_anticutscenes] = function() toggleCutscenes(true) end,
     [_G.msdoors_antijumpscares] = function() toggleJumpscares(true) end,
     [_G.msdoors_antidread] = function() toggleDread(true) end,
@@ -76,6 +76,7 @@ end
 
 monitorIsAlive()
 player.CharacterAdded:Connect(monitorIsAlive)
+]]--
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
