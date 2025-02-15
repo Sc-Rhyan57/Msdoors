@@ -107,6 +107,7 @@ GroupMisc:AddButton({
     end,
     DoubleClick = true
 })
+
 local EntityTable = {
     ["Names"] = {"BackdoorRush", "BackdoorLookman", "RushMoving", "AmbushMoving", "Eyes", "JeffTheKiller", "A60", "A120"},
     ["NotifyReason"] = {
@@ -149,12 +150,18 @@ end
 function MonitorEntities()
     game:GetService("RunService").Stepped:Connect(function()
         if notificationsEnabled then
+            local entitiesToNotify = {}
+
             for _, entityName in ipairs(EntityTable.Names) do
                 local entity = workspace:FindFirstChild(entityName)
                 if entity and not entity:GetAttribute("Notified") then
                     entity:SetAttribute("Notified", true)
-                    NotifyEntity(entityName)
+                    table.insert(entitiesToNotify, entityName)
                 end
+            end
+
+            for _, entityName in ipairs(entitiesToNotify) do
+                NotifyEntity(entityName)
             end
         end
     end)
