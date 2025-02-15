@@ -1,24 +1,3 @@
-print("Não mano esse não é o mspaint, esse é o msdoors feito por rhyan57!")
---[[
-                                                                                                                     
-     ______  _______            ______       _____           _____            _____         _____            ______  
-    |      \/       \       ___|\     \  ___|\    \     ____|\    \      ____|\    \    ___|\    \       ___|\     \ 
-   /          /\     \     |    |\     \|    |\    \   /     /\    \    /     /\    \  |    |\    \     |    |\     \
-  /     /\   / /\     |    |    |/____/||    | |    | /     /  \    \  /     /  \    \ |    | |    |    |    |/____/|
- /     /\ \_/ / /    /| ___|    \|   | ||    | |    ||     |    |    ||     |    |    ||    |/____/  ___|    \|   | |
-|     |  \|_|/ /    / ||    \    \___|/ |    | |    ||     |    |    ||     |    |    ||    |\    \ |    \    \___|/ 
-|     |       |    |  ||    |\     \    |    | |    ||\     \  /    /||\     \  /    /||    | |    ||    |\     \    
-|\____\       |____|  /|\ ___\|_____|   |____|/____/|| \_____\/____/ || \_____\/____/ ||____| |____||\ ___\|_____|   
-| |    |      |    | / | |    |     |   |    /    | | \ |    ||    | / \ |    ||    | /|    | |    || |    |     |   
- \|____|      |____|/   \|____|_____|   |____|____|/   \|____||____|/   \|____||____|/ |____| |____| \|____|_____|   
-    \(          )/         \(    )/       \(    )/        \(    )/         \(    )/      \(     )/      \(    )/     
-     '          '           '    '         '    '          '    '           '    '        '     '        '    '      
-                                                                                                                     
-                                        Por Rhyan57 💜
-  ]]--
---[[ LIBRARY & API]]--
-
-
 if _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
@@ -29,7 +8,6 @@ local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/MSESP/refs/heads/main/source.lua"))()
 local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
-_G.ObsidianaLib = true
 
 --[[ SERVIÇOS ]]--
 local Lighting = game:GetService("Lighting")
@@ -45,7 +23,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = game.Players.LocalPlayer
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
@@ -60,7 +38,7 @@ _G.msdoors_antieyes = _G.msdoors_antieyes or false
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
-
+_G.ObsidianaLib = true
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
@@ -1388,11 +1366,7 @@ GroupAntiEntity:AddToggle("AntiEyes", {
     Text = "Anti Eyes",
     Default = _G.msdoors_antieyes,
     Callback = function(value)
-        _G.msdoors_antieyes = value
-
-        local Workspace = game:GetService("Workspace")
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
+    _G.msdoors_antieyes = value
         local function AntiEyes()
             for _, eye in pairs(Workspace:GetChildren()) do
                 if eye.Name == "Eyes" or eye.Name == "BackdoorLookman" then
@@ -1463,6 +1437,17 @@ GroupAntiEntity:AddToggle("Anti-Snare", {
                     hitbox.CanTouch = not state
                 end
             end
+        end
+    end
+})
+
+GroupAntiEntity:AddToggle("AntiHearing", {
+    Text = "Anti-Figure Hearing",
+    Default = false,
+    Callback = function(state)
+        local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
+        if remote and remote:IsA("RemoteEvent") then
+            remote:FireServer(state)
         end
     end
 })
@@ -1669,4 +1654,3 @@ SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
-
