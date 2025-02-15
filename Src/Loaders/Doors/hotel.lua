@@ -69,12 +69,11 @@ local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
 local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
-local GroupNotification = Tabs.Visual:AddRightTabBox("Notificação")
-
-local GroupNot = TabBox:AddTab("Notificar")
-local GroupNotC = TabBox:AddTab("Configurações")
-
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
+local GroupNotification = Tabs.Visual:AddRightTabbox()
+local GroupNot = GroupNotification:AddTab('Notificação')
+local GroupNotC = GroupNotification:AddTab('Configurações')
+
 
 --// EXPLOITS PAGE \\--
 local GroupModifiers = Tabs.Exploits:AddRightGroupbox("Modificadores")
