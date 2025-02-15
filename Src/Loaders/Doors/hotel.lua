@@ -113,7 +113,6 @@ local EntityTable = {
     ["NotifyReason"] = {
         ["A60"] = { ["Image"] = "12350986086", ["Title"] = "A-60", ["Description"] = "A-60 SPAWNOU!" },
         ["A120"] = { ["Image"] = "12351008553", ["Title"] = "A-120", ["Description"] = "A-120 SPAWNOU!" },
-        ["HaltRoom"] = { ["Image"] = "11331795398", ["Title"] = "Halt", ["Description"] = "Prepare-se para Halt!" },
         ["Window_BrokenSally"] = { ["Image"] = "100573561401335", ["Title"] = "Sally", ["Description"] = "Sally SPAWNOU!" },
         ["BackdoorRush"] = { ["Image"] = "11102256553", ["Title"] = "Backdoor Blitz", ["Description"] = "Blitz SPAWNOU!" },
         ["RushMoving"] = { ["Image"] = "11102256553", ["Title"] = "Rush", ["Description"] = "Rush SPAWNOU!" },
@@ -131,7 +130,6 @@ local RoomTable = {
 local notificationsEnabled = true
 local chatEnabled = false
 local notifiedRooms = {}
-local notifiedEntities = {} -- Para rastrear entidades já notificadas por ID único
 
 _G.msdoors_chatActive = false
 
@@ -148,24 +146,15 @@ local function TrySendChatMessage(message)
     end
 end
 
--- Função para gerar um ID único para cada entidade
-local function GetEntityUniqueId(entity)
-    return tostring(entity:GetFullName()) .. "_" .. tostring(entity.Position)
-end
-
 function MonitorEntities()
     game:GetService("RunService").Stepped:Connect(function()
         if notificationsEnabled then
             for _, entityName in ipairs(EntityTable.Names) do
-                -- Procurar TODAS as instâncias da entidade, não apenas a primeira
                 local entities = workspace:GetChildren()
                 for _, entity in pairs(entities) do
                     if entity.Name == entityName then
-                        local uniqueId = GetEntityUniqueId(entity)
-                        
-                        -- Verificar se esta instância específica já foi notificada
-                        if not notifiedEntities[uniqueId] then
-                            notifiedEntities[uniqueId] = true
+                        if not entity:GetAttribute("Msdoors_notificada") then
+                            entity:SetAttribute("Msdoors_notificada", true)
                             NotifyEntity(entityName)
                         end
                     end
@@ -178,7 +167,6 @@ end
 function NotifyEntity(entityName)
     local notificationData = EntityTable.NotifyReason[entityName]
     if notificationData then
-        -- Usar task.spawn para garantir que cada notificação seja independente
         task.spawn(function()
             MsdoorsNotify(
                 notificationData.Title,
