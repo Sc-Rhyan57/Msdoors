@@ -93,8 +93,9 @@ local GroupNotification = Tabs.Visual:AddRightGroupbox("Notifications")
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
 --// EXPLOITS PAGE \\--
-local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
+local GroupModifiers = Tabs.Exploits:AddRightGroupbox("Modificadores")
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
+local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 
 --// FLOOR PAGE \\--
 local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
@@ -801,7 +802,7 @@ GroupVPlayer:AddToggle("Visual-no-ambience", {
 	Default = false,
 	Disabled = false,
 	Visible = true,
-	Risky = true,
+	Risky = false,
 	Callback = function(Value)
         if not game.SoundService:FindFirstChild("AmbienceRemove") then
             local ambiencerem = Instance.new("BoolValue")
@@ -1307,7 +1308,6 @@ local function toggleScreech(enabled)
     local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
 
     if not screech then
-        warn("[Msdoors] • Screech não encontrado!")
         return
     end
 
@@ -1357,7 +1357,7 @@ local function toggleDread(enabled)
 end
 
 
-GroupAntiEntity:AddToggle("Anti-A90", {
+GroupModifiers:AddToggle("Anti-A90", {
 	Text = "Anti A90",
 	DisabledTooltip = "I am disabled!",
 	Default = _G.msdoors_antia90,
@@ -1424,6 +1424,33 @@ GroupAntiEntity:AddToggle("Anti-Screech", {
         _G.msdoors_antiscreech = Value
         toggleScreech(Value)
 	end,
+})
+GroupAntiEntity:AddToggle("Anti-Snare", {
+    Text = "Anti Snare",
+    Default = false,
+    Callback = function(state)
+        local connection
+        if state then
+            connection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "Snare" then
+                    local hitbox = descendant:FindFirstChild("Hitbox")
+                    if hitbox then
+                        hitbox.CanTouch = false
+                    end
+                end
+            end)
+        elseif connection then
+            connection:Disconnect()
+        end
+        for _, snare in pairs(workspace:GetDescendants()) do
+            if snare.Name == "Snare" then
+                local hitbox = snare:FindFirstChild("Hitbox")
+                if hitbox then
+                    hitbox.CanTouch = not state
+                end
+            end
+        end
+    end
 })
 
 GroupTroll:AddToggle("Troll-Stunned-animation", {
