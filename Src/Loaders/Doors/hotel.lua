@@ -746,22 +746,12 @@ function ITEMESPManager:CreateESP(object, itemName)
     return espInstance
 end
 
-function ITEMESPManager:AddESP(object)
+function ITEMESPManager:AddESP(object, itemName)
     if not object or self.ActiveESPs[object] then return end
-
-    local itemName = object:GetAttribute("Tool_NameSingular") or object:GetAttribute("Pickup")
-    if not itemName then return end
 
     local espInstance = self:CreateESP(object, itemName)
     if espInstance then
         self.ActiveESPs[object] = espInstance
-    end
-end
-
-function ITEMESPManager:RemoveESP(object)
-    if self.ActiveESPs[object] then
-        self.ActiveESPs[object].Destroy()
-        self.ActiveESPs[object] = nil
     end
 end
 
@@ -772,7 +762,23 @@ function ITEMESPManager:ScanDrops()
     if not dropsFolder then return end
 
     for _, item in pairs(dropsFolder:GetChildren()) do
-        self:AddESP(item)
+        local itemName = item:GetAttribute("Tool_NameSingular") or item:GetAttribute("Pickup")
+        if itemName then
+            self:AddESP(item, itemName)
+        end
+    end
+end
+
+function ITEMESPManager:ScanWorkspace()
+    if not self.IsEnabled then return end
+
+    for _, object in pairs(workspace:GetDescendants()) do
+        if object:GetAttribute("JustLoot") == true then
+            local itemName = object:GetAttribute("Tool")
+            if itemName then
+                self:AddESP(object, itemName)
+            end
+        end
     end
 end
 
@@ -789,7 +795,8 @@ function ITEMESPManager:StartScanning()
 
     spawn(function()
         while self.IsChecking do
-            self:ScanDrops()
+            self:ScanDrops()     -- Verifica a pasta "Drops"
+            self:ScanWorkspace() -- Verifica todo o workspace
             wait(ITEMESPConfig.Settings.UpdateInterval)
         end
     end)
