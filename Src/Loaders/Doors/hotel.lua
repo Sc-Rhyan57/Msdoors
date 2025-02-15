@@ -597,24 +597,20 @@ end
 local ItemESPConfig = {
     Settings = {
         MaxDistance = 5000,
-        UpdateInterval = 5,
         TextSize = 16,
         FillTransparency = 0.75,
         OutlineTransparency = 0,
         TracerStartPosition = "Bottom",
-        ArrowCenterOffset = 300,
-        Color = Color3.fromRGB(0, 255, 128)
+        ArrowCenterOffset = 300
     }
 }
 
 local ItemESPManager = {
-    ActiveESPs = {},
-    IsEnabled = false,
-    IsChecking = false,
-    CurrentRoom = nil
+    DroppedItemESPs = {},
+    IsEnabled = false
 }
 
-function ItemESPManager:CreateESP(item, isDropped)
+function ItemESPManager:CreateESP(item)
     local displayName = ""
     if item:GetAttribute("Tool_NameSingular") then
         displayName = item:GetAttribute("Tool_NameSingular")
@@ -622,18 +618,14 @@ function ItemESPManager:CreateESP(item, isDropped)
         displayName = item.Name:gsub("_", " ")
     end
     
-    if isDropped then
-        displayName = displayName .. " [Dropped]"
-    end
-    
     local espInstance = ESPLibrary.ESP.Highlight({
         Name = displayName,
         Model = item,
         MaxDistance = ItemESPConfig.Settings.MaxDistance,
         
-        FillColor = ItemESPConfig.Settings.Color,
-        OutlineColor = ItemESPConfig.Settings.Color,
-        TextColor = ItemESPConfig.Settings.Color,
+        FillColor = Options.ItemEspColor.Value,
+        OutlineColor = Options.ItemEspColor.Value,
+        TextColor = Options.ItemEspColor.Value,
         TextSize = ItemESPConfig.Settings.TextSize,
         
         FillTransparency = ItemESPConfig.Settings.FillTransparency,
@@ -642,126 +634,139 @@ function ItemESPManager:CreateESP(item, isDropped)
         Tracer = {
             Enabled = true,
             From = ItemESPConfig.Settings.TracerStartPosition,
-            Color = ItemESPConfig.Settings.Color
+            Color = Options.ItemEspColor.Value
         },
         
         Arrow = {
             Enabled = true,
             CenterOffset = ItemESPConfig.Settings.ArrowCenterOffset,
-            Color = ItemESPConfig.Settings.Color
+            Color = Options.ItemEspColor.Value
         }
     })
     
-    return espInstance, displayName
+    return espInstance
 end
 
 function ItemESPManager:ItemCondition(item)
     return item:IsA("Model") or item:IsA("BasePart")
 end
 
-function ItemESPManager:AddESP(item, isDropped)
-    if not item or self.ActiveESPs[item] then return end
+function ItemESPManager:AddESP(item)
+    if not item or self.DroppedItemESPs[item] then return end
     
     if self:ItemCondition(item) then
-        local espInstance, displayName = self:CreateESP(item, isDropped)
+        local espInstance = self:CreateESP(item)
         if espInstance then
-            self.ActiveESPs[item] = espInstance
+            self.DroppedItemESPs[item] = espInstance
         end
     end
 end
 
 function ItemESPManager:RemoveESP(item)
-    if self.ActiveESPs[item] then
-        self.ActiveESPs[item].Destroy()
-        self.ActiveESPs[item] = nil
+    if self.DroppedItemESPs[item] then
+        self.DroppedItemESPs[item].Destroy()
+        self.DroppedItemESPs[item] = nil
     end
 end
 
 function ItemESPManager:ScanItems()
     if not self.IsEnabled then return end
     
-    local currentRoom = workspace.CurrentRooms:FindFirstChild(game.Players.LocalPlayer:GetAttribute("CurrentRoom"))
-    if not currentRoom then return end
-    
-    if self.CurrentRoom ~= currentRoom then
-        self:ClearESPs()
-        self.CurrentRoom = currentRoom
-    end
-    
-    -- Procura itens na sala atual
-    for _, item in pairs(currentRoom:GetDescendants()) do
-        if self:ItemCondition(item) then
-            self:AddESP(item, false)
-        end
-    end
-    
     -- Procura itens dropados
     for _, item in pairs(workspace.Drops:GetChildren()) do
         if self:ItemCondition(item) then
-            self:AddESP(item, true)
+            self:AddESP(item)
         end
     end
 end
 
 function ItemESPManager:ClearESPs()
-    for item, esp in pairs(self.ActiveESPs) do
+    for item, esp in pairs(self.DroppedItemESPs) do
         esp.Destroy()
     end
-    self.ActiveESPs = {}
+    self.DroppedItemESPs = {}
 end
 
-function ItemESPManager:StartScanning()
-    if self.IsChecking then return end
-    self.IsChecking = true
+function ItemESPManager:UpdateColors(color)
+    for _, esp in pairs(self.DroppedItemESPs) do
+        esp.Update({
+            FillColor = color,
+            OutlineColor = color,
+            TextColor = color,
+            Tracer = {
+                Color = color
+            },
+            Arrow = {
+                Color = color
+            }
+        })
+    end
+end
+
+function ItemESPManager:Enable()
+    if self.IsEnabled then return end
+    self.IsEnabled = true
     
-    spawn(function()
-        while self.IsChecking do
-            self:ScanItems()
-            wait(ItemESPConfig.Settings.UpdateInterval)
+    -- Scan inicial
+    self:ScanItems()
+    
+    -- Configura os eventos
+    self.DropsAddedConnection = workspace.Drops.ChildAdded:Connect(function(item)
+        if self.IsEnabled and self:ItemCondition(item) then
+            self:AddESP(item)
         end
+    end)
+    
+    self.DropsRemovedConnection = workspace.Drops.ChildRemoved:Connect(function(item)
+        self:RemoveESP(item)
+    end)
+    
+    -- Configura o evento de mudança de cor
+    self.ColorChangedConnection = Options.ItemEspColor.OnChanged:Connect(function(color)
+        self:UpdateColors(color)
     end)
 end
 
-function ItemESPManager:StopScanning()
-    self.IsChecking = false
+function ItemESPManager:Disable()
+    if not self.IsEnabled then return end
+    self.IsEnabled = false
+    
+    -- Desconecta os eventos
+    if self.DropsAddedConnection then
+        self.DropsAddedConnection:Disconnect()
+        self.DropsAddedConnection = nil
+    end
+    
+    if self.DropsRemovedConnection then
+        self.DropsRemovedConnection:Disconnect()
+        self.DropsRemovedConnection = nil
+    end
+    
+    if self.ColorChangedConnection then
+        self.ColorChangedConnection:Disconnect()
+        self.ColorChangedConnection = nil
+    end
+    
+    -- Limpa os ESPs
     self:ClearESPs()
 end
 
--- Conecta ao toggles
+-- Adiciona o toggle
 GroupEsp:AddToggle("Visual-esp-item", {
     Text = "Esp Itens",
-    DisabledTooltip = "Desativado!",
     Default = false,
     Disabled = false,
     Visible = true,
     Risky = false,
     Callback = function(state)
-        ItemESPManager.IsEnabled = state
-        
         if state then
-            ItemESPManager:StartScanning()
+            ItemESPManager:Enable()
         else
-            ItemESPManager:StopScanning()
+            ItemESPManager:Disable()
         end
     end,
 })
 
-game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
-    if ItemESPManager.IsEnabled then
-        ItemESPManager:ScanItems()
-    end
-end)
-
--- Conecta ao evento de adição de itens dropados
-workspace.Drops.ChildAdded:Connect(function(item)
-    if ItemESPManager.IsEnabled and ItemESPManager:ItemCondition(item) then
-        ItemESPManager:AddESP(item, true)
-    end
-end)
-
-workspace.Drops.ChildRemoved:Connect(function(item)
-    ItemESPManager:RemoveESP(item)
-end)
 GroupEsp:AddToggle("Visual-esp-objective", {
 	Text = "Esp Objetivo",
 	DisabledTooltip = "I am disabled!",
