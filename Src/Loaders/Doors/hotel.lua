@@ -26,7 +26,7 @@ local LocalPlayer = game.Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --[[ VARIAVEIS GLOBAIS ]]--
-G.msdoors_anticutscenes = false
+_G.msdoors_anticutscenes = false
 _G.msdoors_antijumpscares = false
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
 _G.msdoors_antiscreech = _G.msdoors_antiscreech or false
