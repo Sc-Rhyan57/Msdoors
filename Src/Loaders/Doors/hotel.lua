@@ -602,7 +602,8 @@ local ItemESPConfig = {
         FillTransparency = 0.75,
         OutlineTransparency = 0,
         TracerStartPosition = "Bottom",
-        ArrowCenterOffset = 300
+        ArrowCenterOffset = 300,
+        DefaultColor = Color3.fromRGB(52, 152, 219) -- Cor padrão azul
     }
 }
 
@@ -615,15 +616,16 @@ local ItemESPManager = {
 
 function ItemESPManager:CreateESP(item)
     local displayName = item.Name
+    local color = ItemESPConfig.Settings.DefaultColor
 
     local espInstance = ESPLibrary.ESP.Highlight({
         Name = displayName,
         Model = item,
         MaxDistance = ItemESPConfig.Settings.MaxDistance,
 
-        FillColor = Options.ItemEspColor.Value,
-        OutlineColor = Options.ItemEspColor.Value,
-        TextColor = Options.ItemEspColor.Value,
+        FillColor = color,
+        OutlineColor = color,
+        TextColor = color,
         TextSize = ItemESPConfig.Settings.TextSize,
 
         FillTransparency = ItemESPConfig.Settings.FillTransparency,
@@ -632,13 +634,13 @@ function ItemESPManager:CreateESP(item)
         Tracer = {
             Enabled = true,
             From = ItemESPConfig.Settings.TracerStartPosition,
-            Color = Options.ItemEspColor.Value
+            Color = color
         },
 
         Arrow = {
             Enabled = true,
             CenterOffset = ItemESPConfig.Settings.ArrowCenterOffset,
-            Color = Options.ItemEspColor.Value
+            Color = color
         }
     })
 
@@ -647,7 +649,19 @@ end
 
 function ItemESPManager:AddESP(item)
     if not item or self.ActiveESPs[item] then return end
-    
+
+    -- Verifica se o item é uma PASTA e tenta pegar o primeiro objeto dentro dela
+    if item:IsA("Folder") then
+        local children = item:GetChildren()
+        if #children > 0 then
+            item = children[1] -- Pega o primeiro objeto dentro da pasta
+        else
+            return -- Se a pasta estiver vazia, ignora
+        end
+    end
+
+    if not item:IsA("Model") and not item:IsA("BasePart") then return end
+
     local espInstance = self:CreateESP(item)
     if espInstance then
         self.ActiveESPs[item] = espInstance
@@ -666,16 +680,18 @@ function ItemESPManager:ScanRoom()
     
     local currentRoom = workspace.CurrentRooms:FindFirstChild(game.Players.LocalPlayer:GetAttribute("CurrentRoom"))
     if not currentRoom then return end
-    
+
     if self.CurrentRoom ~= currentRoom then
         self:ClearESPs()
         self.CurrentRoom = currentRoom
     end
-    
-    for _, item in pairs(workspace.Drops:GetChildren()) do
-        self:AddESP(item)
+
+    -- Adiciona ESP para itens dentro de "workspace.Drops"
+    for _, folder in pairs(workspace.Drops:GetChildren()) do
+        self:AddESP(folder)
     end
 
+    -- Adiciona ESP para itens dentro do quarto atual
     for _, item in pairs(currentRoom:GetDescendants()) do
         self:AddESP(item)
     end
@@ -691,7 +707,7 @@ end
 function ItemESPManager:StartScanning()
     if self.IsChecking then return end
     self.IsChecking = true
-    
+
     spawn(function()
         while self.IsChecking do
             self:ScanRoom()
