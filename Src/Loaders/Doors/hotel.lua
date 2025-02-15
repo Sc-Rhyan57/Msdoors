@@ -1657,6 +1657,98 @@ GroupNotC:AddToggle("Chat-Notifier", {
     end,
 })
 
+local function toggleCutscenes(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+
+    if not mainUI then
+        return
+    end
+
+    local initiator = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game")
+
+    if not initiator then
+        return
+    end
+
+    local cutscenes = initiator:FindFirstChild("Cutscenes") or initiator:FindFirstChild("Cutscenes_MSDOORS_DISABLE")
+
+    if not cutscenes then
+        return
+    end
+
+    if enabled then
+        if cutscenes.Name == "Cutscenes" then
+            cutscenes.Name = "Cutscenes_MSDOORS_DISABLE"
+        end
+    else
+        if cutscenes.Name == "Cutscenes_MSDOORS_DISABLE" then
+            cutscenes.Name = "Cutscenes"
+        end
+    end
+end
+
+SelfTab:AddToggle("Anti-Cutscenes", {
+    Text = "No Cutscenes",
+    DisabledTooltip = "Eu estou desativado!",
+    Default = _G.msdoors_anticutscenes,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(Value)
+        _G.msdoors_anticutscenes = Value
+        toggleCutscenes(Value)
+    end,
+})
+
+local function toggleJumpscares(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+
+    if not mainUI then
+        return
+    end
+
+    local initiator = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game")
+
+    if not initiator then
+        return
+    end
+
+    local jumpscares = initiator:FindFirstChild("Jumpscares") or initiator:FindFirstChild("Jumpscares_MSDOORS_DISABLE")
+
+    if not jumpscares then
+        return
+    end
+
+    if enabled then
+        if jumpscares.Name == "Jumpscares" then
+            jumpscares.Name = "Jumpscares_MSDOORS_DISABLE"
+        end
+    else
+        if jumpscares.Name == "Jumpscares_MSDOORS_DISABLE" then
+            jumpscares.Name = "Jumpscares"
+        end
+    end
+end
+
+SelfTabE:AddToggle("Anti-Jumpscares", {
+    Text = "No Jumpscares",
+    DisabledTooltip = "Eu estou desativado!",
+    Default = _G.msdoors_antijumpscares,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(Value)
+        _G.msdoors_antijumpscares = Value
+        toggleJumpscares(Value)
+    end,
+})
+
+
+
+
+
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
 GroupCredits:AddLabel('• SeekAlegriaFla - <font color="#FFA500">SUB-DONO</font>')
