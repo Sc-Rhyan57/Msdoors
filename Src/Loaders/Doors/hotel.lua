@@ -70,9 +70,14 @@ local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 --// VISUAL PAGE \\--
 local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
+
 local GroupNotification = Tabs.Visual:AddRightTabbox()
 local GroupNot = GroupNotification:AddTab('Notificação')
 local GroupNotC = GroupNotification:AddTab('Configurações')
+
+local GroupSelf = Tabs.Visual:AddRightTabbox()
+local SelfTab = GroupSelf:AddTab('Camera')
+local SelfTabE = GroupSelf:AddTab('Efeitos')
 
 
 --// EXPLOITS PAGE \\--
