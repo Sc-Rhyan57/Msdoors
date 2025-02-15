@@ -69,7 +69,11 @@ local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
 local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
-local GroupNotification = Tabs.Visual:AddRightGroupbox("Notifications")
+local GroupNotification = Window:AddTabBox("Notificação")
+
+local GroupNot = TabBox:AddTab("Notificar")
+local GroupNotC = TabBox:AddTab("Configurações")
+
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
 --// EXPLOITS PAGE \\--
@@ -104,6 +108,117 @@ GroupMisc:AddButton({
     end,
     DoubleClick = true
 })
+local EntityTable = {
+    ["Names"] = {"BackdoorRush", "BackdoorLookman", "RushMoving", "AmbushMoving", "Eyes", "JeffTheKiller", "A60", "A120"},
+    ["NotifyReason"] = {
+        ["A60"] = { ["Image"] = "12350986086", ["Title"] = "A-60", ["Description"] = "A-60 SPAWNOU!" },
+        ["A120"] = { ["Image"] = "12351008553", ["Title"] = "A-120", ["Description"] = "A-120 SPAWNOU!" },
+        ["HaltRoom"] = { ["Image"] = "11331795398", ["Title"] = "Halt", ["Description"] = "Prepare-se para Halt!" },
+        ["Window_BrokenSally"] = { ["Image"] = "100573561401335", ["Title"] = "Sally", ["Description"] = "Sally SPAWNOU!" },
+        ["BackdoorRush"] = { ["Image"] = "11102256553", ["Title"] = "Backdoor Blitz", ["Description"] = "Blitz SPAWNOU!" },
+        ["RushMoving"] = { ["Image"] = "11102256553", ["Title"] = "Rush", ["Description"] = "Rush SPAWNOU!" },
+        ["AmbushMoving"] = { ["Image"] = "10938726652", ["Title"] = "Ambush", ["Description"] = "Ambush SPAWNOU!" },
+        ["Eyes"] = { ["Image"] = "10865377903", ["Title"] = "Eyes", ["Description"] = "Não olhe para os olhos!" },
+        ["BackdoorLookman"] = { ["Image"] = "16764872677", ["Title"] = "Backdoor Lookman", ["Description"] = "Olhe para baixo!" },
+        ["JeffTheKiller"] = { ["Image"] = "98993343", ["Title"] = "Jeff The Killer", ["Description"] = "Fuja do Jeff the Killer!" }
+    }
+}
+
+local RoomTable = {
+    ["HaltHallway"] = { ["Image"] = "11331795398", ["Title"] = "Halt", ["Description"] = "Prepare-se para Halt!" }
+}
+
+local notificationsEnabled = false
+local chatEnabled = false
+local notifiedRooms = {}
+
+_G.msdoors_chatActive = false
+
+local function TrySendChatMessage(message)
+    if _G.msdoors_chatActive then
+        local TextChatService = game:GetService("TextChatService")
+
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            local textChannel = TextChatService.TextChannels.RBXGeneral
+            textChannel:SendAsync(message)
+        else
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+        end
+    end
+end
+
+function MonitorEntities()
+    game:GetService("RunService").Stepped:Connect(function()
+        if notificationsEnabled then
+            for _, entityName in ipairs(EntityTable.Names) do
+                local entity = workspace:FindFirstChild(entityName)
+                if entity and not entity:GetAttribute("Notified") then
+                    entity:SetAttribute("Notified", true)
+                    NotifyEntity(entityName)
+                end
+            end
+        end
+    end)
+end
+
+function NotifyEntity(entityName)
+    local notificationData = EntityTable.NotifyReason[entityName]
+    if notificationData then
+        MsdoorsNotify(
+            notificationData.Title,
+            notificationData.Description,
+            "",
+            "rbxassetid://" .. notificationData.Image,
+            Color3.fromRGB(255, 0, 0),
+            5
+        )
+
+        if _G.msdoors_chatActive then
+            TrySendChatMessage("[" .. notificationData.Title .. "] - " .. notificationData.Description)
+        end
+    end
+end
+
+function MonitorRooms()
+    game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+        local currentRoom = game.Players.LocalPlayer:GetAttribute("CurrentRoom")
+        if currentRoom then
+            for i = 1, 3 do
+                local nextRoomNumber = currentRoom + i
+                local nextRoom = workspace.CurrentRooms:FindFirstChild(tostring(nextRoomNumber))
+                if nextRoom and nextRoom:GetAttribute("RawName") then
+                    local roomName = nextRoom:GetAttribute("RawName")
+                    if RoomTable[roomName] and not notifiedRooms[roomName] then
+                        notifiedRooms[roomName] = true
+                        NotifyRoom(roomName)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+function NotifyRoom(roomName)
+    local roomData = RoomTable[roomName]
+    if roomData then
+        MsdoorsNotify(
+            roomData.Title,
+            roomData.Description,
+            "",
+            "rbxassetid://" .. roomData.Image,
+            Color3.fromRGB(0, 255, 255),
+            5
+        )
+
+        if _G.msdoors_chatActive then
+            TrySendChatMessage("[" .. roomData.Title .. "] - " .. roomData.Description)
+        end
+    end
+end
+
+MonitorEntities()
+MonitorRooms()
+
 
 local DoorESPConfig = {
     Types = {
@@ -1477,6 +1592,29 @@ GroupReach:AddSlider("Main-MaxActivationDistance", {
     end,
 })
 
+GroupNot:AddToggle("Visual-Notifier-Entities", {
+    Text = "Notificar Entidades",
+    Default = false,
+    Callback = function(value)
+        notificationsEnabled = value
+        MsdoorsNotify(
+            "MsDoors",
+            value and "Notificações de Entidades ativas!" or "Notificações de Entidades desativadas!",
+            "",
+            "rbxassetid://100573561401335",
+            value and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0),
+            3
+        )
+    end,
+})
+
+GroupNotC:AddToggle("Chat-Notifier", {
+    Text = "Enviar notificações no chat",
+    Default = false,
+    Callback = function(value)
+        _G.msdoors_chatActive = value
+    end,
+})
 
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
