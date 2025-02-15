@@ -594,6 +594,141 @@ function ObjectiveESPManager:StopScanning()
     self:ClearESPs()
 end
 
+local ItemESPConfig = {
+    Settings = {
+        MaxDistance = 5000,
+        UpdateInterval = 5,
+        TextSize = 16,
+        FillTransparency = 0.75,
+        OutlineTransparency = 0,
+        TracerStartPosition = "Bottom",
+        ArrowCenterOffset = 300
+    }
+}
+
+local ItemESPManager = {
+    ActiveESPs = {},
+    IsEnabled = false,
+    IsChecking = false,
+    CurrentRoom = nil
+}
+
+function ItemESPManager:CreateESP(item)
+    local displayName = item.Name
+
+    local espInstance = ESPLibrary.ESP.Highlight({
+        Name = displayName,
+        Model = item,
+        MaxDistance = ItemESPConfig.Settings.MaxDistance,
+
+        FillColor = Options.ItemEspColor.Value,
+        OutlineColor = Options.ItemEspColor.Value,
+        TextColor = Options.ItemEspColor.Value,
+        TextSize = ItemESPConfig.Settings.TextSize,
+
+        FillTransparency = ItemESPConfig.Settings.FillTransparency,
+        OutlineTransparency = ItemESPConfig.Settings.OutlineTransparency,
+
+        Tracer = {
+            Enabled = true,
+            From = ItemESPConfig.Settings.TracerStartPosition,
+            Color = Options.ItemEspColor.Value
+        },
+
+        Arrow = {
+            Enabled = true,
+            CenterOffset = ItemESPConfig.Settings.ArrowCenterOffset,
+            Color = Options.ItemEspColor.Value
+        }
+    })
+
+    return espInstance
+end
+
+function ItemESPManager:AddESP(item)
+    if not item or self.ActiveESPs[item] then return end
+    
+    local espInstance = self:CreateESP(item)
+    if espInstance then
+        self.ActiveESPs[item] = espInstance
+    end
+end
+
+function ItemESPManager:RemoveESP(item)
+    if self.ActiveESPs[item] then
+        self.ActiveESPs[item].Destroy()
+        self.ActiveESPs[item] = nil
+    end
+end
+
+function ItemESPManager:ScanRoom()
+    if not self.IsEnabled then return end
+    
+    local currentRoom = workspace.CurrentRooms:FindFirstChild(game.Players.LocalPlayer:GetAttribute("CurrentRoom"))
+    if not currentRoom then return end
+    
+    if self.CurrentRoom ~= currentRoom then
+        self:ClearESPs()
+        self.CurrentRoom = currentRoom
+    end
+    
+    for _, item in pairs(workspace.Drops:GetChildren()) do
+        self:AddESP(item)
+    end
+
+    for _, item in pairs(currentRoom:GetDescendants()) do
+        self:AddESP(item)
+    end
+end
+
+function ItemESPManager:ClearESPs()
+    for item, esp in pairs(self.ActiveESPs) do
+        esp.Destroy()
+    end
+    self.ActiveESPs = {}
+end
+
+function ItemESPManager:StartScanning()
+    if self.IsChecking then return end
+    self.IsChecking = true
+    
+    spawn(function()
+        while self.IsChecking do
+            self:ScanRoom()
+            wait(ItemESPConfig.Settings.UpdateInterval)
+        end
+    end)
+end
+
+function ItemESPManager:StopScanning()
+    self.IsChecking = false
+    self:ClearESPs()
+end
+
+GroupEsp:AddToggle("Visual-esp-item", {
+    Text = "ESP Itens",
+    DisabledTooltip = "I am disabled!",
+    Default = false,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(state)
+        ItemESPManager.IsEnabled = state
+
+        if state then
+            ItemESPManager:StartScanning()
+        else
+            ItemESPManager:StopScanning()
+        end
+    end
+})
+
+game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+    if ItemESPManager.IsEnabled then
+        ItemESPManager:ScanRoom()
+    end
+end)
+
 GroupEsp:AddToggle("Visual-esp-objective", {
 	Text = "Esp Objetivo",
 	DisabledTooltip = "I am disabled!",
