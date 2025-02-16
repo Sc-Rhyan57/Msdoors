@@ -1824,7 +1824,7 @@ task.spawn(function()
 
     local containAddonsLoaded = false
 
-    for _, file in pairs(listfiles(".msdoors/addons")) do
+    for _, file in pairs(listfiles("msdoors/addons")) do
         print("[MsDoors Addons] Carregando addon '" .. file:gsub("msdoors/addons/", "") .. "'...")
         if not (file:match("%.lua$") or file:match("%.txt$") or file:match("%.luau$")) then
             continue
