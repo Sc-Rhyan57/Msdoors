@@ -1582,7 +1582,7 @@ end)
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
     Min = 7,
-    Max = 20,
+    Max = 13,
     Default = _G.MaxActivationDistance,
     Increment = 0.1,
     Callback = function(value)
@@ -1614,6 +1614,69 @@ GroupNotC:AddToggle("Chat-Notifier", {
         _G.msdoors_chatActive = value
     end,
 })
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local function renameEntities()
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    if _G.msdoors_antia90 then
+        local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+        if a90 then a90.Name = "A90_MSDOORS_DISABLE" end
+    end
+
+    if _G.msdoors_antiscreech then
+        local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
+        if screech then screech.Name = "Screech_MSDOORS_DISABLE" end
+    end
+
+    if _G.msdoors_antidread then
+        local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
+        if dread then dread.Name = "Dread_MSDOORS_DISABLE" end
+    end
+
+    local remoteListener = mainUI.Initiator.Main_Game.RemoteListener
+
+    if _G.msdoors_antijumpscares then
+        local jumpscares = remoteListener:FindFirstChild("Jumpscares") or remoteListener:FindFirstChild("Jumpscares_MSDOORS_DISABLE")
+        if jumpscares then jumpscares.Name = "Jumpscares_MSDOORS_DISABLE" end
+    end
+
+    if _G.msdoors_anticutscenes then
+        local cutscenes = remoteListener:FindFirstChild("Cutscenes") or remoteListener:FindFirstChild("Cutscenes_MSDOORS_DISABLE")
+        if cutscenes then cutscenes.Name = "Cutscenes_MSDOORS_DISABLE" end
+    end
+end
+
+local function monitorAlive()
+    while true do
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+        if humanoid then
+            local aliveAttr = character:GetAttribute("Alive")
+            
+            repeat task.wait(1) until not aliveAttr or humanoid.Health <= 0
+            
+            repeat
+                task.wait(1)
+                aliveAttr = character:GetAttribute("Alive")
+            until aliveAttr and humanoid.Health > 0
+
+            renameEntities()
+        end
+    end
+end
+
+task.spawn(monitorAlive)
 
 local function toggleCutscenes(enabled)
     local player = game.Players.LocalPlayer
@@ -1799,66 +1862,3 @@ SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
-
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-
-local function renameEntities()
-    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-    if not mainUI then return end
-
-    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-    if not modules then return end
-
-    if _G.msdoors_antia90 then
-        local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
-        if a90 then a90.Name = "A90_MSDOORS_DISABLE" end
-    end
-
-    if _G.msdoors_antiscreech then
-        local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
-        if screech then screech.Name = "Screech_MSDOORS_DISABLE" end
-    end
-
-    if _G.msdoors_antidread then
-        local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
-        if dread then dread.Name = "Dread_MSDOORS_DISABLE" end
-    end
-
-    local remoteListener = mainUI.Initiator.Main_Game.RemoteListener
-
-    if _G.msdoors_antijumpscares then
-        local jumpscares = remoteListener:FindFirstChild("Jumpscares") or remoteListener:FindFirstChild("Jumpscares_MSDOORS_DISABLE")
-        if jumpscares then jumpscares.Name = "Jumpscares_MSDOORS_DISABLE" end
-    end
-
-    if _G.msdoors_anticutscenes then
-        local cutscenes = remoteListener:FindFirstChild("Cutscenes") or remoteListener:FindFirstChild("Cutscenes_MSDOORS_DISABLE")
-        if cutscenes then cutscenes.Name = "Cutscenes_MSDOORS_DISABLE" end
-    end
-end
-
-local function monitorAlive()
-    while true do
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-        if humanoid then
-            local aliveAttr = character:GetAttribute("Alive")
-            
-            repeat task.wait(1) until not aliveAttr or humanoid.Health <= 0
-            
-            repeat
-                task.wait(1)
-                aliveAttr = character:GetAttribute("Alive")
-            until aliveAttr and humanoid.Health > 0
-
-            renameEntities()
-        end
-    end
-end
-
-task.spawn(monitorAlive)
