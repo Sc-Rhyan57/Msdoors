@@ -1,8 +1,8 @@
 # **Msdoors**
 > ``Version: 1.1.0`` | ``Build: 0.1.3``
 
-> [!IMPORTANT]
-> **Esse script não é feito pela equipe do [Mspaint](https://mspaint.cc/), mas o dono do mesmo gosta muito da mspaint! :3**
+> [!WARNING]
+> Este script não foi desenvolvido nem é afiliado à equipe do [Mspaint](https://mspaint.cc/). Mas sim por um cara que gosta da mspaint!
 
 > [!NOTE]
 > Oi Upio, se você estiver vendo isso, não isso não é uma cópia do seu script é só uma inspiração [ em lua ].
