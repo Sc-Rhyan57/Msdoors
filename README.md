@@ -20,7 +20,7 @@
 ### **🎮 GAMES SUPORTE**
 - **Doors**,
 - **Natural Disaster**
-- **Campos de Armas[FFA]**
+- **Carrinho + Cart para giganoob!**
 - e mais...
 
 ### **🌐 WEBSITE**
