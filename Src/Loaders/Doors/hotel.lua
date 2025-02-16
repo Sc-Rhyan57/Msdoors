@@ -1761,8 +1761,8 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
 task.spawn(function()
     local AddonTab = Window:AddTab("Addons [BETA]")
 
-    if not isfolder(".msdoors/addons") then
-        makefolder(".msdoors/addons")
+    if not isfolder("msdoors/addons") then
+        makefolder("msdoors/addons")
     end
 
     local function AddAddonElement(Group, Element)
@@ -1825,7 +1825,7 @@ task.spawn(function()
     local containAddonsLoaded = false
 
     for _, file in pairs(listfiles(".msdoors/addons")) do
-        print("[MsDoors Addons] Carregando addon '" .. file:gsub(".msdoors/addons/", "") .. "'...")
+        print("[MsDoors Addons] Carregando addon '" .. file:gsub("msdoors/addons/", "") .. "'...")
         if not (file:match("%.lua$") or file:match("%.txt$") or file:match("%.luau$")) then
             continue
         end
@@ -1835,7 +1835,7 @@ task.spawn(function()
             local addon = loadstring(fileContent)()
 
             if type(addon.Name) ~= "string" or type(addon.Elements) ~= "table" then
-                warn("[MsDoors Addons] Addon '" .. file:gsub(".msdoors/addons/", "") .. "' não carregado: Nome/Elementos inválidos.")
+                warn("[MsDoors Addons] Addon '" .. file:gsub("msdoors/addons/", "") .. "' não carregado: Nome/Elementos inválidos.")
                 return 
             end
 
@@ -1850,13 +1850,13 @@ task.spawn(function()
         end)
 
         if not success then
-            warn("[MsDoors Addons] Falha ao carregar addon '" .. file:gsub(".msdoors/addons/", "") .. "':", errorMessage)
+            warn("[MsDoors Addons] Falha ao carregar addon '" .. file:gsub("msdoors/addons/", "") .. "':", errorMessage)
         end
     end
 
     if not containAddonsLoaded then
         local EmptyGroup = AddonTab:AddLeftGroupbox("Nenhum Addon Encontrado")
-        EmptyGroup:AddLabel("A pasta '.msdoors/addons' está vazia. Adicione addons e reinicie o script.")
+        EmptyGroup:AddLabel("A pasta 'msdoors/addons' está vazia. Adicione addons e reinicie o script.")
     end
 end)
 
