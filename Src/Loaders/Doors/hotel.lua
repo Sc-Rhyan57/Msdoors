@@ -1355,32 +1355,6 @@ local function toggleA90(enabled)
     a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
 end
 
-local function monitorAliveA90()
-    local player = game.Players.LocalPlayer
-
-    while true do
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-        if humanoid then
-            repeat task.wait(1) until player:GetAttribute("Alive") and humanoid.Health > 0
-            
-            repeat task.wait(1)
-            until player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-                and player.PlayerGui.MainUI:FindFirstChild("Initiator")
-                and player.PlayerGui.MainUI.Initiator:FindFirstChild("Main_Game")
-                and player.PlayerGui.MainUI.Initiator.Main_Game:FindFirstChild("RemoteListener")
-                and player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-                and (player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("A90")
-                or player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("A90_MSDOORS_DISABLE"))
-
-            toggleA90(true)
-        end
-    end
-end
-
-task.spawn(monitorAliveA90)
-
 local function toggleScreech(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
@@ -1399,32 +1373,6 @@ local function toggleScreech(enabled)
     screech.Name = enabled and "Screech_MSDOORS_DISABLE" or "Screech"
 end
 
-local function monitorAliveScreech()
-    local player = game.Players.LocalPlayer
-
-    while true do
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-        if humanoid then
-            repeat task.wait(1) until player:GetAttribute("Alive") and humanoid.Health > 0
-            
-            repeat task.wait(1)
-            until player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-                and player.PlayerGui.MainUI:FindFirstChild("Initiator")
-                and player.PlayerGui.MainUI.Initiator:FindFirstChild("Main_Game")
-                and player.PlayerGui.MainUI.Initiator.Main_Game:FindFirstChild("RemoteListener")
-                and player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-                and (player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Screech")
-                or player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Screech_MSDOORS_DISABLE"))
-
-            toggleScreech(true)
-        end
-    end
-end
-
-task.spawn(monitorAliveScreech)
-
 local function toggleDread(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
@@ -1442,32 +1390,6 @@ local function toggleDread(enabled)
 
     dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
 end
-
-local function monitorAliveDread()
-    local player = game.Players.LocalPlayer
-
-    while true do
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-        if humanoid then
-            repeat task.wait(1) until player:GetAttribute("Alive") and humanoid.Health > 0
-            
-            repeat task.wait(1)
-            until player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-                and player.PlayerGui.MainUI:FindFirstChild("Initiator")
-                and player.PlayerGui.MainUI.Initiator:FindFirstChild("Main_Game")
-                and player.PlayerGui.MainUI.Initiator.Main_Game:FindFirstChild("RemoteListener")
-                and player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-                and (player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Dread")
-                or player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Dread_MSDOORS_DISABLE"))
-
-            toggleDread(true)
-        end
-    end
-end
-
-task.spawn(monitorAliveDread)
 
 GroupModifiers:AddToggle("Anti-A90", {
 	Text = "Anti A90",
@@ -1660,7 +1582,7 @@ end)
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
     Min = 7,
-    Max = 10,
+    Max = 20,
     Default = _G.MaxActivationDistance,
     Increment = 0.1,
     Callback = function(value)
