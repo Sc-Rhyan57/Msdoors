@@ -1811,6 +1811,8 @@ task.spawn(function()
                 Text = Element.Arguments.Text or "Cor",
                 Callback = Element.Arguments.Callback
             })
+	elseif Element.Type == "Divider" then
+            Group:AddDivider()
         elseif Element.Type == "KeyPicker" then
             Group:AddKeyPicker(Element.Name, {
                 Default = Element.Arguments.Default,
