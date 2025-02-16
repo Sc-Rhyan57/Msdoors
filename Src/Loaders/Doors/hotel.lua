@@ -1341,70 +1341,40 @@ local function toggleA90(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
     
-    if not mainUI then
-        return
-    end
+    if not mainUI then return end
 
     local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
                     mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
                     mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
 
-    if not modules then
-        return
-    end
+    if not modules then return end
 
     local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+    if not a90 then return end
 
-    if not a90 then
-        return
-    end
-
-    if enabled then
-        if a90.Name == "A90" then
-            a90.Name = "A90_MSDOORS_DISABLE"
-        end
-    else
-        if a90.Name == "A90_MSDOORS_DISABLE" then
-            a90.Name = "A90"
-        end
-    end
+    a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
 end
 
 local function monitorAliveA90()
     local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    
-    if not humanoid then
-        return
-    end
 
     while true do
-        task.wait(1)
-        local alive = player:GetAttribute("Alive")
-        local health = humanoid.Health
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-        if not alive or health <= 0 then
-            repeat
-                task.wait(1)
-                alive = player:GetAttribute("Alive")
-                health = humanoid.Health
-            until alive and health > 0
+        if humanoid then
+            repeat task.wait(1) until player:GetAttribute("Alive") and humanoid.Health > 0
+            
+            repeat task.wait(1)
+            until player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+                and player.PlayerGui.MainUI:FindFirstChild("Initiator")
+                and player.PlayerGui.MainUI.Initiator:FindFirstChild("Main_Game")
+                and player.PlayerGui.MainUI.Initiator.Main_Game:FindFirstChild("RemoteListener")
+                and player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+                and (player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("A90")
+                or player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("A90_MSDOORS_DISABLE"))
 
-            local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-            if mainUI then
-                local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                                mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                                mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-                if modules then
-                    repeat
-                        task.wait(1)
-                    until modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
-
-                    toggleA90(true)
-                end
-            end
+            toggleA90(true)
         end
     end
 end
@@ -1415,145 +1385,84 @@ local function toggleScreech(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
     
-    if not mainUI then
-        return
-    end
+    if not mainUI then return end
 
     local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
                     mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
                     mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
 
-    if not modules then
-        return
-    end
+    if not modules then return end
 
     local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
+    if not screech then return end
 
-    if not screech then
-        return
-    end
-
-    if enabled then
-        if screech.Name == "Screech" then
-            screech.Name = "Screech_MSDOORS_DISABLE"
-        end
-    else
-        if screech.Name == "Screech_MSDOORS_DISABLE" then
-            screech.Name = "Screech"
-        end
-    end
+    screech.Name = enabled and "Screech_MSDOORS_DISABLE" or "Screech"
 end
 
-local function monitorPlayer()
+local function monitorAliveScreech()
     local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    
-    if not humanoid then
-        return
-    end
 
     while true do
-        task.wait(1)
-        local alive = player:GetAttribute("Alive")
-        local health = humanoid.Health
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-        if not alive or health <= 0 then
-            repeat
-                task.wait(1)
-                alive = player:GetAttribute("Alive")
-                health = humanoid.Health
-            until alive and health > 0
+        if humanoid then
+            repeat task.wait(1) until player:GetAttribute("Alive") and humanoid.Health > 0
+            
+            repeat task.wait(1)
+            until player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+                and player.PlayerGui.MainUI:FindFirstChild("Initiator")
+                and player.PlayerGui.MainUI.Initiator:FindFirstChild("Main_Game")
+                and player.PlayerGui.MainUI.Initiator.Main_Game:FindFirstChild("RemoteListener")
+                and player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+                and (player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Screech")
+                or player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Screech_MSDOORS_DISABLE"))
 
-            local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-            if mainUI then
-                local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                                mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                                mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-                if modules then
-                    repeat
-                        task.wait(1)
-                    until modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
-
-                    toggleScreech(true)
-                end
-            end
+            toggleScreech(true)
         end
     end
 end
 
-task.spawn(monitorPlayer)
+task.spawn(monitorAliveScreech)
 
 local function toggleDread(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
     
-    if not mainUI then
-        return
-    end
+    if not mainUI then return end
 
     local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
                     mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
                     mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
 
-    if not modules then
-        return
-    end
+    if not modules then return end
 
     local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
+    if not dread then return end
 
-    if not dread then
-        warn("[Msdoors] • Dread não encontrado!")
-        return
-    end
-
-    if enabled then
-        if dread.Name == "Dread" then
-            dread.Name = "Dread_MSDOORS_DISABLE"
-        end
-    else
-        if dread.Name == "Dread_MSDOORS_DISABLE" then
-            dread.Name = "Dread"
-        end
-    end
+    dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
 end
 
 local function monitorAliveDread()
     local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    
-    if not humanoid then
-        return
-    end
 
     while true do
-        task.wait(1)
-        local alive = player:GetAttribute("Alive")
-        local health = humanoid.Health
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-        if not alive or health <= 0 then
-            repeat
-                task.wait(1)
-                alive = player:GetAttribute("Alive")
-                health = humanoid.Health
-            until alive and health > 0
+        if humanoid then
+            repeat task.wait(1) until player:GetAttribute("Alive") and humanoid.Health > 0
+            
+            repeat task.wait(1)
+            until player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+                and player.PlayerGui.MainUI:FindFirstChild("Initiator")
+                and player.PlayerGui.MainUI.Initiator:FindFirstChild("Main_Game")
+                and player.PlayerGui.MainUI.Initiator.Main_Game:FindFirstChild("RemoteListener")
+                and player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+                and (player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Dread")
+                or player.PlayerGui.MainUI.Initiator.Main_Game.RemoteListener.Modules:FindFirstChild("Dread_MSDOORS_DISABLE"))
 
-            local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-            if mainUI then
-                local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                                mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                                mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-                if modules then
-                    repeat
-                        task.wait(1)
-                    until modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
-
-                    toggleDread(true)
-                end
-            end
+            toggleDread(true)
         end
     end
 end
