@@ -1757,6 +1757,109 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
     end,
 })
 
+--// ADDONS \\--
+task.spawn(function()
+    local AddonTab = Window:AddTab("Addons [BETA]")
+
+    if not isfolder(".msdoors/addons") then
+        makefolder(".msdoors/addons")
+    end
+
+    local function AddAddonElement(Group, Element)
+        if not Element or type(Element) ~= "table" then return end
+
+        if Element.Type == "Label" then
+            Group:AddLabel(Element.Arguments.Text or "Sem Texto")
+        elseif Element.Type == "Toggle" then
+            Group:AddToggle(Element.Name, {
+                Text = Element.Arguments.Text or "Sem Nome",
+                Default = Element.Arguments.Default or false,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Button" then
+            Group:AddButton({
+                Text = Element.Arguments.Text or "Botão",
+                Func = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Slider" then
+            Group:AddSlider(Element.Name, {
+                Text = Element.Arguments.Text or "Slider",
+                Min = Element.Arguments.Min,
+                Max = Element.Arguments.Max,
+                Default = Element.Arguments.Default,
+                Rounding = Element.Arguments.Rounding or 0,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Input" then
+            Group:AddInput(Element.Name, {
+                Default = Element.Arguments.Default or "",
+                Text = Element.Arguments.Text or "Entrada",
+                Numeric = Element.Arguments.Numeric or false,
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "Dropdown" then
+            Group:AddDropdown(Element.Name, {
+                Values = Element.Arguments.Values or {},
+                Default = Element.Arguments.Default,
+                Multi = Element.Arguments.Multi or false,
+                Text = Element.Arguments.Text or "Dropdown",
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "ColorPicker" then
+            Group:AddColorPicker(Element.Name, {
+                Default = Element.Arguments.Default or Color3.new(1, 1, 1),
+                Text = Element.Arguments.Text or "Cor",
+                Callback = Element.Arguments.Callback
+            })
+        elseif Element.Type == "KeyPicker" then
+            Group:AddKeyPicker(Element.Name, {
+                Default = Element.Arguments.Default,
+                Text = Element.Arguments.Text or "Atalho",
+                Callback = Element.Arguments.Callback
+            })
+        else
+            warn("[MsDoors Addons] Elemento '" .. tostring(Element.Name) .. "' não carregado: Tipo inválido.")
+        end
+    end
+
+    local containAddonsLoaded = false
+
+    for _, file in pairs(listfiles(".msdoors/addons")) do
+        print("[MsDoors Addons] Carregando addon '" .. file:gsub(".msdoors/addons/", "") .. "'...")
+        if not (file:match("%.lua$") or file:match("%.txt$") or file:match("%.luau$")) then
+            continue
+        end
+
+        local success, errorMessage = pcall(function()
+            local fileContent = readfile(file)
+            local addon = loadstring(fileContent)()
+
+            if type(addon.Name) ~= "string" or type(addon.Elements) ~= "table" then
+                warn("[MsDoors Addons] Addon '" .. file:gsub(".msdoors/addons/", "") .. "' não carregado: Nome/Elementos inválidos.")
+                return 
+            end
+
+            containAddonsLoaded = true
+
+            local AddonGroup = AddonTab:AddLeftGroupbox(addon.Name)
+            AddonGroup:AddLabel(addon.Description or "Sem descrição.")
+
+            for _, element in pairs(addon.Elements) do
+                AddAddonElement(AddonGroup, element)
+            end
+        end)
+
+        if not success then
+            warn("[MsDoors Addons] Falha ao carregar addon '" .. file:gsub(".msdoors/addons/", "") .. "':", errorMessage)
+        end
+    end
+
+    if not containAddonsLoaded then
+        local EmptyGroup = AddonTab:AddLeftGroupbox("Nenhum Addon Encontrado")
+        EmptyGroup:AddLabel("A pasta '.msdoors/addons' está vazia. Adicione addons e reinicie o script.")
+    end
+end)
+
 -- Credits[ Tenha bom senso ]
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
