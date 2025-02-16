@@ -7,6 +7,8 @@
 > [!NOTE]
 > Oi Upio, se você estiver vendo isso, não isso não é uma cópia do seu script é só uma inspiração [ em lua ].
 
+---
+
 ![Preview msdoors](https://msdoors-gg.vercel.app/_next/image?url=%2Fmspaint.png&w=750&q=75)
 
 ### **📍 VANTAGENS**
@@ -26,12 +28,22 @@
 
 📍 [ **Msdoors Discord**](https://dsc.gg/Msdoors-gg)
 
-### **🔔 Versões**
-- **ATUAL**
+
+### **💻 ADDONS**
+📌 [ **Website Doc** ](https://msdoors-gg.vercel.app/Addons)
+
+📌 [ **Github Doc** ](https://github.com/Sc-Rhyan57/MsAddons/tree/main)
+
+---
+
+### **📂 SCRIPT DONWLOAD**
+- VERSÃO ATUAL ``[ 1.0.1 ]`` | ``[BUILD: 0.1.3 ]``
 ```luau
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/download/main"))()
 ```
-- **PRIMEIRA VERSÃO**
+---
+- VERSÃO ANTINGA ``[ 0.0.1 ]`` | ``[BUILD: 0.0.10 ]``
+
 ```luau
   loadstring(game:HttpGet('https://github.com/Sc-Rhyan57/Msdoors/releases/download/DOWNLOAD/TWT-msdoorsV1.lua'))()
 ```
