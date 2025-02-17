@@ -56,7 +56,7 @@ local Window = Library:CreateWindow({
 local Tabs = {
     Main = Window:AddTab("Principal", "house"),
     Hotel = Window:AddTab("Hotel", "hotel"),
-    Visual = Window:AddTab("Visual", "view"),
+    Visual = Window:AddTab("Visuais", "view"),
     Exploits = Window:AddTab("Exploits", "bomb"),
     Credits = Window:AddTab("Créditos", "axe"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
@@ -73,6 +73,7 @@ local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
 local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
+local GroupAmbient = Tabs.Visual:AddLeftGroupbox("Ambiente")
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
 local GroupNotification = Tabs.Visual:AddRightTabbox()
@@ -1687,7 +1688,6 @@ local function toggleCutscenes(enabled)
     local initiator = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game")
     if not initiator then return end
 
-    -- Agora buscando dentro de RemoteListener
     local remoteListener = initiator:FindFirstChild("RemoteListener")
     if not remoteListener then return end
 
@@ -1756,6 +1756,85 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
         toggleJumpscares(Value)
     end,
 })
+
+
+GroupAmbient:AddSlider("Brightness", {
+        Text = "Brilho",
+        Default = 0,
+        Min = 0,
+        Max = 9,
+        Rounding = 1,
+    })
+
+GroupAmbient:AddToggle("Fullbright", {
+        Text = "Brilho total",
+        Default = false,
+    })
+
+GroupAmbient:AddToggle("NoFog", {
+        Text = "No Fog",
+        Default = false,
+    })
+
+    Brightness:OnChanged(function(value)
+        Lighting.Brightness = value
+    end)
+
+    Fullbright:OnChanged(function(value)
+        if value then
+            Lighting.Ambient = Color3.new(1, 1, 1)
+        else
+            local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
+            if currentRoom and workspace:FindFirstChild("CurrentRooms") and workspace.CurrentRooms:FindFirstChild(currentRoom) then
+                Lighting.Ambient = workspace.CurrentRooms[currentRoom]:GetAttribute("Ambient") or Color3.new(0, 0, 0)
+            else
+                Lighting.Ambient = Color3.new(0, 0, 0)
+            end
+        end
+    end)
+
+    NoFog:OnChanged(function(value)
+        if not Lighting:GetAttribute("FogStart") then
+            Lighting:SetAttribute("FogStart", Lighting.FogStart)
+        end
+        if not Lighting:GetAttribute("FogEnd") then
+            Lighting:SetAttribute("FogEnd", Lighting.FogEnd)
+        end
+
+        Lighting.FogStart = value and 0 or Lighting:GetAttribute("FogStart")
+        Lighting.FogEnd = value and math.huge or Lighting:GetAttribute("FogEnd")
+
+        local fog = Lighting:FindFirstChildOfClass("Atmosphere")
+        if fog then
+            if not fog:GetAttribute("Density") then
+                fog:SetAttribute("Density", fog.Density)
+            end
+            fog.Density = value and 0 or fog:GetAttribute("Density")
+        end
+    end)
+
+    Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
+        Lighting.Brightness = BrightnessSlider.Value
+    end)
+
+    Lighting:GetPropertyChangedSignal("Ambient"):Connect(function()
+        if FullbrightToggle.Value then
+            Lighting.Ambient = Color3.new(1, 1, 1)
+        end
+    end)
+
+    Lighting:GetPropertyChangedSignal("FogStart"):Connect(function()
+        if NoFogToggle.Value then
+            Lighting.FogStart = 0
+        end
+    end)
+
+    Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
+        if NoFogToggle.Value then
+            Lighting.FogEnd = math.huge
+        end
+    end)
+end
 
 --// ADDONS \\--
 task.spawn(function()
