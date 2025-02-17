@@ -37,6 +37,11 @@ _G.msdoors_SpeedHackBeTurned = nil
 _G.MaxActivationDistance = _G.MaxActivationDistance or 7
 _G.PromptClip = _G.PromptClip or false
 _G.msdoors_antieyes = _G.msdoors_antieyes or false
+_G.msdoors_antilag = {
+    Enabled = false,
+    Connection = nil,
+    StoredProperties = {}
+}
 getgenv().AntiSeekManager = {
     IsEnabled = false
 }
@@ -1410,6 +1415,90 @@ end)
 Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
     if Options.NoFog.Value then
         Lighting.FogEnd = math.huge
+    end
+end)
+
+function _G.msdoors_antilag:Activate()
+    if not self.Enabled then return end  
+
+    Lighting.FogEnd = 1e10
+    Lighting.FogStart = 1e10
+    Lighting.Brightness = 2
+    Lighting.GlobalShadows = false
+    Lighting.EnvironmentDiffuseScale = 0
+    Lighting.EnvironmentSpecularScale = 0
+
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            if not self.StoredProperties[obj] then
+                self.StoredProperties[obj] = { Material = obj.Material }
+            end
+            obj.Material = Enum.Material.Plastic
+        elseif obj:IsA("Decal") then
+            if not self.StoredProperties[obj] then
+                self.StoredProperties[obj] = { Transparency = obj.Transparency }
+            end
+            obj.Transparency = 1
+        end
+    end
+
+    if not self.Connection then
+        self.Connection = Workspace.DescendantAdded:Connect(function(obj)
+            if not self.Enabled then return end
+            
+            if obj:IsA("BasePart") then
+                self.StoredProperties[obj] = { Material = obj.Material }
+                obj.Material = Enum.Material.Plastic
+            elseif obj:IsA("Decal") then
+                self.StoredProperties[obj] = { Transparency = obj.Transparency }
+                obj.Transparency = 1
+            end
+        end)
+    end
+end
+
+function _G.msdoors_antilag:Deactivate()
+    Lighting.FogEnd = 500
+    Lighting.FogStart = 0
+    Lighting.Brightness = 1
+    Lighting.GlobalShadows = true
+    Lighting.EnvironmentDiffuseScale = 1
+    Lighting.EnvironmentSpecularScale = 1
+
+    for obj, properties in pairs(self.StoredProperties) do
+        if obj:IsA("BasePart") and properties.Material then
+            obj.Material = properties.Material
+        elseif obj:IsA("Decal") and properties.Transparency ~= nil then
+            obj.Transparency = properties.Transparency
+        end
+    end
+
+    self.StoredProperties = {}
+
+    if self.Connection then
+        self.Connection:Disconnect()
+        self.Connection = nil
+    end
+end
+
+
+GroupAmbient:AddToggle("AntiLag", {
+    Text = "Anti-Lag",
+    Default = false,
+    Callback = function(value)
+        _G.msdoors_antilag.Enabled = value
+        if value then
+            _G.msdoors_antilag:Activate()
+        else
+            _G.msdoors_antilag:Deactivate()
+        end
+    end
+})
+
+local latestRoom = game.ReplicatedStorage:WaitForChild("GameData"):WaitForChild("LatestRoom")
+latestRoom:GetPropertyChangedSignal("Value"):Connect(function()
+    if _G.msdoors_antilag.Enabled then
+        _G.msdoors_antilag:Activate()
     end
 end)
 
