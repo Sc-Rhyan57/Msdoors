@@ -1337,6 +1337,82 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
     end
 end)
 
+
+
+GroupAmbient:AddSlider("Brightness", {
+    Text = "Brilho",
+    Default = 0,
+    Min = 0,
+    Max = 9,
+    Rounding = 1,
+    Callback = function(value)
+        Lighting.Brightness = value
+    end
+})
+
+GroupAmbient:AddToggle("Fullbright", {
+    Text = "Brilho total",
+    Default = false,
+    Callback = function(value)
+        if value then
+            Lighting.Ambient = Color3.new(1, 1, 1)
+        else
+            local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
+            if currentRoom and workspace:FindFirstChild("CurrentRooms") and workspace.CurrentRooms:FindFirstChild(currentRoom) then
+                Lighting.Ambient = workspace.CurrentRooms[currentRoom]:GetAttribute("Ambient") or Color3.new(0, 0, 0)
+            else
+                Lighting.Ambient = Color3.new(0, 0, 0)
+            end
+        end
+    end
+})
+
+GroupAmbient:AddToggle("NoFog", {
+    Text = "No Fog",
+    Default = false,
+    Callback = function(value)
+        if not Lighting:GetAttribute("FogStart") then
+            Lighting:SetAttribute("FogStart", Lighting.FogStart)
+        end
+        if not Lighting:GetAttribute("FogEnd") then
+            Lighting:SetAttribute("FogEnd", Lighting.FogEnd)
+        end
+
+        Lighting.FogStart = value and 0 or Lighting:GetAttribute("FogStart")
+        Lighting.FogEnd = value and math.huge or Lighting:GetAttribute("FogEnd")
+
+        local fog = Lighting:FindFirstChildOfClass("Atmosphere")
+        if fog then
+            if not fog:GetAttribute("Density") then
+                fog:SetAttribute("Density", fog.Density)
+            end
+            fog.Density = value and 0 or fog:GetAttribute("Density")
+        end
+    end
+})
+
+Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
+    Lighting.Brightness = Options.Brightness.Value
+end)
+
+Lighting:GetPropertyChangedSignal("Ambient"):Connect(function()
+    if Options.Fullbright.Value then
+        Lighting.Ambient = Color3.new(1, 1, 1)
+    end
+end)
+
+Lighting:GetPropertyChangedSignal("FogStart"):Connect(function()
+    if Options.NoFog.Value then
+        Lighting.FogStart = 0
+    end
+end)
+
+Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
+    if Options.NoFog.Value then
+        Lighting.FogEnd = math.huge
+    end
+end)
+
 --// ANTI ENTITY \\--
 local function toggleA90(enabled)
     local player = game.Players.LocalPlayer
