@@ -89,9 +89,9 @@ local GroupSelf = Tabs.Visual:AddRightTabbox()
 local SelfTab = GroupSelf:AddTab('Camera')
 local SelfTabE = GroupSelf:AddTab('Efeitos')
 
-
+--// MODFIERS PAGE \\--
+local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 --// EXPLOITS PAGE \\--
-local GroupModifiers = Tabs.Exploits:AddRightGroupbox("Modificadores")
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 
