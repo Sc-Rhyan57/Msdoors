@@ -1601,28 +1601,6 @@ GroupModifiers:AddToggle("Anti-A90", {
 	end,
 })
 
-GroupModifiers:AddToggle("NoVoiceActing", {
-	Text = "No Voice Acting",
-	DisabledTooltip = "I Am disabled!",
-	Default = _G.noVoiceActing,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(Value)
-        _G.noVoiceActing = Value
-        toggleVoiceActing(Value)
-	end,
-})
-
-local function toggleVoiceActing(enabled)
-    local voiceActing = shared.ReplicatedStorage:FindFirstChild("VoiceActing")
-    if not voiceActing then return end
-
-    local voicelines = voiceActing:FindFirstChild("Voicelines") or voiceActing:FindFirstChild("_Voicelines")
-    if voicelines then
-        voicelines.Name = enabled and "_Voicelines" or "Voicelines"
-    end
-end
 
 GroupAntiEntity:AddToggle("AntiEyes", {
     Text = "Anti Eyes",
