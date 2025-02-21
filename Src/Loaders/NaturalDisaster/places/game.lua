@@ -415,88 +415,87 @@ lp.CharacterAdded:Connect(nofalldamage)
 })
 GamesTab:AddDivider()
 
-GamesTab:AddToggle({
-    Text = "Conseguir balão",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            spawn(function()
-                while Value do
-                    local backpack = game:GetService("Players").LocalPlayer.Backpack
-                    if not backpack:FindFirstChild("GreenBalloon") then
-                        if game.Workspace:FindFirstChild("GreenBalloon", true) then
-                            local balloonClone = game.Workspace:FindFirstChild("GreenBalloon", true):Clone()
-                            balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
-                            print("[Msdoors] • Balão consedido!")
-                            Library:Notify({
-                                Title = "Balão Consedido!",
-                                Description = "Balão clonado com sucesso!",
-                                Time = 5,
-                            })
-                        end
-                    end
-                    wait(1)
-                end
-            end)
-        end
-    end,
-    Tooltip = "Clona o balão de algum player que o tem.",
-})
 
-GamesTab:AddToggle({
-    Text = "Conseguir bussola",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            spawn(function()
-                while Value do
-                    local backpack = game:GetService("Players").LocalPlayer.Backpack
-                    if not backpack:FindFirstChild("Compass") then
-                        if game.Workspace:FindFirstChild("Compass", true) then
-                            local compassClone = game.Workspace:FindFirstChild("Compass", true):Clone()
-                            compassClone.Parent = game:GetService("Players").LocalPlayer.Backpack
-                            print("[Msdoors] • Bússola consedida!")
-                            Library:Notify({
-                                Title = "Bússola Consedida!",
-                                Description = "Bússola clonada com sucesso!",
-                                Time = 5,
-                            })
-                        end
-                    end
-                    wait(1)
-                end
-            end)
-        end
-    end,
-    Tooltip = "Clona a bússola de algum player que o tem.",
+GamesTab:AddButton({
+	Text = "Conseguir balão",
+	Func = function()
+if game.Workspace:FindFirstChild("GreenBalloon", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("GreenBalloon", true):Clone() -- clone it 
+	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
+	print("[Msdoors] • Balão consedido!")
+        Library:Notify({
+		Title = "Balão Consedido!",
+		Description = "Balão cloando com sucesso!",
+		Time = 5,
+	})
+else 
+	print("[Msdoors] • Balão não disponível!")
+        Library:Notify({
+		Title = "Balão não encontrado...",
+		Description = "Não á ninguém com o balão para Clone nesse servidor.",
+		Time = 5,
+	})
+end 
+	end,
+	DoubleClick = false,
+	Tooltip = "Clona o balão de algum player que o tem.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
 })
-
-GamesTab:AddToggle({
-    Text = "Conseguir maçã",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            spawn(function()
-                while Value do
-                    local backpack = game:GetService("Players").LocalPlayer.Backpack
-                    if not backpack:FindFirstChild("RedApple") then
-                        if game.Workspace:FindFirstChild("RedApple", true) then
-                            local appleClone = game.Workspace:FindFirstChild("RedApple", true):Clone()
-                            appleClone.Parent = game:GetService("Players").LocalPlayer.Backpack
-                            print("[Msdoors] • Maçã consedida!")
-                            Library:Notify({
-                                Title = "Maçã Consedida!",
-                                Description = "Maçã clonada com sucesso!",
-                                Time = 5,
-                            })
-                        end
-                    end
-                    wait(1)
-                end
-            end)
-        end
-    end,
-    Tooltip = "Clona a maçã de algum player que o tem.",
+GamesTab:AddButton({
+	Text = "Conseguir bussola",
+	Func = function()
+if game.Workspace:FindFirstChild("Compass", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("Compass", true):Clone() -- clone it 
+	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
+	print("[Msdoors] • Balão consedido!")
+        Library:Notify({
+		Title = "Bussola Consedida!",
+		Description = "Bussola cloanda com sucesso!",
+		Time = 5,
+	})
+else 
+	print("[Msdoors] • Bussola não disponível!")
+        Library:Notify({
+		Title = "Bussola não encontrada...",
+		Description = "Não á ninguém com Uma bussola para Clone nesse servidor.",
+		Time = 5,
+	})
+end 
+	end,
+	DoubleClick = false,
+	Tooltip = "Clona a bussola de algum player que o tem.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+GamesTab:AddButton({
+	Text = "Conseguir maçã",
+	Func = function()
+if game.Workspace:FindFirstChild("RedApple", true) then -- Check for stealable GreenBalloon 
+	balloonClone = game.Workspace:FindFirstChild("RedApple", true):Clone() -- clone it 
+	balloonClone.Parent = game:GetService("Players").LocalPlayer.Backpack
+	print("[Msdoors] • maçã consedida!")
+        Library:Notify({
+		Title = "maçã Consedida!",
+		Description = "maçã consedida com sucesso!",
+		Time = 5,
+	})
+else 
+	print("[Msdoors] • maçã não disponível!")
+        Library:Notify({
+		Title = "maça não encontrada...",
+		Description = "Não á ninguém com Uma maçã para Clone nesse servidor.",
+		Time = 5,
+	})
+end 
+	end,
+	DoubleClick = false,
+	Tooltip = "Clona a maçã de algum player que o tem.",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
 })
 
 PlayersTab:AddSlider("SpeedPlayer", {
