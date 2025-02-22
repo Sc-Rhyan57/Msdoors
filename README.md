@@ -5,7 +5,7 @@
 > Este script não foi desenvolvido nem é afiliado à equipe do [Mspaint](https://mspaint.cc/). Mas sim por um cara que gosta da mspaint!
 
 > [!NOTE]
-> Oi Upio, se você estiver vendo isso, não isso não é uma cópia do seu script é só uma inspiração [ em lua ].
+> Kkjoao não pode testar isso - ass: *Sei no mano*
 
 ---
 
