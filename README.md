@@ -5,7 +5,7 @@
 > Este script não foi desenvolvido nem é afiliado à equipe do [Mspaint](https://mspaint.cc/). Mas sim por um cara que gosta da mspaint!
 
 > [!NOTE]
-> Kkjoao não pode testar isso - ass: *Sei no mano*
+> Preciso de ajuda!
 
 ---
 
