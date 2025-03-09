@@ -25,6 +25,9 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = game.Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+--[[ FLOOR VERIFICATION ]]--
+print("[ Msdoors ] » Iniciando verificação do floor atual...")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_anticutscenes = false
 _G.msdoors_antijumpscares = false
