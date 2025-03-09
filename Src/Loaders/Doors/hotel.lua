@@ -28,7 +28,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 --[[ FLOOR VERIFICATION ]]--
 print("[ Msdoors ] » Iniciando verificação do floor atual...")
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/Doors/floor-verification.luau"))()
-
+local floorName = _G.msdoors_floor
+----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_anticutscenes = false
 _G.msdoors_antijumpscares = false
@@ -92,14 +93,101 @@ local GroupSelf = Tabs.Visual:AddRightTabbox()
 local SelfTab = GroupSelf:AddTab('Camera')
 local SelfTabE = GroupSelf:AddTab('Efeitos')
 
---// MODFIERS PAGE \\--
-local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 --// EXPLOITS PAGE \\--
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 
 --// FLOOR PAGE \\--
-local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
+if _G.msdoors_floor then
+    if floorName == "DOORS-GAME" then
+        print("[ Msdoors ] » Carregando funções da página Hotel para Doors principal.")
+        local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
+		
+	local function toggleA90(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+    if not a90 then return end
+
+    a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
+end
+
+local function toggleScreech(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
+    if not screech then return end
+
+    screech.Name = enabled and "Screech_MSDOORS_DISABLE" or "Screech"
+end
+
+local function toggleDread(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
+    if not dread then return end
+
+    dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
+end
+
+GroupModifiers:AddToggle("Anti-A90", {
+	Text = "Anti A90",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antia90,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antia90 = Value
+        toggleA90(Value)
+	end,
+        })
+    elseif floorName == "DOORS-FOOLS23" then
+        print("[ Msdoors ] » Carregando funções da página Hotel para Fools23.")
+        
+    elseif floorName == "DOORS-FOOLS24" then
+        print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
+        
+    elseif floorName == "DOORS-BACKDOORS" then
+        print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
+
+    elseif floorName == "DOORS-MINES" then
+        print("[ Msdoors ] » Carregando funções da página Hotel para The Mines.")
+        
+    else
+        print(floorName .. ": N")
+    end
+else
+    warn("[ Msdoors ] » o jogo atual não está na lista, nada será adicionando na página Hotel!")
+end
 
 
 GroupMisc:AddButton({
@@ -1008,8 +1096,6 @@ GroupVPlayer:AddToggle("Visual-No-Wardobre-Vignette", {
 	end,
 })
 
-
-
 local Toggles = {}
 local InstaInteractEnabled = false
 
@@ -1537,74 +1623,6 @@ GroupModifiers:AddToggle("Anti-Giggle", {
     end
 })
 
-local function toggleA90(enabled)
-    local player = game.Players.LocalPlayer
-    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-    
-    if not mainUI then return end
-
-    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-    if not modules then return end
-
-    local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
-    if not a90 then return end
-
-    a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
-end
-
-local function toggleScreech(enabled)
-    local player = game.Players.LocalPlayer
-    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-    
-    if not mainUI then return end
-
-    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-    if not modules then return end
-
-    local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
-    if not screech then return end
-
-    screech.Name = enabled and "Screech_MSDOORS_DISABLE" or "Screech"
-end
-
-local function toggleDread(enabled)
-    local player = game.Players.LocalPlayer
-    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-    
-    if not mainUI then return end
-
-    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-    if not modules then return end
-
-    local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
-    if not dread then return end
-
-    dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
-end
-
-GroupModifiers:AddToggle("Anti-A90", {
-	Text = "Anti A90",
-	DisabledTooltip = "I am disabled!",
-	Default = _G.msdoors_antia90,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(Value)
-        _G.msdoors_antia90 = Value
-        toggleA90(Value)
-	end,
-})
-
-
 GroupAntiEntity:AddToggle("AntiEyes", {
     Text = "Anti Eyes",
     Default = _G.msdoors_antieyes,
@@ -1687,6 +1705,7 @@ GroupAntiEntity:AddToggle("Anti-Snare", {
 GroupAntiEntity:AddToggle("AntiHearing", {
     Text = "Anti-Figure Hearing",
     Default = false,
+    Disabled = true,
     Callback = function(state)
         local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
         if remote and remote:IsA("RemoteEvent") then
