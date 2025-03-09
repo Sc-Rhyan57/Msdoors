@@ -27,7 +27,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --[[ FLOOR VERIFICATION ]]--
 print("[ Msdoors ] » Iniciando verificação do floor atual...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/Doors/floor-verification.luau"))()
+
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_anticutscenes = false
 _G.msdoors_antijumpscares = false
@@ -51,10 +52,9 @@ getgenv().AntiSeekManager = {
 _G.ObsidianaLib = true
 
 
-
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
-    Footer = "Build: 0.1.3 | by rhyan57",
+    Footer = "Build: 0.1.3 | Game: Doors",
     Icon = "95869322194132",
     NotifySide = "Right",
     ShowCustomCursor = true
@@ -131,10 +131,9 @@ local EntityTable = {
     ["NotifyReason"] = {
         ["A60"] = { ["Image"] = "12350986086", ["Title"] = "A-60", ["Description"] = "A-60 SPAWNOU!" },
         ["A120"] = { ["Image"] = "12351008553", ["Title"] = "A-120", ["Description"] = "A-120 SPAWNOU!" },
-        ["Window_BrokenSally"] = { ["Image"] = "100573561401335", ["Title"] = "Sally", ["Description"] = "Sally SPAWNOU!" },
-        ["BackdoorRush"] = { ["Image"] = "11102256553", ["Title"] = "Backdoor Blitz", ["Description"] = "Blitz SPAWNOU!" },
+        ["BackdoorRush"] = { ["Image"] = "11102256553", ["Title"] = "Backdoor Blitz", ["Description"] = "Blitz spawnou!" },
         ["RushMoving"] = { ["Image"] = "11102256553", ["Title"] = "Rush", ["Description"] = "Rush SPAWNOU!" },
-        ["AmbushMoving"] = { ["Image"] = "10938726652", ["Title"] = "Ambush", ["Description"] = "Ambush SPAWNOU!" },
+        ["AmbushMoving"] = { ["Image"] = "10938726652", ["Title"] = "Ambush", ["Description"] = "Ambush spawnou!" },
         ["Eyes"] = { ["Image"] = "10865377903", ["Title"] = "Eyes", ["Description"] = "Não olhe para os olhos!" },
         ["BackdoorLookman"] = { ["Image"] = "16764872677", ["Title"] = "Backdoor Lookman", ["Description"] = "Olhe para baixo!" },
         ["JeffTheKiller"] = { ["Image"] = "98993343", ["Title"] = "Jeff The Killer", ["Description"] = "Fuja do Jeff the Killer!" }
@@ -413,7 +412,7 @@ local EntityESPConfig = {
             Color = Color3.fromRGB(255, 0, 0)
         },
         GrumbleRig = {
-            Name = "Grumbo",
+            Name = "Grumle",
             Color = Color3.fromRGB(255, 0, 0)
         },
         BackdoorRush = {
@@ -858,11 +857,11 @@ end
 
 GroupEsp:AddToggle("Visual-esp-item", {
     Text = "Esp Item",
-    DisabledTooltip = "I am disabled!",
+    DisabledTooltip = "Manutenção!",
     Default = false,
-    Disabled = false,
+    Disabled = true,
     Visible = true,
-    Risky = false,
+    Risky = true,
     Callback = function(state)
         ITEMESPManager.IsEnabled = state
         
@@ -922,6 +921,7 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
         EntityESPManager:ScanRoom()
     end
 end)
+
 GroupEsp:AddToggle("Visual-esp-door", {
 	Text = "Esp Portas",
 	DisabledTooltip = "I am disabled!",
