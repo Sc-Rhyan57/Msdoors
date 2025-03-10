@@ -24,6 +24,7 @@ local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = game.Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+_G.msdoors_floor = DOORS-GAME
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
@@ -118,42 +119,6 @@ if _G.msdoors_floor then
     a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
 end
 
-local function toggleScreech(enabled)
-    local player = game.Players.LocalPlayer
-    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-    
-    if not mainUI then return end
-
-    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-    if not modules then return end
-
-    local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
-    if not screech then return end
-
-    screech.Name = enabled and "Screech_MSDOORS_DISABLE" or "Screech"
-end
-
-local function toggleDread(enabled)
-    local player = game.Players.LocalPlayer
-    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
-    
-    if not mainUI then return end
-
-    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
-                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
-                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
-
-    if not modules then return end
-
-    local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
-    if not dread then return end
-
-    dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
-end
-
 GroupModifiers:AddToggle("Anti-A90", {
 	Text = "Anti A90",
 	DisabledTooltip = "I am disabled!",
@@ -165,6 +130,7 @@ GroupModifiers:AddToggle("Anti-A90", {
         _G.msdoors_antia90 = Value
         toggleA90(Value)
 	end,
+				
         })
     elseif floorName == "DOORS-FOOLS23" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools23.")
@@ -1588,6 +1554,42 @@ latestRoom:GetPropertyChangedSignal("Value"):Connect(function()
 end)
 
 --// ANTI ENTITY \\--
+local function toggleScreech(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local screech = modules:FindFirstChild("Screech") or modules:FindFirstChild("Screech_MSDOORS_DISABLE")
+    if not screech then return end
+
+    screech.Name = enabled and "Screech_MSDOORS_DISABLE" or "Screech"
+end
+
+local function toggleDread(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local dread = modules:FindFirstChild("Dread") or modules:FindFirstChild("Dread_MSDOORS_DISABLE")
+    if not dread then return end
+
+    dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
+end
+
 GroupModifiers:AddToggle("Anti-Giggle", {
     Text = "Anti Giggle",
     Default = false,
