@@ -140,6 +140,38 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
     end
 end)
 
+        --[[ ANTI GIGGLE ]]--
+GroupModifiers:AddToggle("Anti-Giggle", {
+    Text = "Anti Giggle",
+    Default = false,
+    Callback = function(state)
+        local connection
+        if state then
+            connection = workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "GiggleCeiling" then
+                    local hitbox = descendant:WaitForChild("Hitbox", 5)
+                    if hitbox then
+                        hitbox.CanTouch = false
+                    end
+                end
+            end)
+        elseif connection then
+            connection:Disconnect()
+        end
+        
+        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+            for _, giggle in pairs(room:GetDescendants()) do
+                if giggle.Name == "GiggleCeiling" then
+                    local hitbox = giggle:FindFirstChild("Hitbox")
+                    if hitbox then
+                        hitbox.CanTouch = not state
+                    end
+                end
+            end
+        end
+    end
+})
+		
 	--[[ ANTI A-90 ]]--
 	local function toggleA90(enabled)
     local player = game.Players.LocalPlayer
@@ -1590,36 +1622,6 @@ local function toggleDread(enabled)
     dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
 end
 
-GroupModifiers:AddToggle("Anti-Giggle", {
-    Text = "Anti Giggle",
-    Default = false,
-    Callback = function(state)
-        local connection
-        if state then
-            connection = workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
-                if descendant.Name == "GiggleCeiling" then
-                    local hitbox = descendant:WaitForChild("Hitbox", 5)
-                    if hitbox then
-                        hitbox.CanTouch = false
-                    end
-                end
-            end)
-        elseif connection then
-            connection:Disconnect()
-        end
-        
-        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
-            for _, giggle in pairs(room:GetDescendants()) do
-                if giggle.Name == "GiggleCeiling" then
-                    local hitbox = giggle:FindFirstChild("Hitbox")
-                    if hitbox then
-                        hitbox.CanTouch = not state
-                    end
-                end
-            end
-        end
-    end
-})
 
 GroupAntiEntity:AddToggle("AntiEyes", {
     Text = "Anti Eyes",
