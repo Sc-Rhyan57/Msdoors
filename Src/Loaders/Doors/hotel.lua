@@ -23,7 +23,9 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = game.Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
@@ -1387,6 +1389,38 @@ end
 InitializeScript()
 task.spawn(AutoInteractLoop)
 
+local function UpdateSpeeds()
+    Humanoid.WalkSpeed = WalkSpeed
+end
+
+GroupPlayer:AddToggle("WalkSpeed", {
+	Text = "WalkSpeed",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        WalkSpeed = Value and 15 or Humanoid.WalkSpeed
+        UpdateSpeeds()
+	end,
+})
+
+GroupPlayer:AddSlider("walkspeedSpeed", {
+	Text = "Velocidade",
+	Default = 15,
+	Min = 0,
+	Max = 75,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(Value)
+        WalkSpeed = Value
+        UpdateSpeeds()
+	end,
+	Disabled = false,
+	Visible = true,
+})
+
 GroupPlayer:AddToggle("EnableJump", {
     Text = "Habilitar Pulo",
     Default = false
@@ -1977,8 +2011,79 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
     end,
 })
 
+--// SPEED BYPASS \\--
+local SpeedBypassing = false
+local SpeedBypassDelay = 0.23
+local WalkSpeed = 15
+local CollisionClone
+
+local function SetupCollision()
+    local Collision = Character:FindFirstChild("Collision") or RootPart
+    CollisionClone = Collision:Clone()
+    CollisionClone.CanCollide = false
+    CollisionClone.Massless = true
+    CollisionClone.Parent = Character
+end
+
+local function SpeedBypass()
+    if SpeedBypassing or not CollisionClone then return end
+    SpeedBypassing = true
+
+    task.spawn(function()
+        while WalkSpeed > 0 do
+            if RootPart.Anchored then
+                CollisionClone.Massless = true
+                repeat task.wait() until not RootPart.Anchored
+                task.wait(0.15)
+            else
+                CollisionClone.Massless = not CollisionClone.Massless
+            end
+            task.wait(SpeedBypassDelay)
+        end
+        SpeedBypassing = false
+    end)
+end
 
 
+GroupBypass:AddToggle("speedBypass", {
+	Text = "Speed Bypass",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+         WalkSpeed = Value and math.min(WalkSpeed, 75) or 15
+        if Value then SpeedBypass() end
+        UpdateSpeeds()
+	end,
+})
+
+GroupBypass:AddSlider("SpeedBypassDelay", {
+	Text = "Speed bypass delay",
+	Default = 0.23,
+	Min = 0.22,
+	Max = 0.25,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(Value)
+        WalkSpeed = Value
+        UpdateSpeeds()
+	end,
+	Disabled = false,
+	Visible = true,
+})
+
+SetupCollision()
+LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
+    Character = NewCharacter
+    RootPart = Character:WaitForChild("HumanoidRootPart")
+    Humanoid = Character:WaitForChild("Humanoid")
+    SetupCollision()
+    UpdateSpeeds()
+end)
+
+RunService.Heartbeat:Connect(UpdateSpeeds)
 
 --// ADDONS \\--
 task.spawn(function()
