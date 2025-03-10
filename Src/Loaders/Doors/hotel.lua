@@ -24,10 +24,6 @@ local Workspace = game:GetService("Workspace")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = game.Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
---[[ FLOOR VERIFICATION ]]--
-print("[ Msdoors ] » Iniciando verificação do floor atual...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/Doors/floor-verification.luau"))()
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
