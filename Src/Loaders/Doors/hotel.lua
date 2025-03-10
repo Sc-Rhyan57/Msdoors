@@ -1492,21 +1492,36 @@ GroupAmbient:AddSlider("Brightness", {
     end
 })
 
+local fullbrightConnection = nil
+
 GroupAmbient:AddToggle("Fullbright", {
-    Text = "Brilho total",
-    Default = false,
-    Callback = function(value)
-        if value then
-            Lighting.Ambient = Color3.new(1, 1, 1)
-        else
-            local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
-            if currentRoom and workspace:FindFirstChild("CurrentRooms") and workspace.CurrentRooms:FindFirstChild(currentRoom) then
-                Lighting.Ambient = workspace.CurrentRooms[currentRoom]:GetAttribute("Ambient") or Color3.new(0, 0, 0)
-            else
-                Lighting.Ambient = Color3.new(0, 0, 0)
-            end
-        end
-    end
+   Text = "Brilho total",
+   Default = false,
+   Callback = function(value)
+       if value then
+           Lighting.Ambient = Color3.new(1, 1, 1)
+           
+           if fullbrightConnection then
+               fullbrightConnection:Disconnect()
+           end
+           
+           fullbrightConnection = game:GetService("RunService").RenderStepped:Connect(function()
+               Lighting.Ambient = Color3.new(1, 1, 1)
+           end)
+       else
+           if fullbrightConnection then
+               fullbrightConnection:Disconnect()
+               fullbrightConnection = nil
+           end
+           
+           local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
+           if currentRoom and workspace:FindFirstChild("CurrentRooms") and workspace.CurrentRooms:FindFirstChild(currentRoom) then
+               Lighting.Ambient = workspace.CurrentRooms[currentRoom]:GetAttribute("Ambient") or Color3.new(0, 0, 0)
+           else
+               Lighting.Ambient = Color3.new(0, 0, 0)
+           end
+       end
+   end
 })
 
 GroupAmbient:AddToggle("NoFog", {
