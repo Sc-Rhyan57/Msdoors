@@ -217,7 +217,59 @@ GroupModifiers:AddToggle("Anti-A90", {
 
     elseif floorName == "DOORS-MINES" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Mines.")
-        
+        local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
+       
+	
+local TempBridges = {}
+local Connection = nil
+local function ProtectBridges(room)
+    if not room:FindFirstChild("Parts") then return end
+
+    for _, bridge in pairs(room.Parts:GetChildren()) do
+        if bridge.Name == "Bridge" then
+            for _, barrier in pairs(bridge:GetChildren()) do
+                if not (barrier.Name == "PlayerBarrier" and barrier.Size.Y == 2.75 and (barrier.Rotation.X == 0 or barrier.Rotation.X == 180)) then continue end
+                
+                local clone = barrier:Clone()
+                clone.CFrame = clone.CFrame * CFrame.new(0, 0, -5)
+                clone.Color = Color3.new(1, 1, 1)
+                clone.Name = "AntiBridge"
+                clone.Size = Vector3.new(clone.Size.X, clone.Size.Y, 11)
+                clone.Transparency = 0
+                clone.Parent = bridge
+                
+                table.insert(TempBridges, clone)
+            end
+        end
+    end
+end
+GroupHotel:AddToggle("AntiSeekObstructions", {
+    Text = "Anti Bridge",
+    Default = false,
+    Callback = function(value)
+        if value then
+            for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+                ProtectBridges(room)
+            end
+            Connection = workspace.CurrentRooms.ChildAdded:Connect(function(room)
+                ProtectBridges(room)
+            end)
+        else
+            for _, bridge in pairs(TempBridges) do
+                if bridge and bridge.Parent then
+                    bridge:Destroy()
+                end
+            end
+            TempBridges = {}
+            if Connection then
+                Connection:Disconnect()
+                Connection = nil
+            end
+        end
+		
+    end
+})        
     else
         print(floorName .. ": N")
     end
