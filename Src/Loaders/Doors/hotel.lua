@@ -269,7 +269,7 @@ local RoomTable = {
     ["Hotel_SeekIntro"] = { ["Image"] = "11043368229", ["Title"] = "Seek", ["Description"] = "Prepare-se para Seek!" }
 }
 
-local notificationsEnabled = true
+local notificationsEnabled = false
 local chatEnabled = false
 local notifiedRooms = {}
 
@@ -1433,7 +1433,7 @@ GroupAmbient:AddSlider("Brightness", {
     Text = "Brilho",
     Default = 0,
     Min = 0,
-    Max = 9,
+    Max = 20,
     Rounding = 1,
     Callback = function(value)
         Lighting.Brightness = value
@@ -1708,6 +1708,7 @@ GroupAntiEntity:AddToggle("Anti-Screech", {
         toggleScreech(Value)
 	end,
 })
+
 GroupAntiEntity:AddToggle("Anti-Snare", {
     Text = "Anti Snare",
     Default = false,
@@ -1737,7 +1738,7 @@ GroupAntiEntity:AddToggle("Anti-Snare", {
 })
 
 GroupAntiEntity:AddToggle("AntiHearing", {
-    Text = "Anti-Figure Hearing",
+    Text = "Anti-Figure Hearing[MANUTENÇÃO]",
     Default = false,
     Disabled = true,
     Callback = function(state)
@@ -2011,6 +2012,188 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
 })
 
 --// SPEED BYPASS \\--
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+_G.MSDoors_SpeedBypass = false
+_G.MSDoors_EnableJump = false
+_G.MSDoors_SpeedBypassDelay = 0.23
+_G.MSDoors_WalkSpeed = 15
+_G.MSDoors_FlySpeed = 15
+
+
+local MSDoors_Script = {
+    SpeedBypassing = false,
+    CollisionClone = nil,
+    Bypassed = false,
+    FakeRevive = {Enabled = false},
+}
+
+if not Character then
+    Character = LocalPlayer.CharacterAdded:Wait()
+end
+
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
+local Collision
+
+local function MSDoors_SetupCollision()
+    Collision = Character:FindFirstChild("Collision")
+    if not Collision then
+        for _, part in pairs(Character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name:lower():find("collision") then
+                Collision = part
+                break
+            end
+        end
+    end
+    
+    if not Collision then
+        Collision = RootPart
+    end
+    
+    if Collision then
+        MSDoors_Script.CollisionClone = Collision:Clone()
+        MSDoors_Script.CollisionClone.CanCollide = false
+        MSDoors_Script.CollisionClone.Massless = true
+        MSDoors_Script.CollisionClone.CanQuery = false
+        MSDoors_Script.CollisionClone.Name = "CollisionClone"
+        
+        if MSDoors_Script.CollisionClone:FindFirstChild("CollisionCrouch") then
+            MSDoors_Script.CollisionClone.CollisionCrouch:Destroy()
+        end
+        
+        MSDoors_Script.CollisionClone.Parent = Character
+    end
+end
+
+local function MSDoors_SpeedBypass()
+    if MSDoors_Script.SpeedBypassing or not MSDoors_Script.CollisionClone then return end
+    MSDoors_Script.SpeedBypassing = true
+
+    task.spawn(function()
+        while _G.MSDoors_SpeedBypass and MSDoors_Script.CollisionClone do
+            if RootPart.Anchored then
+                MSDoors_Script.CollisionClone.Massless = true
+                repeat task.wait() until not RootPart.Anchored
+                task.wait(0.15)
+            else
+                MSDoors_Script.CollisionClone.Massless = not MSDoors_Script.CollisionClone.Massless
+            end
+            task.wait(_G.MSDoors_SpeedBypassDelay)
+        end
+
+        MSDoors_Script.SpeedBypassing = false
+        if MSDoors_Script.CollisionClone then
+            MSDoors_Script.CollisionClone.Massless = true
+        end
+    end)
+end
+
+local function MSDoors_UpdateSpeeds()
+    if _G.MSDoors_SpeedBypass then
+        Humanoid.WalkSpeed = _G.MSDoors_WalkSpeed
+    else
+        local speed = MSDoors_Script.Bypassed and 75 or (_G.MSDoors_EnableJump and 18 or 22)
+        Humanoid.WalkSpeed = math.min(_G.MSDoors_WalkSpeed, speed)
+    end
+end
+
+
+GroupPlayer:AddToggle("WalkSpeed", {
+	Text = "Habilitar WalkSpeed",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.MSDoors_WalkSpeed = Value and 15 or Humanoid.WalkSpeed
+        MSDoors_UpdateSpeeds()
+	end,
+})
+GroupPlayer:AddSlider("WalkSpeedVelocity", {
+	Text = "WalkSpeed",
+	Default = 15,
+	Min = 0,
+	Max = 100,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(Value)
+        _G.MSDoors_WalkSpeed = Value
+        MSDoors_UpdateSpeeds()
+	end,
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+
+
+GroupBypass:AddToggle("SpeedBypass", {
+	Text = "Speed Bypass",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+            _G.MSDoors_SpeedBypass = Value
+        
+        if Value then
+            _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, 75)
+            MSDoors_SpeedBypass()
+        else
+            if MSDoors_Script.FakeRevive.Enabled then return end
+            
+            local speed = MSDoors_Script.Bypassed and 75 or (_G.MSDoors_EnableJump and 18 or 22)
+            _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, speed)
+        end
+        
+        MSDoors_UpdateSpeeds()
+	end,
+})
+
+GroupBypass:AddSlider("WalkSpeedVelocity", {
+	Text = "Speed Bypass delay",
+	Default = 0.23,
+	Min = 0.22,
+	Max = 0.25,
+	Rounding = 1,
+	Compact = false,
+	Callback = function(Value)
+            _G.MSDoors_SpeedBypassDelay = Value
+	end,
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+})
+
+
+MSDoors_SetupCollision()
+
+LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
+    Character = NewCharacter
+    RootPart = Character:WaitForChild("HumanoidRootPart")
+    Humanoid = Character:WaitForChild("Humanoid")
+    
+    MSDoors_SetupCollision()
+    
+    if _G.MSDoors_EnableJump then
+        Character:SetAttribute("CanJump", true)
+        Humanoid.JumpHeight = 7.2
+    end
+    
+    if _G.MSDoors_SpeedBypass then
+        MSDoors_SpeedBypass()
+    end
+    
+    MSDoors_UpdateSpeeds()
+end)
+
+RunService.Heartbeat:Connect(function()
+    if _G.MSDoors_SpeedBypass and _G.MSDoors_WalkSpeed > 0 then
+        Humanoid.WalkSpeed = _G.MSDoors_WalkSpeed
+    end
+end)
 
 
 --// ADDONS \\--
