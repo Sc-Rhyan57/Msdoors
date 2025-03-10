@@ -92,6 +92,7 @@ local SelfTabE = GroupSelf:AddTab('Efeitos')
 --// EXPLOITS PAGE \\--
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
+local GroupByppas = Tabs.Main:AddRightGroupbox("Byppas")
 
 --// FLOOR PAGE \\--
 if _G.msdoors_floor then
