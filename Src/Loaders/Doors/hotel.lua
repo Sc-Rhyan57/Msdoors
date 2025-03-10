@@ -99,7 +99,48 @@ if _G.msdoors_floor then
         print("[ Msdoors ] » Carregando funções da página Hotel para Doors principal.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
-		
+        --[[ ANTI SEEK OBSTRUCTIONS ]]--
+GroupHotel:AddToggle("AntiSeekObstructions", {
+    Text = "Anti-Seek Obstructions",
+    Default = false,
+    Callback = function(state)
+        AntiSeekManager.IsEnabled = state
+        AntiSeekManager:ScanNearbyRooms(state)
+    end
+})
+
+function AntiSeekManager:ScanNearbyRooms(state)
+    local player = game.Players.LocalPlayer
+    local currentRoomNumber = player:GetAttribute("CurrentRoom")
+
+    if not currentRoomNumber then return end
+
+    for i = 0, 2 do
+        local room = workspace.CurrentRooms:FindFirstChild(tostring(currentRoomNumber + i))
+        if room then
+            self:ToggleSeekObstacles(room, state)
+        end
+    end
+end
+
+function AntiSeekManager:ToggleSeekObstacles(room, state)
+    for _, v in pairs(room:GetDescendants()) do
+        if v.Name == "ChandelierObstruction" or v.Name == "Seek_Arm" then
+            for _, obj in pairs(v:GetDescendants()) do
+                if obj:IsA("BasePart") then
+                    obj.CanTouch = not state
+                end
+            end
+        end
+    end
+end
+game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+    if AntiSeekManager.IsEnabled then
+        AntiSeekManager:ScanNearbyRooms(true)
+    end
+end)
+
+	--[[ ANTI A-90 ]]--
 	local function toggleA90(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
@@ -1350,46 +1391,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     
     local humanoid = character:WaitForChild("Humanoid")
     humanoid.JumpHeight = Toggles.EnableJump.Value and Toggles.JumpBoost.Value or 0
-end)
-
-GroupHotel:AddToggle("AntiSeekObstructions", {
-    Text = "Anti-Seek Obstructions",
-    Default = false,
-    Callback = function(state)
-        AntiSeekManager.IsEnabled = state
-        AntiSeekManager:ScanNearbyRooms(state)
-    end
-})
-
-function AntiSeekManager:ScanNearbyRooms(state)
-    local player = game.Players.LocalPlayer
-    local currentRoomNumber = player:GetAttribute("CurrentRoom")
-
-    if not currentRoomNumber then return end
-
-    for i = 0, 2 do
-        local room = workspace.CurrentRooms:FindFirstChild(tostring(currentRoomNumber + i))
-        if room then
-            self:ToggleSeekObstacles(room, state)
-        end
-    end
-end
-
-function AntiSeekManager:ToggleSeekObstacles(room, state)
-    for _, v in pairs(room:GetDescendants()) do
-        if v.Name == "ChandelierObstruction" or v.Name == "Seek_Arm" then
-            for _, obj in pairs(v:GetDescendants()) do
-                if obj:IsA("BasePart") then
-                    obj.CanTouch = not state
-                end
-            end
-        end
-    end
-end
-game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
-    if AntiSeekManager.IsEnabled then
-        AntiSeekManager:ScanNearbyRooms(true)
-    end
 end)
 
 
