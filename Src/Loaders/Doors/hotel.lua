@@ -94,7 +94,7 @@ local SelfTabE = GroupSelf:AddTab('Efeitos')
 --// EXPLOITS PAGE \\--
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
-local GroupByppas = Tabs.Main:AddRightGroupbox("Byppas")
+local GroupBypass = Tabs.Exploits:AddRightGroupbox("Byppas")
 
 --// FLOOR PAGE \\--
 if _G.msdoors_floor then
@@ -1657,6 +1657,38 @@ local function toggleDread(enabled)
     dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
 end
 
+if floorName == "DOORS-MINES" then
+    GroupAntiEntity:AddToggle("Anti-Giggle", {
+    Text = "Anti Giggle",
+    Default = false,
+    Callback = function(state)
+        local connection
+        if state then
+            connection = workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "GiggleCeiling" then
+                    local hitbox = descendant:WaitForChild("Hitbox", 5)
+                    if hitbox then
+                        hitbox.CanTouch = false
+                    end
+                end
+            end)
+        elseif connection then
+            connection:Disconnect()
+        end
+        
+        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+            for _, giggle in pairs(room:GetDescendants()) do
+                if giggle.Name == "GiggleCeiling" then
+                    local hitbox = giggle:FindFirstChild("Hitbox")
+                    if hitbox then
+                        hitbox.CanTouch = not state
+                    end
+                end
+            end
+        end
+    end
+})
+end
 
 GroupAntiEntity:AddToggle("AntiEyes", {
     Text = "Anti Eyes",
