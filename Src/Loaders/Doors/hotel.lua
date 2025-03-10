@@ -245,7 +245,7 @@ local function ProtectBridges(room)
     end
 end
 GroupHotel:AddToggle("AntiSeekObstructions", {
-    Text = "Anti Bridge",
+    Text = "Anti Bridge Fall",
     Default = false,
     Callback = function(value)
         if value then
