@@ -2197,16 +2197,6 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-local function onUnload()
-    if Script.CollisionClone then
-        Script.CollisionClone:Destroy()
-    end
-    Script.SpeedBypassing = false
-end
-
-return {
-    unload = onUnload
-}
 --// ADDONS \\--
 task.spawn(function()
     local AddonTab = Window:AddTab("Addons [BETA]")
