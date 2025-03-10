@@ -2044,38 +2044,95 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
 })
 
 --// SPEED BYPASS \\--
-local SpeedBypassing = false
-local SpeedBypassDelay = 0.23
-local WalkSpeed = 15
-local CollisionClone
+
+local Script = {
+    SpeedBypassing = false,
+    CollisionClone = nil,
+    Bypassed = false,
+    FakeRevive = {Enabled = false},
+}
+
+local Toggles = {
+    SpeedBypass = false,
+    EnableJump = false,
+}
+
+local Options = {
+    SpeedBypassDelay = 0.23,
+    WalkSpeed = 15,
+    FlySpeed = 15,
+}
+
+if not Character then
+    Character = LocalPlayer.CharacterAdded:Wait()
+end
+
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
+local Collision
 
 local function SetupCollision()
-    local Collision = Character:FindFirstChild("Collision") or RootPart
-    CollisionClone = Collision:Clone()
-    CollisionClone.CanCollide = false
-    CollisionClone.Massless = true
-    CollisionClone.Parent = Character
+    Collision = Character:FindFirstChild("Collision")
+    
+    if not Collision then
+        for _, part in pairs(Character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name:lower():find("collision") then
+                Collision = part
+                break
+            end
+        end
+    end
+    
+    if not Collision then
+        Collision = RootPart
+    end
+    
+    if Collision then
+        Script.CollisionClone = Collision:Clone()
+        Script.CollisionClone.CanCollide = false
+        Script.CollisionClone.Massless = true
+        Script.CollisionClone.CanQuery = false
+        Script.CollisionClone.Name = "CollisionClone"
+        
+        if Script.CollisionClone:FindFirstChild("CollisionCrouch") then
+            Script.CollisionClone.CollisionCrouch:Destroy()
+        end
+        
+        Script.CollisionClone.Parent = Character
+    end
 end
 
 local function SpeedBypass()
-    if SpeedBypassing or not CollisionClone then return end
-    SpeedBypassing = true
+    if Script.SpeedBypassing or not Script.CollisionClone then return end
+    Script.SpeedBypassing = true
 
     task.spawn(function()
-        while WalkSpeed > 0 do
+        while Toggles.SpeedBypass and Script.CollisionClone do
             if RootPart.Anchored then
-                CollisionClone.Massless = true
+                Script.CollisionClone.Massless = true
                 repeat task.wait() until not RootPart.Anchored
                 task.wait(0.15)
             else
-                CollisionClone.Massless = not CollisionClone.Massless
+                Script.CollisionClone.Massless = not Script.CollisionClone.Massless
             end
-            task.wait(SpeedBypassDelay)
+            task.wait(Options.SpeedBypassDelay)
         end
-        SpeedBypassing = false
+
+        Script.SpeedBypassing = false
+        if Script.CollisionClone then
+            Script.CollisionClone.Massless = true
+        end
     end)
 end
 
+local function UpdateSpeeds()
+    if Toggles.SpeedBypass then
+        Humanoid.WalkSpeed = Options.WalkSpeed
+    else
+        local speed = Script.Bypassed and 75 or (Toggles.EnableJump and 18 or 22)
+        Humanoid.WalkSpeed = math.min(Options.WalkSpeed, speed)
+    end
+end
 
 GroupBypass:AddToggle("speedBypass", {
 	Text = "Speed Bypass",
@@ -2085,8 +2142,16 @@ GroupBypass:AddToggle("speedBypass", {
 	Visible = true,
 	Risky = false,
 	Callback = function(Value)
-         WalkSpeed = Value and math.min(WalkSpeed, 75) or 15
-        if Value then SpeedBypass() end
+        if Value then
+            Options.WalkSpeed = math.min(Options.WalkSpeed, 75)
+            SpeedBypass()
+        else
+            if Script.FakeRevive.Enabled then return end
+            
+            local speed = Script.Bypassed and 75 or (Toggles.EnableJump and 18 or 22)
+            Options.WalkSpeed = math.min(Options.WalkSpeed, speed)
+        end
+        
         UpdateSpeeds()
 	end,
 })
@@ -2099,24 +2164,50 @@ GroupBypass:AddSlider("SpeedBypassDelay", {
 	Rounding = 1,
 	Compact = false,
 	Callback = function(Value)
-        WalkSpeed = Value
-        UpdateSpeeds()
+       Options.SpeedBypassDelay = Value
 	end,
 	Disabled = false,
 	Visible = true,
 })
 
+
 SetupCollision()
+
 LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
     Character = NewCharacter
     RootPart = Character:WaitForChild("HumanoidRootPart")
     Humanoid = Character:WaitForChild("Humanoid")
+    
     SetupCollision()
+    
+    if Toggles.EnableJump then
+        Character:SetAttribute("CanJump", true)
+        Humanoid.JumpHeight = 7.2
+    end
+    
+    if Toggles.SpeedBypass then
+        SpeedBypass()
+    end
+    
     UpdateSpeeds()
 end)
 
-RunService.Heartbeat:Connect(UpdateSpeeds)
+RunService.Heartbeat:Connect(function()
+    if Toggles.SpeedBypass and Options.WalkSpeed > 0 then
+        Humanoid.WalkSpeed = Options.WalkSpeed
+    end
+end)
 
+local function onUnload()
+    if Script.CollisionClone then
+        Script.CollisionClone:Destroy()
+    end
+    Script.SpeedBypassing = false
+end
+
+return {
+    unload = onUnload
+}
 --// ADDONS \\--
 task.spawn(function()
     local AddonTab = Window:AddTab("Addons [BETA]")
