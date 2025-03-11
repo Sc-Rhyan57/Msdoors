@@ -28,6 +28,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
+_G.msdoors_AntiFlood = false
 _G.msdoors_AntiSeekDoor = false
 _G.msdoors_anticutscenes = false
 _G.msdoors_antijumpscares = false
@@ -301,7 +302,7 @@ local function RestoreSeekDoors()
     ModifiedDoors = {}
 end
 GroupHotel:AddToggle("antikickdoor", {
-	Text = "Anti Kickdoor seek2",
+	Text = "Anti Kickdoor",
 	DisabledTooltip = "I am disabled!",
 	Default = false,
 	Disabled = false,
@@ -331,7 +332,58 @@ GroupHotel:AddToggle("antikickdoor", {
 
 	end,
 })
-		
+
+--[[ ANTI FLOOD ]]--
+_G.msdoors_OriginalFloodState = {}
+local SeekFloodConnection
+
+GroupHotel:AddToggle("antiFlood", {
+    Text = "Anti Flood",
+    DisabledTooltip = "I am disabled!",
+    Default = false,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(value)
+        _G.msdoors_AntiFlood = value
+
+        local function HandleSeekFlood(instance)
+            if instance:IsA("BasePart") and instance.Name == "SeekFloodline" then
+                if _G.msdoors_OriginalFloodState[instance] == nil then
+                    _G.msdoors_OriginalFloodState[instance] = instance.CanCollide
+                end
+                instance.CanCollide = value
+            end
+        end
+
+        if value then
+            for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+                local damHandler = room:FindFirstChild("_DamHandler")
+                if damHandler then
+                    for _, instance in pairs(damHandler:GetDescendants()) do
+                        HandleSeekFlood(instance)
+                    end
+                end
+            end
+
+            SeekFloodConnection = game.Workspace.DescendantAdded:Connect(function(instance)
+                HandleSeekFlood(instance)
+            end)
+        else
+            for instance, originalState in pairs(_G.msdoors_OriginalFloodState) do
+                if instance and instance.Parent then
+                    instance.CanCollide = originalState
+                end
+            end
+            _G.msdoors_OriginalFloodState = {}
+
+            if SeekFloodConnection then
+                SeekFloodConnection:Disconnect()
+                SeekFloodConnection = nil
+            end
+        end
+    end,
+})
 		
     else
         print(floorName .. ": N")
