@@ -222,10 +222,71 @@ GroupModifiers:AddToggle("Anti-A90", {
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
        
-	
-local TempBridges = {}
-local Connection = nil
-local function ProtectBridges(room)
+
+	--[[ ANTI A-90 ]]--
+	local function toggleA90(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+    if not a90 then return end
+
+    a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
+end
+
+GroupModifiers:AddToggle("Anti-A90", {
+	Text = "Anti A90",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antia90,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antia90 = Value
+        toggleA90(Value)
+	end,
+				
+        })
+
+GroupModifiers:AddToggle("Anti-Snare", {
+    Text = "Anti Snare",
+    Default = false,
+    Callback = function(state)
+        local connection
+        if state then
+            connection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "Snare" then
+                    local hitbox = descendant:FindFirstChild("Hitbox")
+                    if hitbox then
+                        hitbox.CanTouch = false
+                    end
+                end
+            end)
+        elseif connection then
+            connection:Disconnect()
+        end
+        for _, snare in pairs(workspace:GetDescendants()) do
+            if snare.Name == "Snare" then
+                local hitbox = snare:FindFirstChild("Hitbox")
+                if hitbox then
+                    hitbox.CanTouch = not state
+                end
+            end
+        end
+    end
+})
+		
+        local TempBridges = {}
+        local Connection = nil
+        local function ProtectBridges(room)
     if not room:FindFirstChild("Parts") then return end
 
     for _, bridge in pairs(room.Parts:GetChildren()) do
@@ -1806,7 +1867,7 @@ local function toggleDread(enabled)
     dread.Name = enabled and "Dread_MSDOORS_DISABLE" or "Dread"
 end
 
-if floorName == "DOORS-MINES" then
+if floorName == "Mines" then
     GroupAntiEntity:AddToggle("Anti-Giggle", {
     Text = "Anti Giggle",
     Default = false,
@@ -1839,6 +1900,39 @@ if floorName == "DOORS-MINES" then
 })
 end
 
+if floorName == "Rooms" then
+    local function toggleA90(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+    if not a90 then return end
+
+    a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
+end
+
+GroupModifiers:AddToggle("Anti-A90", {
+	Text = "Anti A90",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antia90,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antia90 = Value
+        toggleA90(Value)
+	end,
+				
+        })
+end
 GroupAntiEntity:AddToggle("AntiEyes", {
     Text = "Anti Eyes",
     Default = _G.msdoors_antieyes,
