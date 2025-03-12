@@ -2417,6 +2417,72 @@ GroupPlayer:AddSlider("WalkSpeedVelocity", {
 	Visible = true,
 })
 
+-- Variáveis globais
+_G.msdoors_densidadeOriginal = nil
+_G.msdoors_rootPart = nil
+
+_G.msdoors_atualizarPropriedadesFisicas = function(valor)
+    if not _G.msdoors_rootPart then return end
+    
+    local props = _G.msdoors_rootPart.CustomPhysicalProperties
+    
+    if valor then
+        _G.msdoors_densidadeOriginal = props.Density
+        
+        _G.msdoors_rootPart.CustomPhysicalProperties = PhysicalProperties.new(
+            100,
+            props.Friction,
+            props.Elasticity,
+            props.FrictionWeight,
+            props.ElasticityWeight
+        )
+    else
+        if _G.msdoors_densidadeOriginal then
+            _G.msdoors_rootPart.CustomPhysicalProperties = PhysicalProperties.new(
+                _G.msdoors_densidadeOriginal,
+                props.Friction,
+                props.Elasticity,
+                props.FrictionWeight,
+                props.ElasticityWeight
+            )
+        end
+    end
+end
+
+GroupPlayer:AddToggle("NoAccel", {
+    Text = "No Acceleration",
+    DisabledTooltip = "No Acceleration está desativado",
+    Default = false,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(value)
+        _G.msdoors_atualizarPropriedadesFisicas(value)
+    end,
+})
+
+_G.msdoors_iniciarPersonagem = function(character)
+    if not character then return end
+    
+    local success = pcall(function()
+        _G.msdoors_rootPart = character:WaitForChild("HumanoidRootPart", 5)
+    end)
+    
+    if not success or not _G.msdoors_rootPart then return end
+    
+    if Toggles and Toggles.NoAccel and Toggles.NoAccel.Value then
+        _G.msdoors_atualizarPropriedadesFisicas(true)
+    end
+end
+
+local player = game.Players.LocalPlayer
+if player then
+    player.CharacterAdded:Connect(_G.msdoors_iniciarPersonagem)
+    
+    if player.Character then
+        _G.msdoors_iniciarPersonagem(player.Character)
+    end
+end
 
 GroupBypass:AddToggle("SpeedBypass", {
 	Text = "Speed Bypass",
