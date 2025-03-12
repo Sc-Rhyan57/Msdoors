@@ -741,7 +741,7 @@ local EntityESPConfig = {
         },
         AmbushMoving = {
             Name = "Ambush", 
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = Color3.fromRGB(255, 0, 0)
         },
         Snare = {
             Name = "Armadilha",
@@ -1655,7 +1655,15 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     humanoid.JumpHeight = Toggles.EnableJump.Value and Toggles.JumpBoost.Value or 0
 end)
 
+local Options = {}
 
+Options.Brightness = {Value = 0}
+Options.Fullbright = {Value = false}
+Options.NoFog = {Value = false}
+
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = game.Players.LocalPlayer
+local fullbrightConnection = nil
 
 GroupAmbient:AddSlider("Brightness", {
     Text = "Brilho",
@@ -1664,16 +1672,17 @@ GroupAmbient:AddSlider("Brightness", {
     Max = 20,
     Rounding = 1,
     Callback = function(value)
+        Options.Brightness.Value = value
         Lighting.Brightness = value
     end
 })
-
-local fullbrightConnection = nil
 
 GroupAmbient:AddToggle("Fullbright", {
    Text = "Brilho total",
    Default = false,
    Callback = function(value)
+       Options.Fullbright.Value = value
+       
        if value then
            Lighting.Ambient = Color3.new(1, 1, 1)
            
@@ -1704,6 +1713,8 @@ GroupAmbient:AddToggle("NoFog", {
     Text = "No Fog",
     Default = false,
     Callback = function(value)
+        Options.NoFog.Value = value
+        
         if not Lighting:GetAttribute("FogStart") then
             Lighting:SetAttribute("FogStart", Lighting.FogStart)
         end
@@ -1725,26 +1736,29 @@ GroupAmbient:AddToggle("NoFog", {
 })
 
 Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
-    Lighting.Brightness = Options.Brightness.Value
+    if Options and Options.Brightness and Options.Brightness.Value then
+        Lighting.Brightness = Options.Brightness.Value
+    end
 end)
 
 Lighting:GetPropertyChangedSignal("Ambient"):Connect(function()
-    if Options.Fullbright.Value then
+    if Options and Options.Fullbright and Options.Fullbright.Value then
         Lighting.Ambient = Color3.new(1, 1, 1)
     end
 end)
 
 Lighting:GetPropertyChangedSignal("FogStart"):Connect(function()
-    if Options.NoFog.Value then
+    if Options and Options.NoFog and Options.NoFog.Value then
         Lighting.FogStart = 0
     end
 end)
 
 Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
-    if Options.NoFog.Value then
+    if Options and Options.NoFog and Options.NoFog.Value then
         Lighting.FogEnd = math.huge
     end
 end)
+
 
 function _G.msdoors_antilag:Activate()
     if not self.Enabled then return end  
