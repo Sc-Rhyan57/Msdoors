@@ -99,7 +99,7 @@ local GroupBypass = Tabs.Exploits:AddRightGroupbox("Byppas")
 
 --// FLOOR PAGE \\--
 if _G.msdoors_floor then
-    if floorName == "DOORS-GAME" then
+    if floorName == "Hotel" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Doors principal.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
@@ -208,16 +208,16 @@ GroupModifiers:AddToggle("Anti-A90", {
 	end,
 				
         })
-    elseif floorName == "DOORS-FOOLS23" then
+    elseif floorName == "Super Hard Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools23.")
         
-    elseif floorName == "DOORS-FOOLS24" then
+    elseif floorName == "Retro Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
         
-    elseif floorName == "DOORS-BACKDOORS" then
+    elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
 
-    elseif floorName == "DOORS-MINES" then
+    elseif floorName == "Mines" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Mines.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
