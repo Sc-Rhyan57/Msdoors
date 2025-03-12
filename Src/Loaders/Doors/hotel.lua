@@ -1595,65 +1595,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
 end)
 
 
-local densidadeOriginal = nil
-local rootPart = nil
-
-GroupPlayer:AddToggle("NoAccel", {
-    Text = "No Acceleration",
-    DisabledTooltip = "No Acceleration está desativado",
-    Default = false,
-    Disabled = false,
-    Visible = true,
-    Risky = false,
-    Callback = function(value)
-        if not rootPart then return end
-        
-        local props = rootPart.CustomPhysicalProperties
-        
-        if value then
-            densidadeOriginal = props.Density
-            
-            rootPart.CustomPhysicalProperties = PhysicalProperties.new(
-                100,
-                props.Friction,
-                props.Elasticity,
-                props.FrictionWeight,
-                props.ElasticityWeight
-            )
-        else
-            rootPart.CustomPhysicalProperties = PhysicalProperties.new(
-                densidadeOriginal,
-                props.Friction,
-                props.Elasticity,
-                props.FrictionWeight,
-                props.ElasticityWeight
-            )
-        end
-    end,
-})
-
-local function iniciarPersonagem(character)
-    rootPart = character:WaitForChild("HumanoidRootPart")
-    
-    if Toggles.NoAccel.Value and rootPart then
-        local props = rootPart.CustomPhysicalProperties
-        densidadeOriginal = props.Density
-        
-        rootPart.CustomPhysicalProperties = PhysicalProperties.new(
-            100,
-            props.Friction,
-            props.Elasticity,
-            props.FrictionWeight,
-            props.ElasticityWeight
-        )
-    end
-end
-
-game.Players.LocalPlayer.CharacterAdded:Connect(iniciarPersonagem)
-
-if game.Players.LocalPlayer.Character then
-    iniciarPersonagem(game.Players.LocalPlayer.Character)
-end
 
 GroupAmbient:AddSlider("Brightness", {
     Text = "Brilho",
