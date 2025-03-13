@@ -102,7 +102,7 @@ if _G.msdoors_floor then
     if floorName == "Hotel" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Doors principal.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
-	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
         --[[ ANTI SEEK OBSTRUCTIONS ]]--
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti-Seek Obstructions",
@@ -220,8 +220,7 @@ GroupModifiers:AddToggle("Anti-A90", {
     elseif floorName == "Mines" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Mines.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
-	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Hotel Functions")
-       
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
 
 	--[[ ANTI A-90 ]]--
 	local function toggleA90(enabled)
@@ -1947,8 +1946,14 @@ GroupModifiers:AddToggle("Anti-A90", {
 				
         })
 end
+
+local EyesName = (_G.msdoors_floor == "Hotel" and "Anti Eyes") or  
+                 (_G.msdoors_floor == "Backdoor" and "Anti Lookman") or  
+                 (_G.msdoors_floor == "Mines" and "Anti Eyes") or  
+                 "Anti Default"
+
 GroupAntiEntity:AddToggle("AntiEyes", {
-    Text = "Anti Eyes",
+    Text = EyesName,
     Default = _G.msdoors_antieyes,
     Callback = function(value)
     _G.msdoors_antieyes = value
