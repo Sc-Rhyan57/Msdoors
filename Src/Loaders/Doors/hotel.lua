@@ -28,6 +28,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
+_G.msdoors_DupeRunning = false
 _G.msdoors_AntiDupe = false
 _G.msdoors_AntiFlood = false
 _G.msdoors_AntiSeekDoor = false
@@ -2173,58 +2174,114 @@ GroupAntiEntity:AddToggle("Anti-Snare", {
     end
 })
 
-_G.msdoors_DupeOgAtt = {}
+
+_G.msdoors_DupeOriginals = {}
+_G.msdoors_DupeConnection = nil
+
 GroupAntiEntity:AddToggle("Anti-Dupe", {
     Text = "Anti Dupe",
     Default = false,
-    Callback = function(value)
-        _G.msdoors_AntiDupe = value
+    Callback = function(state)
+        _G.msdoors_DupeRunning = state
 
-        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
-            for _, dupeRoom in pairs(room:GetChildren()) do
-                local loadModule = dupeRoom:GetAttribute("LoadModule")
-                if loadModule == "DupeRoom" or loadModule == "SpaceSideroom" then
-                    task.spawn(function() 
-                        if not _G.msdoors_DupeOgAtt[dupeRoom] then
-                            _G.msdoors_DupeOgAtt[dupeRoom] = dupeRoom:GetAttribute("LoadModule")
+        if state then
+            _G.msdoors_DupeConnection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant:GetAttribute("LoadModule") == "DupeRoom" or descendant:GetAttribute("LoadModule") == "SpaceSideroom" then
+                    if not _G.msdoors_DupeOriginals[descendant] then
+                        _G.msdoors_DupeOriginals[descendant] = {}
+
+                        if descendant:GetAttribute("LoadModule") == "SpaceSideroom" then
+                            local collision = descendant:FindFirstChild("Collision")
+                            if collision then
+                                _G.msdoors_DupeOriginals[descendant].CanCollide = collision.CanCollide
+                                _G.msdoors_DupeOriginals[descendant].CanTouch = collision.CanTouch
+                                collision.CanCollide = true
+                                collision.CanTouch = false
+                            end
+                        else
+                            local doorFake = descendant:FindFirstChild("DoorFake")
+                            if doorFake then
+                                local hidden = doorFake:FindFirstChild("Hidden")
+                                local lock = doorFake:FindFirstChild("Lock")
+                                if hidden then
+                                    _G.msdoors_DupeOriginals[descendant].HiddenCanTouch = hidden.CanTouch
+                                    hidden.CanTouch = false
+                                end
+                                if lock and lock:FindFirstChild("UnlockPrompt") then
+                                    _G.msdoors_DupeOriginals[descendant].UnlockPrompt = lock.UnlockPrompt.Enabled
+                                    lock.UnlockPrompt.Enabled = false
+                                end
+                            end
                         end
-                        dupeRoom:SetAttribute("LoadModule", _G.msdoors_AntiDupe and "nil" or _G.msdoors_DupeOgAtt[dupeRoom])
-                    end)
+                    end
+                end
+            end)
+            for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+                for _, dupeRoom in pairs(room:GetChildren()) do
+                    if dupeRoom:GetAttribute("LoadModule") == "DupeRoom" or dupeRoom:GetAttribute("LoadModule") == "SpaceSideroom" then
+                        if not _G.msdoors_DupeOriginals[dupeRoom] then
+                            _G.msdoors_DupeOriginals[dupeRoom] = {}
+
+                            if dupeRoom:GetAttribute("LoadModule") == "SpaceSideroom" then
+                                local collision = dupeRoom:FindFirstChild("Collision")
+                                if collision then
+                                    _G.msdoors_DupeOriginals[dupeRoom].CanCollide = collision.CanCollide
+                                    _G.msdoors_DupeOriginals[dupeRoom].CanTouch = collision.CanTouch
+                                    collision.CanCollide = true
+                                    collision.CanTouch = false
+                                end
+                            else
+                                local doorFake = dupeRoom:FindFirstChild("DoorFake")
+                                if doorFake then
+                                    local hidden = doorFake:FindFirstChild("Hidden")
+                                    local lock = doorFake:FindFirstChild("Lock")
+                                    if hidden then
+                                        _G.msdoors_DupeOriginals[dupeRoom].HiddenCanTouch = hidden.CanTouch
+                                        hidden.CanTouch = false
+                                    end
+                                    if lock and lock:FindFirstChild("UnlockPrompt") then
+                                        _G.msdoors_DupeOriginals[dupeRoom].UnlockPrompt = lock.UnlockPrompt.Enabled
+                                        lock.UnlockPrompt.Enabled = false
+                                    end
+                                end
+                            end
+                        end
+                    end
                 end
             end
-        end
-        
-        if _G.msdoors_roomAddedConnection then
-            _G.msdoors_roomAddedConnection:Disconnect()
-            _G.msdoors_roomAddedConnection = nil
-        end
-
-        if _G.msdoors_AntiDupe then
-            _G.msdoors_roomAddedConnection = workspace.CurrentRooms.ChildAdded:Connect(function(newRoom)
-                for _, dupeRoom in pairs(newRoom:GetChildren()) do
-                    if dupeRoom:GetAttribute("LoadModule") == "DupeRoom" or dupeRoom:GetAttribute("LoadModule") == "SpaceSideroom" then
-                        task.spawn(function() 
-                            dupeRoom:SetAttribute("LoadModule", "nil")
-                        end)
+        else
+            for dupeRoom, originalValues in pairs(_G.msdoors_DupeOriginals) do
+                if dupeRoom and dupeRoom.Parent then
+                    if dupeRoom:GetAttribute("LoadModule") == "SpaceSideroom" then
+                        local collision = dupeRoom:FindFirstChild("Collision")
+                        if collision then
+                            collision.CanCollide = originalValues.CanCollide
+                            collision.CanTouch = originalValues.CanTouch
+                        end
+                    else
+                        local doorFake = dupeRoom:FindFirstChild("DoorFake")
+                        if doorFake then
+                            local hidden = doorFake:FindFirstChild("Hidden")
+                            local lock = doorFake:FindFirstChild("Lock")
+                            if hidden then
+                                hidden.CanTouch = originalValues.HiddenCanTouch
+                            end
+                            if lock and lock:FindFirstChild("UnlockPrompt") then
+                                lock.UnlockPrompt.Enabled = originalValues.UnlockPrompt
+                            end
+                        end
                     end
                 end
-                
-                newRoom.ChildAdded:Connect(function(child)
-                    if child:GetAttribute("LoadModule") == "DupeRoom" or child:GetAttribute("LoadModule") == "SpaceSideroom" then
-                        task.spawn(function() 
-                            child:SetAttribute("LoadModule", "nil")
-                        end)
-                    end
-                end)
-            end)
+            end
+            _G.msdoors_DupeOriginals = {}
+
+            if _G.msdoors_DupeConnection then
+                _G.msdoors_DupeConnection:Disconnect()
+                _G.msdoors_DupeConnection = nil
+            end
         end
-    end
+    end,
 })
-game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
-    if _G.msdoors_roomAddedConnection then
-        _G.msdoors_roomAddedConnection:Disconnect()
-    end
-end)
 
 
 GroupAntiEntity:AddToggle("AntiHearing", {
