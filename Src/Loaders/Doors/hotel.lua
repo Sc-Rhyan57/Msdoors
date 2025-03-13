@@ -103,7 +103,6 @@ if _G.msdoors_floor then
         print("[ Msdoors ] » Carregando funções da página Hotel para Doors principal.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
-        --[[ ANTI SEEK OBSTRUCTIONS ]]--
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti-Seek Obstructions",
     Default = false,
@@ -2819,13 +2818,21 @@ MenuGroup:AddButton("Unload", function()
 	Library:Unload()
 	print("[Msdoors] • Até outra hora 😉")
 end)
+local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
+                 (_G.msdoors_floor == "Rooms" and "Rooms") or  
+                 (_G.msdoors_floor == "Backdoor" and "Backdoor") or  
+                 (_G.msdoors_floor == "Mines" and "Mines") or  
+                 (_G.msdoors_floor == "Retro Mode" and "Retro") or
+                 (_G.msdoors_floor == "Super Hard Mode" and "SuperHardMode") or  
+                 "NoFloor"
+
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("msdoors")
 SaveManager:SetFolder("msdoors/Doors")
-SaveManager:SetSubFolder("Hotel")
+SaveManager:SetSubFolder(FolderFloor)
 SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
