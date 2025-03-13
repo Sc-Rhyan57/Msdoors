@@ -399,12 +399,13 @@ local ModifiedDoors = {}
 local function HandleSeekDoors(instance)
     if instance.Name == "SewerRingBreakable" then
         for _, child in pairs(instance:GetDescendants()) do
-            if child:IsA("BasePart") and (child.Name == "DoorPart" or string.match(child.Name, "Door") and string.match(child.Name, "[Pp]art")) then
+            if child:IsA("BasePart") and (child.Name == "DoorPart" or (string.find(child.Name, "Door") and string.find(child.Name, "[Pp]art"))) then
                 if _G.msdoors_AntiSeekDoor then
-                    ModifiedDoors[child] = {
-                        CanCollide = child.CanCollide,
-                        Instance = child
-                    }
+                    if not ModifiedDoors[child] then
+                        ModifiedDoors[child] = {
+                            CanCollide = child.CanCollide
+                        }
+                    end
                     child.CanCollide = false
                 end
             end
@@ -414,20 +415,21 @@ end
 
 local function RestoreSeekDoors()
     for part, data in pairs(ModifiedDoors) do
-        if part and part:IsDescendantOf(game) then
+        if part and part.Parent then
             part.CanCollide = data.CanCollide
         end
     end
     ModifiedDoors = {}
 end
+
 GroupHotel:AddToggle("antikickdoor", {
-	Text = "Anti Kickdoor",
-	DisabledTooltip = "I am disabled!",
-	Default = false,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(value)
+    Text = "Anti Kickdoor",
+    DisabledTooltip = "I am disabled!",
+    Default = false,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(value)
         _G.msdoors_AntiSeekDoor = value
         
         if value then
@@ -437,20 +439,22 @@ GroupHotel:AddToggle("antikickdoor", {
                 end
             end
             
-            SeekDoorConnection = game.Workspace.DescendantAdded:Connect(function(instance)
-                HandleSeekDoors(instance)
-            end)
+            if not SeekDoorConnection then
+                SeekDoorConnection = workspace.DescendantAdded:Connect(function(instance)
+                    HandleSeekDoors(instance)
+                end)
+            end
         else
             RestoreSeekDoors()
-            
+
             if SeekDoorConnection then
                 SeekDoorConnection:Disconnect()
                 SeekDoorConnection = nil
             end
         end
-
-	end,
+    end,
 })
+		
 
 --[[ ANTI FLOOD ]]--
 _G.msdoors_OriginalFloodState = {}
