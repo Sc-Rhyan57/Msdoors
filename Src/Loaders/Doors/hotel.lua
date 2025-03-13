@@ -28,6 +28,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
+_G.msdoors_AntiDupe = false
 _G.msdoors_AntiFlood = false
 _G.msdoors_AntiSeekDoor = false
 _G.msdoors_anticutscenes = false
@@ -46,9 +47,7 @@ _G.msdoors_antilag = {
     Connection = nil,
     StoredProperties = {}
 }
-getgenv().AntiSeekManager = {
-    IsEnabled = false
-}
+getgenv().AntiSeekManager = { IsEnabled = false }
 _G.ObsidianaLib = true
 
 
@@ -2173,6 +2172,60 @@ GroupAntiEntity:AddToggle("Anti-Snare", {
         end
     end
 })
+
+_G.msdoors_DupeOgAtt = {}
+GroupAntiEntity:AddToggle("Anti-Dupe", {
+    Text = "Anti Dupe",
+    Default = false,
+    Callback = function(value)
+        _G.msdoors_AntiDupe = value
+
+        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+            for _, dupeRoom in pairs(room:GetChildren()) do
+                local loadModule = dupeRoom:GetAttribute("LoadModule")
+                if loadModule == "DupeRoom" or loadModule == "SpaceSideroom" then
+                    task.spawn(function() 
+                        if not _G.msdoors_DupeOgAtt[dupeRoom] then
+                            _G.msdoors_DupeOgAtt[dupeRoom] = dupeRoom:GetAttribute("LoadModule")
+                        end
+                        dupeRoom:SetAttribute("LoadModule", _G.msdoors_AntiDupe and "nil" or _G.msdoors_DupeOgAtt[dupeRoom])
+                    end)
+                end
+            end
+        end
+        
+        if _G.msdoors_roomAddedConnection then
+            _G.msdoors_roomAddedConnection:Disconnect()
+            _G.msdoors_roomAddedConnection = nil
+        end
+
+        if _G.msdoors_AntiDupe then
+            _G.msdoors_roomAddedConnection = workspace.CurrentRooms.ChildAdded:Connect(function(newRoom)
+                for _, dupeRoom in pairs(newRoom:GetChildren()) do
+                    if dupeRoom:GetAttribute("LoadModule") == "DupeRoom" or dupeRoom:GetAttribute("LoadModule") == "SpaceSideroom" then
+                        task.spawn(function() 
+                            dupeRoom:SetAttribute("LoadModule", "nil")
+                        end)
+                    end
+                end
+                
+                newRoom.ChildAdded:Connect(function(child)
+                    if child:GetAttribute("LoadModule") == "DupeRoom" or child:GetAttribute("LoadModule") == "SpaceSideroom" then
+                        task.spawn(function() 
+                            child:SetAttribute("LoadModule", "nil")
+                        end)
+                    end
+                end)
+            end)
+        end
+    end
+})
+game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
+    if _G.msdoors_roomAddedConnection then
+        _G.msdoors_roomAddedConnection:Disconnect()
+    end
+end)
+
 
 GroupAntiEntity:AddToggle("AntiHearing", {
     Text = "Anti-Figure Hearing[MANUTENÇÃO]",
