@@ -685,10 +685,22 @@ local DoorESPManager = {
 
 function DoorESPManager:CreateESP(door, config)
     local room = door.Parent.Parent
-    local doorNumber = tonumber(room.Name) + 1
+    local baseNumber = tonumber(room.Name)
+
+    local startNumber = 1
+    if FolderFloor == "Mines" then
+    startNumber = 100
+    elseif FolderFloor == "Backdoor" then
+    startNumber = -50
+    elseif FolderFloor == "Hotel" then
+    startNumber = 1
+    end
+
+    local doorNumber = baseNumber + startNumber
+
     local opened = room.Door:GetAttribute("Opened")
     local locked = room:GetAttribute("RequiresKey")
-    
+	
     local doorState = opened and "[Aberta]" or (locked and "[Trancada]" or "")
     local displayName = string.format("%s %d %s", config.Name, doorNumber, doorState)
     
