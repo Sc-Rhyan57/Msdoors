@@ -229,6 +229,7 @@ local function modifyBanana(child, enable)
             child.Transparency = _G.msdoors_bananaOGproperties[child].Transparency
             child.Material = _G.msdoors_bananaOGproperties[child].Material
             child.CanTouch = _G.msdoors_bananaOGproperties[child].CanTouch
+            _G.msdoors_bananaOGproperties[child] = nil -- Remove da tabela para evitar vazamento de memória
         end
     end
 end
@@ -251,17 +252,15 @@ end)
 GroupHotel:AddToggle("AntiBanana", {
     Text = "Anti Banana",
     DisabledTooltip = "I am disabled!",
-    Default = _G.msdoors_AntiBanana,
+    Default = false,
     Disabled = false,
     Visible = true,
     Risky = false,
-    Default = false,
     Callback = function(value)
         _G.msdoors_AntiBanana = value
-        end
         destroyAllBananaPeel()
     end
-})
+})	
 		
     elseif floorName == "Retro Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
