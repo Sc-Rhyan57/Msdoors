@@ -688,11 +688,11 @@ function DoorESPManager:CreateESP(door, config)
     local baseNumber = tonumber(room.Name)
 
     local startNumber = 1
-    if FolderFloor == "Mines" then
+    if floorName == "Mines" then
     startNumber = 100
-    elseif FolderFloor == "Backdoor" then
+    elseif floorName == "Backdoor" then
     startNumber = -50
-    elseif FolderFloor == "Hotel" then
+    elseif floorName == "Hotel" then
     startNumber = 1
     end
 
