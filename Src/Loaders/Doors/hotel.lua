@@ -208,8 +208,61 @@ GroupModifiers:AddToggle("Anti-A90", {
 				
         })
     elseif floorName == "Super Hard Mode" then
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools23.")
-        
+	--[[ ANTI BANANA ]]--
+_G.msdoors_bananaOGproperties = {}
+
+local function modifyBanana(child, enable)
+    if enable then
+        _G.msdoors_bananaOGproperties[child] = {
+            Transparency = child.Transparency,
+            Material = child.Material,
+            CanTouch = child.CanTouch
+        }
+
+        child.Transparency = 0.7
+        child.Material = Enum.Material.Neon
+        child.CanTouch = false
+    else
+        if _G.msdoors_bananaOGproperties[child] then
+            child.Transparency = _G.msdoors_bananaOGproperties[child].Transparency
+            child.Material = _G.msdoors_bananaOGproperties[child].Material
+            child.CanTouch = _G.msdoors_bananaOGproperties[child].CanTouch
+        end
+    end
+end
+
+local function destroyAllBananaPeel()
+    for _, child in ipairs(workspace:GetChildren()) do
+        if child.Name == "BananaPeel" then
+            modifyBanana(child, _G.msdoors_AntiBanana)
+        end
+    end
+end
+
+workspace.ChildAdded:Connect(function(child)
+    if _G.msdoors_AntiBanana and child.Name == "BananaPeel" then
+        task.wait(0.1)
+        destroyAllBananaPeel()
+    end
+end)
+
+GroupHotel:AddToggle("AntiBanana", {
+    Text = "Anti Banana",
+    DisabledTooltip = "I am disabled!",
+    Default = _G.msdoors_AntiBanana,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Default = false,
+    Callback = function(value)
+        _G.msdoors_AntiBanana = value
+        end
+        destroyAllBananaPeel()
+    end
+})
+		
     elseif floorName == "Retro Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
         
