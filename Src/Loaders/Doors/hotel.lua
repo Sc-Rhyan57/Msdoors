@@ -255,6 +255,65 @@ GroupModifiers:AddToggle("Anti-A90", {
 				
         })
 
+
+local ProcessedGloomEggs = {}
+local GloomEggConnection = nil
+
+GroupHotel:AddToggle("AntiGloomEgg", {
+    Text = "Anti Gloom Egg",
+    Default = false,
+    Callback = function(value)
+        local function processGloomEgg(gloomEgg)
+            if value then
+                if not ProcessedGloomEggs[gloomEgg] then
+                    ProcessedGloomEggs[gloomEgg] = gloomEgg.CanTouch
+                end
+                gloomEgg.CanTouch = false
+            else
+                if ProcessedGloomEggs[gloomEgg] ~= nil then
+                    gloomEgg.CanTouch = ProcessedGloomEggs[gloomEgg]
+                    ProcessedGloomEggs[gloomEgg] = nil
+                end
+            end
+        end
+        
+        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+            for _, gloomPile in pairs(room:GetChildren()) do
+                if gloomPile.Name == "GloomPile" then
+                    for _, gloomEgg in pairs(gloomPile:GetDescendants()) do
+                        if gloomEgg.Name == "Egg" then
+                            processGloomEgg(gloomEgg)
+                        end
+                    end
+                end
+            end
+        end
+        
+        if value and not GloomEggConnection then
+            GloomEggConnection = workspace.CurrentRooms.ChildAdded:Connect(function(room)
+                room.ChildAdded:Connect(function(child)
+                    if child.Name == "GloomPile" then
+                        for _, gloomEgg in pairs(child:GetDescendants()) do
+                            if gloomEgg.Name == "Egg" then
+                                processGloomEgg(gloomEgg)
+                            end
+                        end
+                        
+                        child.DescendantAdded:Connect(function(descendant)
+                            if descendant.Name == "Egg" and value then
+                                processGloomEgg(descendant)
+                            end
+                        end)
+                    end
+                end)
+            end)
+        elseif not value and GloomEggConnection then
+            GloomEggConnection:Disconnect()
+            GloomEggConnection = nil
+        end
+    end
+})
+		
 GroupModifiers:AddToggle("Anti-Snare", {
     Text = "Anti Snare",
     Default = false,
