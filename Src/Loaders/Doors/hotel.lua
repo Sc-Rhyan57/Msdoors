@@ -2088,13 +2088,15 @@ GroupModifiers:AddToggle("Anti-A90", {
 end
 
 local EyesName = (_G.msdoors_floor == "Hotel" and "Anti Eyes") or  
-                 (_G.msdoors_floor == "Backdoor" and "Anti Lookman") or  
+                 (_G.msdoors_floor == "Backdoor" and "Anti Lookman") or
                  (_G.msdoors_floor == "Mines" and "Anti Eyes") or  
-                 "Anti Default"
+                 "Anti Eyes"
 
+local EyeActive = (_G.msdoors_floor == "Super Hard Mode") and true or false
 GroupAntiEntity:AddToggle("AntiEyes", {
     Text = EyesName,
     Default = _G.msdoors_antieyes,
+    Disabled = EyeActive,
     Callback = function(value)
     _G.msdoors_antieyes = value
         local function AntiEyes()
@@ -2562,7 +2564,7 @@ GroupPlayer:AddSlider("WalkSpeedVelocity", {
 	Visible = true,
 })
 
--- Variáveis globais
+
 _G.msdoors_densidadeOriginal = nil
 _G.msdoors_rootPart = nil
 
