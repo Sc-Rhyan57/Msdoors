@@ -771,9 +771,9 @@ local EntityESPConfig = {
             Name = "Blitz",
             Color = Color3.fromRGB(255, 0, 0)
         },
-        Entity10 = {
-            Name = "Entidade 10",
-            Color = Color3.fromRGB(128, 128, 0)
+        Eyes = {
+            Name = "Olhos",
+            Color = Color3.fromRGB(255, 0, 0)
         }
     },
     Settings = {
