@@ -218,18 +218,32 @@ local function modifyBanana(child, enable)
         _G.msdoors_bananaOGproperties[child] = {
             Transparency = child.Transparency,
             Material = child.Material,
-            CanTouch = child.CanTouch
+            CanTouch = child.CanTouch,
+            CanCollide = child.CanCollide,
+            CanQuery = child.CanQuery
         }
 
         child.Transparency = 0.7
         child.Material = Enum.Material.Neon
         child.CanTouch = false
+        child.CanCollide = false
+        child.CanQuery = false
+
+        for _, descendant in ipairs(child:GetDescendants()) do
+            if descendant:IsA("TouchTransmitter") or descendant:IsA("Constraint") then
+                descendant:Destroy()
+            elseif descendant:IsA("Script") or descendant:IsA("LocalScript") then
+                descendant.Disabled = true
+            end
+        end
     else
         if _G.msdoors_bananaOGproperties[child] then
             child.Transparency = _G.msdoors_bananaOGproperties[child].Transparency
             child.Material = _G.msdoors_bananaOGproperties[child].Material
             child.CanTouch = _G.msdoors_bananaOGproperties[child].CanTouch
-            _G.msdoors_bananaOGproperties[child] = nil -- Remove da tabela para evitar vazamento de memória
+            child.CanCollide = _G.msdoors_bananaOGproperties[child].CanCollide
+            child.CanQuery = _G.msdoors_bananaOGproperties[child].CanQuery
+            _G.msdoors_bananaOGproperties[child] = nil -- Liberar memória
         end
     end
 end
@@ -260,7 +274,7 @@ GroupHotel:AddToggle("AntiBanana", {
         _G.msdoors_AntiBanana = value
         destroyAllBananaPeel()
     end
-})	
+})
 		
     elseif floorName == "Retro Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
