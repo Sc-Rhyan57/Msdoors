@@ -96,7 +96,6 @@ local SelfTabE = GroupSelf:AddTab('Efeitos')
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
 local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 local GroupBypass = Tabs.Exploits:AddRightGroupbox("Byppas")
-
 --// FLOOR PAGE \\--
 if _G.msdoors_floor then
     if floorName == "Hotel" then
@@ -281,7 +280,126 @@ GroupHotel:AddToggle("AntiBanana", {
         
     elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
+_G.msdoors_HasteClockEnabled = false
 
+_G.msdoors_DigitalTimerValue = 0
+_G.msdoors_ScaryStartsNowValue = false
+_G.msdoors_TimerLabel = nil
+_G.msdoors_CLOCK_FUNCTIONS = {}
+
+_G.msdoors_CLOCK_FUNCTIONS.TimerFormat = function(seconds)
+    local minutes = math.floor(seconds / 60)
+    local remainingSeconds = seconds % 60
+    return string.format("%02d:%02d", minutes, remainingSeconds)
+end
+
+_G.msdoors_CLOCK_FUNCTIONS.Captions = function(text)
+    if not _G.msdoors_TimerLabel then
+        -- Criar a UI do timer
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "HasteClockGui"
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        
+        local Frame = Instance.new("Frame")
+        Frame.Name = "TimerFrame"
+        Frame.AnchorPoint = Vector2.new(0.5, 1)
+        Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+        Frame.BorderSizePixel = 2
+        Frame.Position = UDim2.new(0.5, 0, 0.98, 0)
+        Frame.Size = UDim2.new(0, 150, 0, 40)
+        Frame.Parent = ScreenGui
+        
+        _G.msdoors_TimerLabel = Instance.new("TextLabel")
+        _G.msdoors_TimerLabel.Name = "TimerText"
+        _G.msdoors_TimerLabel.BackgroundTransparency = 1
+        _G.msdoors_TimerLabel.Position = UDim2.new(0, 0, 0, 0)
+        _G.msdoors_TimerLabel.Size = UDim2.new(1, 0, 1, 0)
+        _G.msdoors_TimerLabel.Font = Enum.Font.SourceSansBold
+        _G.msdoors_TimerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        _G.msdoors_TimerLabel.TextSize = 24
+        _G.msdoors_TimerLabel.Text = text
+        _G.msdoors_TimerLabel.Parent = Frame
+        
+        local UIStroke = Instance.new("UIStroke")
+        UIStroke.Color = Color3.fromRGB(0, 0, 0)
+        UIStroke.Thickness = 2
+        UIStroke.Parent = _G.msdoors_TimerLabel
+    else
+        _G.msdoors_TimerLabel.Text = text
+    end
+end
+
+_G.msdoors_CLOCK_FUNCTIONS.HideCaptions = function()
+    if _G.msdoors_TimerLabel and _G.msdoors_TimerLabel.Parent and _G.msdoors_TimerLabel.Parent.Parent then
+        _G.msdoors_TimerLabel.Parent.Parent:Destroy()
+        _G.msdoors_TimerLabel = nil
+    end
+end
+
+
+GroupHotel:AddToggle("ShowTimer-backdoor", {
+	Text = "Show timer",
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_HasteClockEnabled = value
+        if not value then
+            _G.msdoors_CLOCK_FUNCTIONS.HideCaptions()
+        end
+	end,
+				
+        })
+local FloorReplicated = {}
+local success, result = pcall(function()
+    return game:GetService("ReplicatedStorage"):WaitForChild("FloorReplicated", 10)
+end)
+
+if success and result then
+    FloorReplicated = result
+    local digitalTimer = FloorReplicated:FindFirstChild("DigitalTimer")
+    local scaryStartsNow = FloorReplicated:FindFirstChild("ScaryStartsNow")
+    
+    if digitalTimer and scaryStartsNow then
+        _G.msdoors_DigitalTimerValue = digitalTimer.Value
+        _G.msdoors_ScaryStartsNowValue = scaryStartsNow.Value
+        
+        digitalTimer:GetPropertyChangedSignal("Value"):Connect(function()
+            _G.msdoors_DigitalTimerValue = digitalTimer.Value
+            if _G.msdoors_HasteClockEnabled and _G.msdoors_ScaryStartsNowValue then
+                _G.msdoors_CLOCK_FUNCTIONS.Captions(_G.msdoors_CLOCK_FUNCTIONS.TimerFormat(_G.msdoors_DigitalTimerValue))
+            end
+        end)
+        
+        scaryStartsNow:GetPropertyChangedSignal("Value"):Connect(function()
+            _G.msdoors_ScaryStartsNowValue = scaryStartsNow.Value
+        end)
+        
+        local clientRemote = FloorReplicated:FindFirstChild("ClientRemote")
+        if clientRemote then
+            local internal_temp_msdoors = clientRemote:FindFirstChild("_msdoors")
+            if internal_temp_msdoors and #internal_temp_msdoors:GetChildren() ~= 0 then
+                local hasteFolder = clientRemote:FindFirstChild("Haste")
+                if hasteFolder then
+                    for _, v in pairs(internal_temp_msdoors:GetChildren()) do
+                        v.Parent = hasteFolder
+                    end
+                end
+                internal_temp_msdoors:Destroy()
+            end
+        end
+    else
+    end
+else
+warn("[ Msdoors ] » FloorReplicated não encontrado! não é possível ativar o haste clock")
+end
+		
     elseif floorName == "Mines" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Mines.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
@@ -2178,8 +2296,12 @@ GroupAntiEntity:AddToggle("Anti-Snare", {
 _G.msdoors_DupeOriginals = {}
 _G.msdoors_DupeConnection = nil
 
+local DupeName = (_G.msdoors_floor == "Hotel" and "Anti Dupe") or
+                 (_G.msdoors_floor == "Backdoor" and "Anti Vacum") or  
+                 "Anti Dupe"
+
 GroupAntiEntity:AddToggle("Anti-Dupe", {
-    Text = "Anti Dupe",
+    Text = DupeName,
     Default = false,
     Callback = function(state)
         _G.msdoors_DupeRunning = state
