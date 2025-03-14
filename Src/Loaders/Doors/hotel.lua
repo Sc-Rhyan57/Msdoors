@@ -7,7 +7,7 @@ local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ESPLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/MSESP/refs/heads/main/source.lua"))()
-local MsdoorsNotify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Notification-doorsAPI/refs/heads/main/Msdoors/MsdoorsApi.lua"))()
+local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/Notification/Source.lua"))()
 
 --[[ SERVIÇOS ]]--
 local Lighting = game:GetService("Lighting")
@@ -28,6 +28,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
+_G.msdoors_LibraryNotif = "Linoria"
 _G.msdoors_DupeRunning = false
 _G.msdoors_AntiDupe = false
 _G.msdoors_AntiFlood = false
@@ -783,15 +784,16 @@ function NotifyEntity(entityName)
     local notificationData = EntityTable.NotifyReason[entityName]
     if notificationData then
         task.spawn(function()
-            MsdoorsNotify(
-                notificationData.Title,
-                notificationData.Description,
-                "",
-                "rbxassetid://" .. notificationData.Image,
-                Color3.fromRGB(255, 0, 0),
-                5
-            )
-
+	    Notify({
+            Title = notificationData.Title,
+            Description = notificationData.Description,
+            Reason = "",
+	    image = "rbxassetid://" .. notificationData.Image,
+            Color = Color3.fromRGB(255, 0, 0),
+            Style = "ENTITIES",
+            Time = 5,
+            NotifyStyle = _G.msdoors_LibraryNotif
+            })
             if _G.msdoors_chatActive then
                 TrySendChatMessage("[" .. notificationData.Title .. "] - " .. notificationData.Description)
             end
@@ -822,15 +824,16 @@ function NotifyRoom(roomName)
     local roomData = RoomTable[roomName]
     if roomData then
         task.spawn(function()
-            MsdoorsNotify(
-                roomData.Title,
-                roomData.Description,
-                "",
-                "rbxassetid://" .. roomData.Image,
-                Color3.fromRGB(0, 255, 255),
-                5
-            )
-
+	    Notify({
+            Title = roomData.Title,
+            Description = roomData.Description,
+            Reason = "",
+	    image = rbxassetid://" .. roomData.Image,
+            Color = Color3.fromRGB(255, 0, 0),
+            Style = "EVENT",
+            Time = 5,
+            NotifyStyle = _G.msdoors_LibraryNotif
+            })
             if _G.msdoors_chatActive then
                 TrySendChatMessage("[" .. roomData.Title .. "] - " .. roomData.Description)
             end
@@ -3115,8 +3118,7 @@ MenuGroup:AddDropdown("DPIDropdown", {
 	end,
 })
 MenuGroup:AddDivider()
-MenuGroup:AddLabel("Menu bind")
-	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
 	Library:Notify({
@@ -3131,6 +3133,25 @@ MenuGroup:AddButton("Unload", function()
 	print("[Msdoors] • Até outra hora 😉")
 end)
 
+MenuGroup:AddDivider()
+
+MenuGroup:AddDropdown("notifyStyle", {
+    Values = { "Obsdian", "Doors" },
+    Default = 1,
+    Multi = false,
+    Text = "estilo de notificação",
+    Tooltip = "Selecione o estilo de notificações",
+    Searchable = false,
+    Callback = function(Value)
+        if Value == "Obsdian" then
+            _G.msdoors_LibraryNotif = "Linoria"
+        elseif Value == "Doors" then
+            _G.msdoors_LibraryNotif = "Doors"
+        end
+    end,
+    Disabled = false,
+    Visible = true
+})
 
 --[[ Floor ]]--
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
