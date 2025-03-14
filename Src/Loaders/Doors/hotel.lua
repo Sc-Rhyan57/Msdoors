@@ -3008,6 +3008,229 @@ MenuGroup:AddButton("Unload", function()
 	Library:Unload()
 	print("[Msdoors] • Até outra hora 😉")
 end)
+
+if _G.msdoors_library == nil then
+    _G.msdoors_library = "Obsidian"
+end
+
+local function SaveLibrarySettings()
+    local settings = {}
+    
+    if _G.msdoors_library == "Linoria" or _G.msdoors_library == "Obsidian" then
+        if Library and Library.SaveManager then
+            settings.configs = Library.SaveManager.Configs
+            settings.currentConfig = Library.SaveManager.CurrentConfig
+            settings.theme = ThemeManager.CurrentTheme
+        end
+        
+        settings.elements = {}
+        
+        pcall(function()
+            for _, window in pairs(Library.Windows) do
+                for _, tab in pairs(window.Tabs) do
+                    for _, groupbox in pairs(tab.Groupboxes) do
+                        for elementId, element in pairs(groupbox.Objects) do
+                            if element.Type == "Toggle" then
+                                settings.elements[elementId] = {
+                                    type = element.Type,
+                                    value = element.Value
+                                }
+                            elseif element.Type == "Slider" then
+                                settings.elements[elementId] = {
+                                    type = element.Type,
+                                    value = element.Value
+                                }
+                            elseif element.Type == "Dropdown" then
+                                settings.elements[elementId] = {
+                                    type = element.Type,
+                                    value = element.Value,
+                                    multiValue = element.MultiValue
+                                }
+                            elseif element.Type == "ColorPicker" then
+                                settings.elements[elementId] = {
+                                    type = element.Type,
+                                    value = element.Value,
+                                    transparency = element.Transparency
+                                }
+                            elseif element.Type == "KeyPicker" then
+                                settings.elements[elementId] = {
+                                    type = element.Type,
+                                    value = element.Value,
+                                    mode = element.Mode
+                                }
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    
+    return settings
+end
+
+local function LoadLibrary(libraryName)
+    local repo = ""
+    
+    if Library then
+        pcall(function()
+            for _, window in pairs(Library.Windows) do
+                for _, tab in pairs(window.Tabs) do
+                    for _, groupbox in pairs(tab.Groupboxes) do
+                        for _, element in pairs(groupbox.Objects) do
+                            if element.Type == "Toggle" and element.Value then
+                                element:SetValue(false)
+                            end
+                            
+                            if element.Connections then
+                                for _, connection in pairs(element.Connections) do
+                                    connection:Disconnect()
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+        
+        if Library.Connections then
+            for _, connection in pairs(Library.Connections) do
+                connection:Disconnect()
+            end
+        end
+        
+        for _, window in pairs(Library.Windows) do
+            if window.Frame then
+                window.Frame:Destroy()
+            end
+        end
+        
+        Library = nil
+    end
+    
+    if libraryName == "Linoria" then
+        repo = 'https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/'
+        Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+        ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+        SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+    elseif libraryName == "Obsidian" then
+        repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+        Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+        ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+        SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+    end
+    
+    _G.msdoors_library = libraryName
+    
+    return Library, ThemeManager, SaveManager
+end
+
+local function ApplySettings(settings)
+    if settings and Library and Library.SaveManager then
+        Library.SaveManager.Configs = settings.configs or {}
+        Library.SaveManager.CurrentConfig = settings.currentConfig or ""
+        
+        if ThemeManager and settings.theme then
+            ThemeManager.CurrentTheme = settings.theme
+            ThemeManager:ApplyTheme(settings.theme)
+        end
+        
+        task.spawn(function()
+            task.wait(0.5)
+            
+            if settings.elements then
+                pcall(function()
+                    for _, window in pairs(Library.Windows) do
+                        for _, tab in pairs(window.Tabs) do
+                            for _, groupbox in pairs(tab.Groupboxes) do
+                                for elementId, element in pairs(groupbox.Objects) do
+                                    local savedElement = settings.elements[elementId]
+                                    
+                                    if savedElement and element.Type == savedElement.type then
+                                        if element.Type == "Toggle" and element.SetValue then
+                                            element:SetValue(savedElement.value)
+                                        elseif element.Type == "Slider" and element.SetValue then
+                                            element:SetValue(savedElement.value)
+                                        elseif element.Type == "Dropdown" and element.SetValue then
+                                            element:SetValue(savedElement.value)
+                                        elseif element.Type == "ColorPicker" and element.SetValueRGB then
+                                            element:SetValueRGB(savedElement.value)
+                                            if element.SetTransparency then
+                                                element:SetTransparency(savedElement.transparency)
+                                            end
+                                        elseif element.Type == "KeyPicker" and element.SetValue then
+                                            element:SetValue(savedElement.value, savedElement.mode)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+end
+
+local function SwitchLibrary(newLibrary)
+    if _G.msdoors_library == newLibrary then
+        return false, "Já está usando a biblioteca " .. newLibrary
+    end
+    
+    local savedSettings = SaveLibrarySettings()
+    local previousLibrary = _G.msdoors_library
+    
+    local success, result = pcall(function()
+        return LoadLibrary(newLibrary)
+    end)
+    
+    if not success then
+        pcall(function()
+            LoadLibrary(previousLibrary)
+        end)
+        return false, "Erro ao carregar a biblioteca " .. newLibrary .. ": " .. tostring(result)
+    end
+    
+    ApplySettings(savedSettings)
+    
+    return true, "Biblioteca trocada para " .. newLibrary
+end
+
+local function AddLibrarySwitcherToTab(tab)
+    local msConfig = MenuGroup:AddRightGroupbox("Estilo de Library")
+    
+    local selectedLibrary = _G.msdoors_library
+    msConfig:AddDropdown("LibraryStyle", {
+        Values = {"Linoria", "Obsidian"},
+        Default = _G.msdoors_library,
+        Multi = false,
+        Text = "Selecione o estilo",
+        Tooltip = "Escolha entre Linoria e Obsidian UI",
+        Callback = function(Value)
+            selectedLibrary = Value
+        end
+    })
+    
+     msConfig:AddButton("Setar Estilo", function()
+        local success, message = SwitchLibrary(selectedLibrary)
+        
+        if Library.Notify then
+            Library:Notify(message, 3)
+        else
+            print(message)
+        end
+    end)
+    
+     msConfig:AddLabel("Biblioteca atual: " .. _G.msdoors_library)
+    
+    return LibraryGroup
+end
+
+return {
+    SwitchLibrary = SwitchLibrary,
+    AddLibrarySwitcherToTab = AddLibrarySwitcherToTab
+}
+
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
                  (_G.msdoors_floor == "Backdoor" and "Backdoor") or  
