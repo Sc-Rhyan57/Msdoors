@@ -51,6 +51,12 @@ _G.msdoors_antilag = {
 }
 getgenv().AntiSeekManager = { IsEnabled = false }
 _G.ObsidianaLib = true
+--[[ ESP SETTINGS ]]--
+_G.msdoors_OutlineTr = 0
+_G.msdoors_tracePos = "Bottom"
+_G.msdoors_TextSize = 16
+_G.msdoors_tracerSt = false
+_G.msdoors_arrowSt = false
 
 
 local Window = Library:CreateWindow({
@@ -856,10 +862,10 @@ local DoorESPConfig = {
     Settings = {
         MaxDistance = 5000,
         UpdateInterval = 5,
-        TextSize = 16,
+        TextSize = _G.msdoors_TextSize,
         FillTransparency = 0.75,
-        OutlineTransparency = 0,
-        TracerStartPosition = "Bottom",
+        OutlineTransparency = _G.msdoors_OutlineTr,
+        TracerStartPosition = _G.msdoors_tracePos,
         ArrowCenterOffset = 300
     }
 }
@@ -906,13 +912,13 @@ function DoorESPManager:CreateESP(door, config)
         OutlineTransparency = DoorESPConfig.Settings.OutlineTransparency,
         
         Tracer = {
-            Enabled = true,
+            Enabled = _G.msdoors_tracerSt,
             From = DoorESPConfig.Settings.TracerStartPosition,
             Color = config.Color
         },
         
         Arrow = {
-            Enabled = true,
+            Enabled = _G.msdoors_arrowSt,
             CenterOffset = DoorESPConfig.Settings.ArrowCenterOffset,
             Color = config.Color
         }
@@ -1040,10 +1046,10 @@ local EntityESPConfig = {
     Settings = {
         MaxDistance = 5000,
         UpdateInterval = 5,
-        TextSize = 16,
+        TextSize = _G.msdoors_TextSize,
         FillTransparency = 0.75,
-        OutlineTransparency = 0,
-        TracerStartPosition = "Bottom",
+        OutlineTransparency = _G.msdoors_OutlineTr,
+        TracerStartPosition = _G.msdoors_tracePos,
         ArrowCenterOffset = 300
     }
 }
@@ -1072,13 +1078,13 @@ function EntityESPManager:CreateESP(entity, config)
         OutlineTransparency = EntityESPConfig.Settings.OutlineTransparency,
         
         Tracer = {
-            Enabled = true,
+            Enabled = _G.msdoors_tracerSt,
             From = EntityESPConfig.Settings.TracerStartPosition,
             Color = config.Color
         },
         
         Arrow = {
-            Enabled = true,
+            Enabled = _G.msdoors_arrowSt,
             CenterOffset = EntityESPConfig.Settings.ArrowCenterOffset,
             Color = config.Color
         }
@@ -1195,10 +1201,10 @@ local ObjectiveESPConfig = {
     Settings = {
         MaxDistance = 5000,
         UpdateInterval = 5,
-        TextSize = 16,
+        TextSize = _G.msdoors_TextSize,
         FillTransparency = 0.75,
-        OutlineTransparency = 0,
-        TracerStartPosition = "Bottom",
+        OutlineTransparency = _G.msdoors_OutlineTr,
+        TracerStartPosition = _G.msdoors_tracePos,
         ArrowCenterOffset = 300
     }
 }
@@ -1227,13 +1233,13 @@ function ObjectiveESPManager:CreateESP(object, config)
         OutlineTransparency = ObjectiveESPConfig.Settings.OutlineTransparency,
         
         Tracer = {
-            Enabled = true,
+            Enabled = _G.msdoors_tracerSt,
             From = ObjectiveESPConfig.Settings.TracerStartPosition,
             Color = config.Color
         },
         
         Arrow = {
-            Enabled = true,
+            Enabled = _G.msdoors_arrowSt,
             CenterOffset = ObjectiveESPConfig.Settings.ArrowCenterOffset,
             Color = config.Color
         }
@@ -1332,10 +1338,10 @@ local ITEMESPConfig = {
     Settings = {
         MaxDistance = 5000,
         UpdateInterval = 5,
-        TextSize = 16,
+        TextSize = _G.msdoors_TextSize,
         FillTransparency = 0.75,
-        OutlineTransparency = 0,
-        TracerStartPosition = "Bottom",
+        OutlineTransparency = _G.msdoors_OutlineTr,
+        TracerStartPosition = _G.msdoors_tracePos,
         ArrowCenterOffset = 300
     }
 }
