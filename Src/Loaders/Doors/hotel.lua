@@ -2534,6 +2534,26 @@ GroupNotC:AddToggle("Chat-Notifier", {
     end,
 })
 
+GroupNotCAddDivider()
+
+GroupNot:AddDropdown("notifyStyle", {
+    Values = { "Obsdian", "Doors" },
+    Default = 1,
+    Multi = false,
+    Text = "estilo de notificação",
+    Tooltip = "Selecione o estilo de notificações",
+    Searchable = false,
+    Callback = function(Value)
+        if Value == "Obsdian" then
+            _G.msdoors_LibraryNotif = "Linoria"
+        elseif Value == "Doors" then
+            _G.msdoors_LibraryNotif = "Doors"
+        end
+    end,
+    Disabled = false,
+    Visible = true
+})
+
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
