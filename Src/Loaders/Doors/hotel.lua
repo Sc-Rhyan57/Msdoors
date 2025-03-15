@@ -2534,7 +2534,7 @@ GroupNotC:AddToggle("Chat-Notifier", {
     end,
 })
 
-GroupNotCAddDivider()
+GroupNotC:AddDivider()
 
 GroupNot:AddDropdown("notifyStyle", {
     Values = { "Obsdian", "Doors" },
