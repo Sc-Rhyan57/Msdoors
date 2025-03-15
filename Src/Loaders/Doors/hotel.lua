@@ -2523,14 +2523,6 @@ GroupNot:AddToggle("Visual-Notifier-Entities", {
     Default = false,
     Callback = function(value)
         notificationsEnabled = value
-        MsdoorsNotify(
-            "MsDoors",
-            value and "Notificações de Entidades ativas!" or "Notificações de Entidades desativadas!",
-            "",
-            "rbxassetid://100573561401335",
-            value and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0),
-            3
-        )
     end,
 })
 
