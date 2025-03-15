@@ -549,6 +549,7 @@ GroupModifiers:AddToggle("Anti-Snare", {
         end
     end
 end
+		
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti Bridge Fall",
     Default = false,
@@ -1804,6 +1805,15 @@ GroupAuto:AddToggle("Auto-interact", {
 	Disabled = false,
 	Visible = true,
 	Risky = false,
+	Callback = function(Value)
+        AutoInteractEnabled = Value
+	end,
+}):AddKeyPicker("KeyP-autointeract", {
+	Default = "P",
+	SyncToggleState = true,
+	Mode = "Toggle",
+	Text = "Auto interact",
+	NoUI = false,
 	Callback = function(Value)
         AutoInteractEnabled = Value
 	end,
