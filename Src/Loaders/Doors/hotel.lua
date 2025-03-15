@@ -2535,7 +2535,6 @@ GroupNotC:AddToggle("Chat-Notifier", {
 })
 
 GroupNotC:AddDivider()
-
 GroupNotC:AddDropdown("notifyStyle", {
     Values = { "Obsdian", "Doors" },
     Default = 1,
@@ -2552,6 +2551,16 @@ GroupNotC:AddDropdown("notifyStyle", {
     end,
     Disabled = false,
     Visible = true
+})
+GroupNotC:AddDivider()
+GroupNotC:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+	Text = "Lado de notificação",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
 })
 
 local player = game.Players.LocalPlayer
@@ -3104,16 +3113,6 @@ MenuGroup:AddToggle("ShowCustomCursor", {
 	Default = true,
 	Callback = function(Value)
 		Library.ShowCustomCursor = Value
-	end,
-})
-MenuGroup:AddDropdown("NotificationSide", {
-	Values = { "Left", "Right" },
-	Default = "Right",
-
-	Text = "Notification Side",
-
-	Callback = function(Value)
-		Library:SetNotifySide(Value)
 	end,
 })
 MenuGroup:AddDropdown("DPIDropdown", {
