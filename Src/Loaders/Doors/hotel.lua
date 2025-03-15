@@ -2536,7 +2536,7 @@ GroupNotC:AddToggle("Chat-Notifier", {
 
 GroupNotC:AddDivider()
 
-GroupNot:AddDropdown("notifyStyle", {
+GroupNotC:AddDropdown("notifyStyle", {
     Values = { "Obsdian", "Doors" },
     Default = 1,
     Multi = false,
@@ -3133,11 +3133,16 @@ MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
 MenuGroup:AddButton("Unload", function()
-	Library:Notify({
-		Title = "Fechando...",
-		Description = "Aguarde estamos cuidando de tudo!.",
-		Time = 5,
-	})
+	Notify({
+        Title = "msdoors",
+        Description = "Fechando script...,
+        Reason = "",
+        Image = "rbxassetid://133147923060988",
+        Color = Color3.fromRGB(255, 255, 0),
+        Style = "LIBRARY",
+        Duration = 6,
+        NotifyStyle = _G.msdoors_LibraryNotif
+})
 	task.wait(5)
 	_G.MsdoorsLoaded = false
 	_G.ObsidianaLib = false
@@ -3145,27 +3150,6 @@ MenuGroup:AddButton("Unload", function()
 	print("[Msdoors] • Até outra hora 😉")
 end)
 
-MenuGroup:AddDivider()
-
-MenuGroup:AddDropdown("notifyStyle", {
-    Values = { "Obsdian", "Doors" },
-    Default = 1,
-    Multi = false,
-    Text = "estilo de notificação",
-    Tooltip = "Selecione o estilo de notificações",
-    Searchable = false,
-    Callback = function(Value)
-        if Value == "Obsdian" then
-            _G.msdoors_LibraryNotif = "Linoria"
-        elseif Value == "Doors" then
-            _G.msdoors_LibraryNotif = "Doors"
-        end
-    end,
-    Disabled = false,
-    Visible = true
-})
-
---[[ Floor ]]--
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
                  (_G.msdoors_floor == "Backdoor" and "Backdoor") or  
