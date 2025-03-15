@@ -828,7 +828,7 @@ function NotifyRoom(roomName)
             Title = roomData.Title,
             Description = roomData.Description,
             Reason = "",
-	    image = rbxassetid://" .. roomData.Image,
+	    image = "rbxassetid://" .. roomData.Image,
             Color = Color3.fromRGB(255, 0, 0),
             Style = "EVENT",
             Time = 5,
