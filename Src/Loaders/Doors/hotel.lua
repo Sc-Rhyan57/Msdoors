@@ -3131,24 +3131,69 @@ MenuGroup:AddDropdown("DPIDropdown", {
 })
 MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
-
+MenuGroup:AddDivider()
 MenuGroup:AddButton("Unload", function()
-	Notify({
-        Title = "msdoors",
-        Description = "Fechando script...,
-        Reason = "",
-        Image = "rbxassetid://133147923060988",
-        Color = Color3.fromRGB(255, 255, 0),
-        Style = "LIBRARY",
-        Duration = 6,
-        NotifyStyle = _G.msdoors_LibraryNotif
-})
-	task.wait(5)
-	_G.MsdoorsLoaded = false
-	_G.ObsidianaLib = false
-	Library:Unload()
-	print("[Msdoors] • Até outra hora 😉")
+    Library:Notify({
+        Title = "Fechando...",
+        Description = "Aguarde, estamos cuidando de tudo!",
+        Time = 5,
+    })
+
+    for _, toggle in pairs(Library.Flags) do
+        if type(toggle) == "boolean" then
+            Library.Flags[_] = false
+        end
+    end
+
+    for _, element in pairs(Library.Elements) do
+        if element.Type == "TextLabel" then
+            element.Instance.Text = ""
+        elseif element.Type == "Dropdown" then
+            element:SetValue(element.Default)
+        elseif element.Type == "Button" or element.Type == "Toggle" then
+            element:SetValue(false)
+        elseif element.Type == "Slider" then
+            element:SetValue(element.Min)
+        elseif element.Type == "Textbox" then
+            element:SetValue("")
+        elseif element.Type == "Keybind" then
+            element:SetValue(nil)
+        elseif element.Type == "ColorPicker" then
+            element:SetValue(Color3.new(1, 1, 1))
+        end
+    end
+
+    _G.msdoors_LibraryNotif = "Linoria"
+    _G.msdoors_DupeRunning = false
+    _G.msdoors_AntiDupe = false
+    _G.msdoors_AntiFlood = false
+    _G.msdoors_AntiSeekDoor = false
+    _G.msdoors_anticutscenes = false
+    _G.msdoors_antijumpscares = false
+    _G.msdoors_antia90 = false
+    _G.msdoors_antiscreech = false
+    _G.msdoors_antidread = false
+    _G.msdoors_CurrentlyUsingSGF = false
+    _G.msdoors_SpeedBypassBeTurned = nil
+    _G.msdoors_SpeedHackBeTurned = nil
+    _G.MaxActivationDistance = 7
+    _G.PromptClip = false
+    _G.msdoors_antieyes = false
+    _G.msdoors_antilag = {
+        Enabled = false,
+        Connection = nil,
+        StoredProperties = {}
+    }
+    getgenv().AntiSeekManager = { IsEnabled = false }
+    _G.ObsidianaLib = true
+
+    task.wait(5)
+
+    Library:Unload()
+
+    print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
+
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
