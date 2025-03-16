@@ -1522,7 +1522,25 @@ GroupEsp:AddToggle("Visual-esp-objective", {
 		Callback = function(Value)
 		ObjectiveESPManager:UpdateAllESPColors(Value)
 		_G.msdoors_objectiveColor = Value
-		end,
+			
+                for _, espInstance in pairs(DoorESPManager.ActiveESPs) do
+                if espInstance then
+                espInstance.SetColor({
+                    FillColor = _G.msdoors_DoorEspColor,
+                    OutlineColor = _G.msdoors_DoorEspColor,
+                    TextColor = _G.msdoors_DoorEspColor
+                })
+
+                if espInstance.TracerInstance then
+                    espInstance.TracerInstance.SetColor({ Color = _G.msdoors_DoorEspColor })
+                end
+
+                if espInstance.ArrowInstance then
+                    espInstance.ArrowInstance.SetColor({ Color = _G.msdoors_DoorEspColor })
+                end
+            end
+        end			
+	end,
 	})
 
 game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
