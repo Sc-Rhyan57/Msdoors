@@ -91,10 +91,6 @@ local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
 local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
-local GroupEspc = Tabs.Visual:AddRightTabbox()
-local GroupEsp = GroupEspc:AddTab('Esp')
-local GroupEspC = GroupEspc:AddTab('Configurações')
-
 local GroupAmbient = Tabs.Visual:AddLeftGroupbox("Ambiente")
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
@@ -105,6 +101,11 @@ local GroupNotC = GroupNotification:AddTab('Configurações')
 local GroupSelf = Tabs.Visual:AddRightTabbox()
 local SelfTab = GroupSelf:AddTab('Camera')
 local SelfTabE = GroupSelf:AddTab('Efeitos')
+
+local GroupEspc = Tabs.Visual:AddLeftTabbox()
+local GroupEsp = GroupEspc:AddTab('Esp')
+local GroupEspC = GroupEspc:AddTab('Configurações')
+
 
 --// EXPLOITS PAGE \\--
 local GroupAntiEntity = Tabs.Exploits:AddLeftGroupbox("Anti Entity")
