@@ -3075,7 +3075,7 @@ end)
 
 --// ADDONS \\--
 task.spawn(function()
-    local AddonTab = Window:AddTab("Addons [BETA]")
+    local AddonTab = Window:AddTab("Addons [BETA]", "package-plus")
 
     if not isfolder("msdoors/addons") then
         makefolder("msdoors/addons")
