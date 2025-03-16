@@ -1619,6 +1619,15 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
     end
 end)
 
+GroupEspConfig:AddToggle("TracersEnabled", {
+    Text = "Tracers",
+    Default = false,
+    Callback = function(Value)
+        _G.msdoors_tracerSt = Value
+        ESPLibrary.Tracers.Set(Value)
+    end
+})
+
 GroupEspConfig:AddDropdown("StartPosTracer", {
     Values = {"Bottom", "Center", "Top", "Mouse"},
     Default = "Bottom",
