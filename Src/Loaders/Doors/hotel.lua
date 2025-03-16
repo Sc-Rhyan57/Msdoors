@@ -91,12 +91,12 @@ local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
 local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
-local GroupAmbient = Tabs.Visual:AddLeftGroupbox("Ambiente")
-local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
-
 local GroupNotification = Tabs.Visual:AddRightTabbox()
 local GroupNot = GroupNotification:AddTab('Notificação')
 local GroupNotC = GroupNotification:AddTab('Configurações')
+
+local GroupAmbient = Tabs.Visual:AddLeftGroupbox("Ambiente")
+local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
 local GroupSelf = Tabs.Visual:AddRightTabbox()
 local SelfTab = GroupSelf:AddTab('Camera')
@@ -104,7 +104,7 @@ local SelfTabE = GroupSelf:AddTab('Efeitos')
 
 local GroupEspc = Tabs.Visual:AddLeftTabbox()
 local GroupEsp = GroupEspc:AddTab('Esp')
-local GroupEspC = GroupEspc:AddTab('Configurações')
+local GroupEspConfig = GroupEspc:AddTab('Configurações')
 
 
 --// EXPLOITS PAGE \\--
@@ -1620,6 +1620,24 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
         DoorESPManager:ScanRoom()
     end
 end)
+
+GroupEspConfig:AddDropdown("StartPosTracer", {
+    Values = {"Bottom", "Center", "Top", "Mouse"},
+    Default = "Bottom",
+    Multi = false,
+    Text = "Tracer Location",
+    DisabledTooltip = "I am disabled!",
+    Callback = function(Value)
+        _G.msdoors_tracePos = Value
+        for _, esp in pairs(ESPLibrary.ESP) do
+            if esp and esp.Update then
+                esp.Update({ Tracer = { From = Value } })
+            end
+        end
+    end,
+    Disabled = false, 
+    Visible = true
+})
 
 GroupVPlayer:AddToggle("Visual-no-ambience", {
 	Text = "No Ambience",
