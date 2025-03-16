@@ -1510,7 +1510,14 @@ GroupEsp:AddToggle("Visual-esp-objective", {
             ObjectiveESPManager:StopScanning()
         end
 	end,
-})
+}):AddColorPicker("ObjectiveEsp-color", {
+		Default = Color3.new(0, 255, 0),
+		Title = "Selecione Uma cor",
+		Transparency = 0,
+		Callback = function(Value)
+		_G.msdoors_objectiveColor = Value
+		end,
+	})
 
 game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
     if ObjectiveESPManager.IsEnabled then
@@ -1535,7 +1542,14 @@ GroupEsp:AddToggle("Visual-esp-entity", {
             EntityESPManager:StopScanning()
 			end
 	end,
-})
+}):AddColorPicker("EntityEsp-color", {
+		Default = Color3.new(255, 0, 0),
+		Title = "Selecione Uma cor",
+		Transparency = 0,
+		Callback = function(Value)
+	        _G.msdoors_entityColor = Value
+		end,
+	})
 
 game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
     if EntityESPManager.IsEnabled then
