@@ -1623,15 +1623,11 @@ GroupEspConfig:AddToggle("TracersEnabled", {
     Text = "Tracers",
     Default = false,
     Callback = function(Value)
+        if _G.msdoors_tracerSt == Value then return end
         _G.msdoors_tracerSt = Value 
-        for _, esp in pairs(ESPLibrary.ESP) do
-            if esp and esp.Update then
-                esp.Update({
-                    Tracer = {
-                        Enabled = Value,
-                        From = _G.msdoors_tracePos
-                    }
-                })
+        for _, tracer in pairs(ESPLibrary.ESP.Tracers) do
+            if tracer and tracer.SetVisible then
+                tracer.SetVisible(Value)
             end
         end
     end
@@ -1644,13 +1640,12 @@ GroupEspConfig:AddDropdown("LocalTrace", {
     Text = "Tracer Location",
     DisabledTooltip = "I am disabled!",
     Callback = function(Value)
+        if _G.msdoors_tracePos == Value then return end
         _G.msdoors_tracePos = Value
-        for _, esp in pairs(ESPLibrary.ESP) do
-            if esp and esp.Update and _G.msdoors_tracerSt then
-                esp.Update({
-                    Tracer = {
-                        From = Value
-                }
+        for _, tracer in pairs(ESPLibrary.ESP.Tracers) do
+            if tracer and tracer.Update and _G.msdoors_tracerSt then
+                tracer.Update({
+                    From = Value
                 })
             end
         end
@@ -1658,6 +1653,7 @@ GroupEspConfig:AddDropdown("LocalTrace", {
     Disabled = false, 
     Visible = true
 })
+
 
 GroupVPlayer:AddToggle("Visual-no-ambience", {
 	Text = "No Ambience",
