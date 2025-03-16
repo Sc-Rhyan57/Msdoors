@@ -1619,28 +1619,24 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
     end
 end)
 
-
 GroupEspConfig:AddToggle("TracersEnabled", {
     Text = "Tracers",
     Default = false,
     Callback = function(Value)
         _G.msdoors_tracerSt = Value
-        for _, category in pairs(ESPLibrary.ESP) do
-            if typeof(category) == "table" then
-                for _, esp in pairs(category) do
-                    if esp and esp.Update then
-                        esp.Update({
-                            Tracer = {
-                                Enabled = Value,
-                                From = _G.msdoors_tracePos
-                            }
-                        })
-                    end
-                end
+        for _, esp in pairs(DoorESPManager.ActiveESPs) do
+            if esp and esp.Update then
+                esp.Update({
+                    Tracer = {
+                        Enabled = Value,
+                        From = _G.msdoors_tracePos
+                    }
+                })
             end
         end
     end
 })
+
 
 GroupEspConfig:AddDropdown("LocalTrace", {
     Values = {"Bottom", "Center", "Top", "Mouse"},
