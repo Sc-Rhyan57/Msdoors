@@ -61,6 +61,7 @@ _G.msdoors_arrowSt = _G.msdoors_arrowSt or false
 --// ESP COLORS \\--
 _G.msdoors_entityColor = _G.msdoors_entityColor or Color3.fromRGB(255, 0, 0)
 _G.msdoors_objectiveColor = _G.msdoors_objectiveColor or Color3.fromRGB(0, 255, 0)
+_G.msdoors_DoorEspColor = _G.msdoors_DoorEspColor or Color3.fromRGB(100, 200, 255)
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
@@ -90,7 +91,10 @@ local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
 local GroupMisc = Tabs.Main:AddRightGroupbox("Diversos")
 
 --// VISUAL PAGE \\--
-local GroupEsp = Tabs.Visual:AddLeftGroupbox("Esp")
+local GroupEspc = Tabs.Visual:AddRightTabbox()
+local GroupEsp = GroupEspc:AddTab('Esp')
+local GroupEspC = GroupEspc:AddTab('Configurações')
+
 local GroupAmbient = Tabs.Visual:AddLeftGroupbox("Ambiente")
 local GroupVPlayer = Tabs.Visual:AddRightGroupbox("Player")
 
@@ -859,7 +863,7 @@ local DoorESPConfig = {
     Types = {
         Door = {
             Name = "Porta",
-            Color = Color3.fromRGB(241, 196, 15)
+            Color = _G.msdoors_DoorEspColor
         }
     },
     Settings = {
@@ -1573,7 +1577,14 @@ GroupEsp:AddToggle("Visual-esp-door", {
             DoorESPManager:StopScanning()
 	   end
 	end,
-})
+}):AddColorPicker("DoorsEsp-color", {
+		Default = Color3.fromRGB(100, 200, 255),
+		Title = "Selecione Uma cor",
+		Transparency = 0,
+		Callback = function(Value)
+		_G.msdoors_DoorEspColor = Value
+		end,
+	})
 
 game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
     if DoorESPManager.IsEnabled then
