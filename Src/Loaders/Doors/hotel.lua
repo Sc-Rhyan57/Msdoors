@@ -29,18 +29,18 @@ local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_LibraryNotif = "Linoria"
-_G.msdoors_DupeRunning = false
-_G.msdoors_AntiDupe = false
-_G.msdoors_AntiFlood = false
-_G.msdoors_AntiSeekDoor = false
-_G.msdoors_anticutscenes = false
-_G.msdoors_antijumpscares = false
+_G.msdoors_DupeRunning = _G.msdoors_DupeRunning or false
+_G.msdoors_AntiDupe = _G.msdoors_AntiDupe or false
+_G.msdoors_AntiFlood = _G.msdoors_AntiFlood or false
+_G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
+_G.msdoors_anticutscenes = _G.msdoors_anticutscenes or false
+_G.msdoors_antijumpscares = _G.msdoors_antijumpscares or false
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
 _G.msdoors_antiscreech = _G.msdoors_antiscreech or false
 _G.msdoors_antidread = _G.msdoors_antidread or false
-_G.msdoors_CurrentlyUsingSGF = false
-_G.msdoors_SpeedBypassBeTurned = nil
-_G.msdoors_SpeedHackBeTurned = nil
+_G.msdoors_CurrentlyUsingSGF = _G.msdoors_CurrentlyUsingSGF or false
+_G.msdoors_SpeedBypassBeTurned = _G.msdoors_SpeedBypassBeTurned or nil
+_G.msdoors_SpeedHackBeTurned = _G.msdoors_SpeedHackBeTurned or nil
 _G.MaxActivationDistance = _G.MaxActivationDistance or 7
 _G.PromptClip = _G.PromptClip or false
 _G.msdoors_antieyes = _G.msdoors_antieyes or false
@@ -52,12 +52,15 @@ _G.msdoors_antilag = {
 getgenv().AntiSeekManager = { IsEnabled = false }
 _G.ObsidianaLib = true
 --[[ ESP SETTINGS ]]--
-_G.msdoors_OutlineTr = 0
-_G.msdoors_tracePos = "Bottom"
-_G.msdoors_TextSize = 16
-_G.msdoors_tracerSt = false
-_G.msdoors_arrowSt = false
+_G.msdoors_OutlineTr = _G.msdoors_OutlineTr or 0
+_G.msdoors_tracePos = _G.msdoors_tracePos or "Bottom"
+_G.msdoors_TextSize = _G.msdoors_TextSize or 16
+_G.msdoors_tracerSt = _G.msdoors_tracerSt or false
+_G.msdoors_arrowSt = _G.msdoors_arrowSt or false
 
+--// ESP COLORS \\--
+_G.msdoors_entityColor = _G.msdoors_entityColor or Color3.fromRGB(255, 0, 0)
+_G.msdoors_objectiveColor = _G.msdoors_objectiveColor or Color3.fromRGB(0, 255, 0)
 
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
@@ -999,48 +1002,47 @@ function DoorESPManager:StopScanning()
     self.IsChecking = false
     self:ClearESPs()
 end
-
 local EntityESPConfig = {
     Types = {
         RushMoving = {
             Name = "Rush",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         AmbushMoving = {
             Name = "Ambush", 
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         Snare = {
             Name = "Armadilha",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         FigureRig = {
             Name = "Figure",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         A60 = {
             Name = "A-60",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         A120 = {
             Name = "A-120",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         GiggleCeiling = {
             Name = "Giggle",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         GrumbleRig = {
             Name = "Grumle",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         BackdoorRush = {
             Name = "Blitz",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         },
         Entity10 = {
             Name = "Entidade 10",
-            Color = Color3.fromRGB(255, 0, 0)
+            Color = _G.msdoors_entityColor
         }
     },
     Settings = {
@@ -1159,43 +1161,43 @@ local ObjectiveESPConfig = {
     Types = {
         KeyObtain = {
             Name = "Chave",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         LeverForGate = {
             Name = "Alavanca",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         ElectricalKeyObtain = {
             Name = "Chave elétrica",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         LiveHintBook = {
             Name = "Livro",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         LiveBreakerPolePickup = {
             Name = "Disjuntor",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         MinesGenerator = {
             Name = "Gerador",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         MinesGateButton = {
             Name = "Botão do portão",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         FuseObtain = {
             Name = "Fusível",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         MinesAnchor = {
             Name = "Torre",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         },
         WaterPump = {
             Name = "Bomba de água",
-            Color = Color3.fromRGB(0, 255, 0)
+            Color = _G.msdoors_objectiveColor
         }
     },
     Settings = {
