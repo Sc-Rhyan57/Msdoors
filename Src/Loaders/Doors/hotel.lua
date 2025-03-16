@@ -1624,7 +1624,16 @@ GroupEspConfig:AddToggle("TracersEnabled", {
     Default = false,
     Callback = function(Value)
         _G.msdoors_tracerSt = Value
-        ESPLibrary.Tracers.Set(Value)
+        for _, esp in pairs(DoorESPManager.ActiveESPs) do
+            if esp and esp.Update then
+                esp.Update({
+                    Tracer = {
+                        Enabled = Value,
+                        From = _G.msdoors_tracePos
+                    }
+                })
+            end
+        end
     end
 })
 
