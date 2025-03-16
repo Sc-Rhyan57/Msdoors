@@ -3033,7 +3033,7 @@ GroupBypass:AddSlider("WalkSpeedVelocity", {
 	Text = "Speed Bypass delay",
 	Default = 0.23,
 	Min = 0.22,
-	Max = 0.25,
+	Max = 0.26,
 	Rounding = 1,
 	Compact = false,
 	Callback = function(Value)
