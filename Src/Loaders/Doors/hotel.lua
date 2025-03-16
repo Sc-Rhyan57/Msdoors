@@ -1521,8 +1521,17 @@ GroupEsp:AddToggle("Visual-esp-objective", {
 		Transparency = 0,
 		Callback = function(Value)
 		ObjectiveESPManager:UpdateAllESPColors(Value)
-		_G.msdoors_objectiveColor = Value		
-	end,
+		_G.msdoors_objectiveColor = Value
+                for _, esp in pairs(ObjectiveESPManager.ActiveESPs) do
+                if esp then
+                esp.Update({
+                    FillColor = Value,
+                    OutlineColor = Value,
+                    TextColor = Value,
+                })
+                end
+		end	
+	        end,
 	})
 
 game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
@@ -1555,6 +1564,15 @@ GroupEsp:AddToggle("Visual-esp-entity", {
 		Callback = function(Value)
 	        EntityESPManager:UpdateAllESPColors(Value)
 	        _G.msdoors_entityColor = Value
+                for _, esp in pairs(EntityESPManager.ActiveESPs) do
+                if esp then
+                esp.Update({
+                    FillColor = Value,
+                    OutlineColor = Value,
+                    TextColor = Value,
+                })
+                end
+		end
 		end,
 	})
 
@@ -1586,13 +1604,13 @@ GroupEsp:AddToggle("Visual-esp-door", {
 		Callback = function(Value)
 		_G.msdoors_DoorEspColor = Value
                 for _, esp in pairs(DoorESPManager.ActiveESPs) do
-            if esp then
+                if esp then
                 esp.Update({
                     FillColor = Value,
                     OutlineColor = Value,
                     TextColor = Value,
                 })
-            end
+                end
 		end
 		end,
 	})
