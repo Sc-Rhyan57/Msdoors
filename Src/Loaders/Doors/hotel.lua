@@ -1585,11 +1585,15 @@ GroupEsp:AddToggle("Visual-esp-door", {
 		Transparency = 0,
 		Callback = function(Value)
 		_G.msdoors_DoorEspColor = Value
-		   for _, espInstance in pairs(DoorESPManager.ActiveESPs) do
-                if espInstance then
-                espInstance.SetColor({ Color = _G.msdoors_DoorEspColor }) -- Aplica a cor diretamente a tudo
-                end
-		   end
+                for _, esp in pairs(DoorESPManager.ActiveESPs) do
+            if esp then
+                esp.Update({
+                    FillColor = Value,
+                    OutlineColor = Value,
+                    TextColor = Value,
+                })
+            end
+		end
 		end,
 	})
 
