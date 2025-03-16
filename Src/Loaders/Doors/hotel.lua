@@ -1521,25 +1521,7 @@ GroupEsp:AddToggle("Visual-esp-objective", {
 		Transparency = 0,
 		Callback = function(Value)
 		ObjectiveESPManager:UpdateAllESPColors(Value)
-		_G.msdoors_objectiveColor = Value
-			
-                for _, espInstance in pairs(DoorESPManager.ActiveESPs) do
-                if espInstance then
-                espInstance.SetColor({
-                    FillColor = _G.msdoors_DoorEspColor,
-                    OutlineColor = _G.msdoors_DoorEspColor,
-                    TextColor = _G.msdoors_DoorEspColor
-                })
-
-                if espInstance.TracerInstance then
-                    espInstance.TracerInstance.SetColor({ Color = _G.msdoors_DoorEspColor })
-                end
-
-                if espInstance.ArrowInstance then
-                    espInstance.ArrowInstance.SetColor({ Color = _G.msdoors_DoorEspColor })
-                end
-            end
-        end			
+		_G.msdoors_objectiveColor = Value		
 	end,
 	})
 
@@ -1591,7 +1573,6 @@ GroupEsp:AddToggle("Visual-esp-door", {
 	Risky = false,
 	Callback = function(state)
         DoorESPManager.IsEnabled = state
-        
         if state then
             DoorESPManager:StartScanning()
         else
@@ -1603,8 +1584,13 @@ GroupEsp:AddToggle("Visual-esp-door", {
 		Title = "Selecione Uma cor",
 		Transparency = 0,
 		Callback = function(Value)
-		DoorESPManager:UpdateAllESPColors(Value)
 		_G.msdoors_DoorEspColor = Value
+		for _, espInstance in pairs(DoorESPManager.ActiveESPs) do
+                if espInstance then
+                espInstance.SetColor({ Color = _G.msdoors_DoorEspColor }) -- Aplica a cor diretamente a tudo
+                end
+			end
+		DoorESPManager:UpdateAllESPColors(Value)
 		end,
 	})
 
