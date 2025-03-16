@@ -1623,8 +1623,8 @@ GroupEspConfig:AddToggle("TracersEnabled", {
     Text = "Tracers",
     Default = false,
     Callback = function(Value)
-        _G.msdoors_tracerSt = Value
-        for _, esp in pairs(DoorESPManager.ActiveESPs) do
+        _G.msdoors_tracerSt = Value 
+        for _, esp in pairs(ESPLibrary.ESP) do
             if esp and esp.Update then
                 esp.Update({
                     Tracer = {
@@ -1637,7 +1637,7 @@ GroupEspConfig:AddToggle("TracersEnabled", {
     end
 })
 
-GroupEspConfig:AddDropdown("StartPosTracer", {
+GroupEspConfig:AddDropdown("LocalTrace", {
     Values = {"Bottom", "Center", "Top", "Mouse"},
     Default = "Bottom",
     Multi = false,
@@ -1646,8 +1646,12 @@ GroupEspConfig:AddDropdown("StartPosTracer", {
     Callback = function(Value)
         _G.msdoors_tracePos = Value
         for _, esp in pairs(ESPLibrary.ESP) do
-            if esp and esp.Update then
-                esp.Update({ Tracer = { From = Value } })
+            if esp and esp.Update and _G.msdoors_tracerSt then
+                esp.Update({
+                    Tracer = {
+                        From = Value
+                }
+                })
             end
         end
     end,
