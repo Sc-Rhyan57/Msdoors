@@ -1619,15 +1619,24 @@ game.Players.LocalPlayer:GetAttributeChangedSignal("CurrentRoom"):Connect(functi
     end
 end)
 
+
 GroupEspConfig:AddToggle("TracersEnabled", {
     Text = "Tracers",
     Default = false,
     Callback = function(Value)
-        if _G.msdoors_tracerSt == Value then return end
-        _G.msdoors_tracerSt = Value 
-        for _, tracer in pairs(ESPLibrary.ESP.Tracers) do
-            if tracer and tracer.SetVisible then
-                tracer.SetVisible(Value)
+        _G.msdoors_tracerSt = Value
+        for _, category in pairs(ESPLibrary.ESP) do
+            if typeof(category) == "table" then
+                for _, esp in pairs(category) do
+                    if esp and esp.Update then
+                        esp.Update({
+                            Tracer = {
+                                Enabled = Value,
+                                From = _G.msdoors_tracePos
+                            }
+                        })
+                    end
+                end
             end
         end
     end
@@ -1640,13 +1649,20 @@ GroupEspConfig:AddDropdown("LocalTrace", {
     Text = "Tracer Location",
     DisabledTooltip = "I am disabled!",
     Callback = function(Value)
-        if _G.msdoors_tracePos == Value then return end
         _G.msdoors_tracePos = Value
-        for _, tracer in pairs(ESPLibrary.ESP.Tracers) do
-            if tracer and tracer.Update and _G.msdoors_tracerSt then
-                tracer.Update({
-                    From = Value
-                })
+        for _, category in pairs(ESPLibrary.ESP) do
+            if typeof(category) == "table" then
+                for _, esp in pairs(category) do
+                    if esp and esp.Update and _G.msdoors_tracerSt then
+                        esp.Update({
+                            Tracer = {
+                                Enabled = _G.msdoors_tracerSt,
+                                From = Value,
+                                Color = _G.msdoors_DoorEspColor
+                            }
+                        })
+                    end
+                end
             end
         end
     end,
