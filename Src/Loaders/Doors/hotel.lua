@@ -1520,6 +1520,7 @@ GroupEsp:AddToggle("Visual-esp-objective", {
 		Title = "Selecione Uma cor",
 		Transparency = 0,
 		Callback = function(Value)
+		ObjectiveESPManager:UpdateAllESPColors(Value)
 		_G.msdoors_objectiveColor = Value
 		end,
 	})
@@ -1552,6 +1553,7 @@ GroupEsp:AddToggle("Visual-esp-entity", {
 		Title = "Selecione Uma cor",
 		Transparency = 0,
 		Callback = function(Value)
+	        EntityESPManager:UpdateAllESPColors(Value)
 	        _G.msdoors_entityColor = Value
 		end,
 	})
@@ -1583,6 +1585,7 @@ GroupEsp:AddToggle("Visual-esp-door", {
 		Title = "Selecione Uma cor",
 		Transparency = 0,
 		Callback = function(Value)
+		DoorESPManager:UpdateAllESPColors(Value)
 		_G.msdoors_DoorEspColor = Value
 		end,
 	})
