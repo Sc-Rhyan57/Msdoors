@@ -1520,7 +1520,6 @@ GroupEsp:AddToggle("Visual-esp-objective", {
 		Title = "Selecione Uma cor",
 		Transparency = 0,
 		Callback = function(Value)
-		ObjectiveESPManager:UpdateAllESPColors(Value)
 		_G.msdoors_objectiveColor = Value
                 for _, esp in pairs(ObjectiveESPManager.ActiveESPs) do
                 if esp then
@@ -1562,7 +1561,6 @@ GroupEsp:AddToggle("Visual-esp-entity", {
 		Title = "Selecione Uma cor",
 		Transparency = 0,
 		Callback = function(Value)
-	        EntityESPManager:UpdateAllESPColors(Value)
 	        _G.msdoors_entityColor = Value
                 for _, esp in pairs(EntityESPManager.ActiveESPs) do
                 if esp then
