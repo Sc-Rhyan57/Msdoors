@@ -296,8 +296,9 @@ GroupHotel:AddToggle("AntiBanana", {
     elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
-_G.msdoors_HasteClockEnabled = false
 
+  --[[ Show Haste Clock ]]--
+_G.msdoors_HasteClockEnabled = true
 _G.msdoors_DigitalTimerValue = 0
 _G.msdoors_ScaryStartsNowValue = false
 _G.msdoors_TimerLabel = nil
@@ -311,7 +312,6 @@ end
 
 _G.msdoors_CLOCK_FUNCTIONS.Captions = function(text)
     if not _G.msdoors_TimerLabel then
-        -- Criar a UI do timer
         local ScreenGui = Instance.new("ScreenGui")
         ScreenGui.Name = "HasteClockGui"
         ScreenGui.ResetOnSpawn = false
@@ -355,29 +355,78 @@ _G.msdoors_CLOCK_FUNCTIONS.HideCaptions = function()
     end
 end
 
-
-GroupHotel:AddToggle("ShowTimer-backdoor", {
-	Text = "Show timer",
-	DisabledTooltip = "I am disabled!",
-	Default = false,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-	Callback = function(Value)
+FloorTab:AddToggle("HasteClockToggle", {
+    Text = "Haste Clock",
+    Tooltip = "Shows a timer for Haste events",
+    DisabledTooltip = "Haste Clock is disabled",
+    
+    Default = true,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    
+    Callback = function(value)
         _G.msdoors_HasteClockEnabled = value
         if not value then
             _G.msdoors_CLOCK_FUNCTIONS.HideCaptions()
         end
-	end,
-				
-        })
-local FloorReplicated = {}
-local success, result = pcall(function()
-    return game:GetService("ReplicatedStorage"):WaitForChild("FloorReplicated", 10)
-end)
+        
+        if value then
+            local FloorReplicated = game:GetService("ReplicatedStorage"):FindFirstChild("FloorReplicated")
+            
+            if FloorReplicated then
+                local digitalTimer = FloorReplicated:FindFirstChild("DigitalTimer")
+                local scaryStartsNow = FloorReplicated:FindFirstChild("ScaryStartsNow")
+                
+                if digitalTimer and scaryStartsNow then
+                    _G.msdoors_DigitalTimerValue = digitalTimer.Value
+                    _G.msdoors_ScaryStartsNowValue = scaryStartsNow.Value
+                    
+                    digitalTimer:GetPropertyChangedSignal("Value"):Connect(function()
+                        _G.msdoors_DigitalTimerValue = digitalTimer.Value
+                        if _G.msdoors_HasteClockEnabled and _G.msdoors_ScaryStartsNowValue then
+                            _G.msdoors_CLOCK_FUNCTIONS.Captions(_G.msdoors_CLOCK_FUNCTIONS.TimerFormat(_G.msdoors_DigitalTimerValue))
+                        end
+                    end)
+                    
+                    scaryStartsNow:GetPropertyChangedSignal("Value"):Connect(function()
+                        _G.msdoors_ScaryStartsNowValue = scaryStartsNow.Value
+                    end)
+                    
+                    local clientRemote = FloorReplicated:FindFirstChild("ClientRemote")
+                    if clientRemote then
+                        local internal_temp_mspaint = clientRemote:FindFirstChild("_mspaint")
+                        if internal_temp_mspaint and #internal_temp_mspaint:GetChildren() ~= 0 then
+                            local hasteFolder = clientRemote:FindFirstChild("Haste")
+                            if hasteFolder then
+                                for _, v in pairs(internal_temp_mspaint:GetChildren()) do
+                                    v.Parent = hasteFolder
+                                end
+                            end
+                            internal_temp_mspaint:Destroy()
+                        end
+                    end
+                else
+                    game:GetService("StarterGui"):SetCore("SendNotification", {
+                        Title = "Error",
+                        Text = "Required game elements not found",
+                        Duration = 5
+                    })
+                end
+            else
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "Error",
+                    Text = "FloorReplicated not found",
+                    Duration = 5
+                })
+            end
+        end
+    end,
+})
 
-if success and result then
-    FloorReplicated = result
+local FloorReplicated = game:GetService("ReplicatedStorage"):FindFirstChild("FloorReplicated")
+
+if FloorReplicated then
     local digitalTimer = FloorReplicated:FindFirstChild("DigitalTimer")
     local scaryStartsNow = FloorReplicated:FindFirstChild("ScaryStartsNow")
     
@@ -398,22 +447,31 @@ if success and result then
         
         local clientRemote = FloorReplicated:FindFirstChild("ClientRemote")
         if clientRemote then
-            local internal_temp_msdoors = clientRemote:FindFirstChild("_msdoors")
-            if internal_temp_msdoors and #internal_temp_msdoors:GetChildren() ~= 0 then
+            local internal_temp_mspaint = clientRemote:FindFirstChild("_mspaint")
+            if internal_temp_mspaint and #internal_temp_mspaint:GetChildren() ~= 0 then
                 local hasteFolder = clientRemote:FindFirstChild("Haste")
                 if hasteFolder then
-                    for _, v in pairs(internal_temp_msdoors:GetChildren()) do
+                    for _, v in pairs(internal_temp_mspaint:GetChildren()) do
                         v.Parent = hasteFolder
                     end
                 end
-                internal_temp_msdoors:Destroy()
+                internal_temp_mspaint:Destroy()
             end
         end
     else
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Required game elements not found",
+            Duration = 5
+        })
     end
 else
-warn("[ Msdoors ] » FloorReplicated não encontrado! não é possível ativar o haste clock")
-end
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Error",
+        Text = "FloorReplicated not found",
+        Duration = 5
+    })
+		end
 		
     elseif floorName == "Mines" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Mines.")
