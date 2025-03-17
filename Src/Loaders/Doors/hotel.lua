@@ -3531,7 +3531,7 @@ MenuInterface:AddDropdown("LibraryDropdown", {
         if selected == "Obsidian" then
             _G.msdoors_syslibrary = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
         elseif selected == "Linoria" then
-            _G.msdoors_syslibrary = "https://raw.githubusercontent.com/mstudio45/linoria-lib/main/"
+            _G.msdoors_syslibrary = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
         end
     end
 })
@@ -3539,13 +3539,12 @@ MenuInterface:AddDropdown("LibraryDropdown", {
 MenuInterface:AddButton({
 	Text = "Recarregar",
 	Func = function()
-			
 	Library:Unload()
+	_G.msdoors_syslibrary = _G.msdoors_syslibrary
 	wait(2)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Loaders/Doors/hotel.lua"))()
 	_G.ObsidianaLib = false
-	_G.MsdoorsLoaded = false
-			
+	_G.MsdoorsLoaded = false		
 	end,
 	DoubleClick = false,
 	DisabledTooltip = "I am disabled!",
