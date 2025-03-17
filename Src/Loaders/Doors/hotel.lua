@@ -3,7 +3,7 @@ if _G.ObsidianaLib then
     return
 end
 -- Definir um valor padrão para a variável global
-_G.msdoors_syslibrary = _G.msdoors_syslibrary or "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
+_G.msdoors_syslibrary = _G.msdoors_syslibrary or "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local repo = _G.msdoors_syslibrary
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
@@ -3542,8 +3542,7 @@ MenuInterface:AddButton({
 	Library:Unload()
 	_G.ObsidianaLib = false
 	_G.MsdoorsLoaded = false
-	_G.msdoors_syslibrary = _G.msdoors_syslibrary
-	task.wait(3)
+	task.wait(1)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Loaders/Doors/hotel.lua"))()
 	end,
 	DoubleClick = false,
