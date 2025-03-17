@@ -34,7 +34,7 @@ _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
-_G.msdoors_AntiSnare = _G.msdoors_AntiSnare = or false
+_G.msdoors_AntiSnare = _G.msdoors_AntiSnare or false
 _G.msdoors_AntiGloomEgg = _G.msdoors_AntiGloomEgg or false
 _G.msdoors_AntiBanana = _G.msdoors_AntiBanana or false
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
