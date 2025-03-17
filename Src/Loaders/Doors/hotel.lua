@@ -3540,6 +3540,9 @@ MenuInterface:AddButton({
 	Text = "Recarregar",
 	Func = function()
 	Library:Unload()
+	_G.ObsidianaLib = false
+	_G.MsdoorsLoaded = false
+	_G.msdoors_syslibrary = _G.msdoors_syslibrary
 	task.wait(3)
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Loaders/Doors/hotel.lua"))()
 	end,
