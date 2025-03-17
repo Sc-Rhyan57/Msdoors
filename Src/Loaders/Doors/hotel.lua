@@ -3574,7 +3574,7 @@ local function NotificarMudancaDeSala(salaAnterior, salaAtual)
             username = "Msdoors bot",
             avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
 	    title = "Mudança de sala detectada!",             
-            description = string.format("**%s mudou de sala!\n <:conectoreply:1351264896343478282>**Sala %s \n<:rwply:1351264360152174633>Sala %s ``(%s)``", 
+            description = string.format("**%s mudou de sala!\n **Sala %s → Sala %s ``(%s)``", 
                                     player.Name, 
                                     tostring(salaAnterior or "?"), 
                                     tostring(salaAtual or "?"),
