@@ -3370,10 +3370,15 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
-_G.webhookEnabled = _G.webhookEnabled or true
+_G.webhookEnabled = _G.webhookEnabled or false
 _G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu_id/seu_token"
 
 function SendEmbed(title, description, color, fields)
+    if not _G.webhookEnabled then
+        warn("[Msdoors] » Webhook está desabilitado! Mensagem não enviada.")
+        return
+    end
+    
     local OSTime = os.time()
     local Time = os.date("!*t", OSTime)
     
