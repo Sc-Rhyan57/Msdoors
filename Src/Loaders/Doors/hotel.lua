@@ -3370,34 +3370,53 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
+
 _G.webhookEnabled = _G.webhookEnabled or false
 _G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu_id/seu_token"
 
-function SendEmbed(title, description, color, fields)
+function SendEmbed(title, description, color, fields, avatarURL, embedImageURL, author)
     if not _G.webhookEnabled then
-        warn("[Msdoors] » Webhook está desabilitado! Mensagem não enviada.")
+        print("[Aviso] Webhook está desabilitado! Mensagem não enviada.")
         return
     end
     
     local OSTime = os.time()
     local Time = os.date("!*t", OSTime)
     
-    local Content = "discord webhooks thru synapse"
+    local Content = "Msdoors"
     local Embed = {
         title = title,
         description = description,
         color = color,
         footer = { text = game.JobId },
-        author = { name = "ROBLOX", url = "https://www.roblox.com/" },
         fields = fields,
         timestamp = string.format("%d-%d-%dT%02d:%02d:%02dZ", Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec)
     }
-
+    
+    if author then
+        Embed.author = author
+    else
+        Embed.author = { 
+            name = "MSDOORS", 
+            url = "https://msdoors-gg.vercel.app/favicon.ico"
+        }
+        
+        if avatarURL and avatarURL ~= "" then
+            Embed.author.icon_url = avatarURL
+        end
+    end
+    
+    if embedImageURL and embedImageURL ~= "" then
+        Embed.image = { url = embedImageURL }
+    end
+    
+    local requestData = { content = Content, embeds = { Embed } }
+    
     (syn and syn.request or http_request) {
         Url = _G.msdoors_webhook,
         Method = "POST",
         Headers = { ["Content-Type"] = "application/json" },
-        Body = game:GetService("HttpService"):JSONEncode({ content = Content, embeds = { Embed } })
+        Body = game:GetService("HttpService"):JSONEncode(requestData)
     }
 
     print("[Sucesso] Webhook enviado!")
@@ -3441,10 +3460,22 @@ MenuDiscord:AddDivider()
 MenuDiscord:AddButton({
     Text = "Testar webhook",
     Func = function()
-        SendEmbed("🚀 Teste de Webhook", "Mensagem de teste!", 65280, {
-            { name = "Campo 1", value = "Valor 1", inline = true },
-            { name = "Campo 2", value = "Valor 2", inline = false }
-        })
+        SendEmbed(
+            "🚀 Teste de Webhook", 
+            "Mensagem de teste!", 
+            65280, 
+            {
+                { name = "Campo 1", value = "Valor 1", inline = true },
+                { name = "Campo 2", value = "Valor 2", inline = false }
+            },
+            "https://msdoors-gg.vercel.app/favicon.ico",
+            "https://google.com/favicon.ico",
+            {
+                name = "Nome do Autor",
+                url = "https://www.roblox.com/users/123456789/profile", -- Link do perfil do autor
+                icon_url = "https://i.imgur.com/exemplo_avatar_autor.png" -- Avatar do autor
+            }
+        )
     end
 })
 
