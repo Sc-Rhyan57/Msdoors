@@ -3536,6 +3536,20 @@ MenuInterface:AddDropdown("LibraryDropdown", {
     end
 })
 
+MenuInterface:AddButton({
+	Text = "Recarregar",
+	Func = function()
+	Library:Unload()
+	task.wait(3)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Loaders/Doors/hotel.lua"))()
+	end,
+	DoubleClick = false,
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+})
+
 --[[ VERIFICAÇÃO CONSTANTE DE SALA ]]--
 if not _G.Config then
     _G.Config = {}
