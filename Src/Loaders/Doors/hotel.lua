@@ -3374,7 +3374,7 @@ end)
 _G.msdoors_webhooktoggle = _G.msdoors_webhooktoggle or false
 _G.msdoors_webhook = ""
 local function EnviarEmbed(config)
-    if not _G.webhooktoggle then
+    if not _G.msdoors_webhooktoggle then
         print("[ Msdoors ] » ❌ Envio de Embed desativado!")
         return
     end
@@ -3418,7 +3418,7 @@ local function EnviarEmbed(config)
         warn("❌ Erro ao enviar Embed: " .. Erro)
     end
 end
-MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo no jogo em um vhat específico no <font color="#9DABFF">Discord</font>')
+MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
 MenuDiscord:AddToggle("Webhook", {
 	Text = "Webhook",
 	DisabledTooltip = "I am disabled!",
