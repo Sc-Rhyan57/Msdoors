@@ -2,7 +2,6 @@ if _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
 end
--- Definir um valor padrão para a variável global
 _G.msdoors_syslibrary = _G.msdoors_syslibrary or "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local repo = _G.msdoors_syslibrary
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
@@ -34,6 +33,7 @@ _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions ir false
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
+_G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
 _G.msdoors_AntiSnare = _G.msdoors_AntiSnare or false
 _G.msdoors_DupeRunning = _G.msdoors_DupeRunning or false
 _G.msdoors_AntiGloomEgg = _G.msdoors_AntiGloomEgg or false
@@ -671,16 +671,16 @@ GroupHotel:AddToggle("AntiSeekObstructions", {
 })
 
 --[[ ANTI SEEK DOOR ]]--
-local SeekDoorConnection = nil
-local ModifiedDoors = {}
+_G.msdoors_SeekDoorConnection = nil
+_G.msdoors_ModifiedDoors = {}
 
 local function HandleSeekDoors(instance)
     if instance.Name == "SewerRingBreakable" then
         for _, child in pairs(instance:GetDescendants()) do
             if child:IsA("BasePart") and (child.Name == "DoorPart" or (string.find(child.Name, "Door") and string.find(child.Name, "[Pp]art"))) then
                 if _G.msdoors_AntiSeekDoor then
-                    if not ModifiedDoors[child] then
-                        ModifiedDoors[child] = {
+                    if not _G.msdoors_ModifiedDoors[child] then
+                        _G.msdoors_ModifiedDoors[child] = {
                             CanCollide = child.CanCollide
                         }
                     end
@@ -692,18 +692,18 @@ local function HandleSeekDoors(instance)
 end
 
 local function RestoreSeekDoors()
-    for part, data in pairs(ModifiedDoors) do
+    for part, data in pairs(_G.msdoors_ModifiedDoors) do
         if part and part.Parent then
             part.CanCollide = data.CanCollide
         end
     end
-    ModifiedDoors = {}
+    _G.msdoors_ModifiedDoors = {}
 end
 
 GroupHotel:AddToggle("antikickdoor", {
     Text = "Anti Kickdoor",
     DisabledTooltip = "I am disabled!",
-    Default = false,
+    Default = _G.msdoors_AntiSeekDoor,
     Disabled = false,
     Visible = true,
     Risky = false,
@@ -717,17 +717,17 @@ GroupHotel:AddToggle("antikickdoor", {
                 end
             end
             
-            if not SeekDoorConnection then
-                SeekDoorConnection = workspace.DescendantAdded:Connect(function(instance)
+            if not _G.msdoors_SeekDoorConnection then
+                _G.msdoors_SeekDoorConnection = workspace.DescendantAdded:Connect(function(instance)
                     HandleSeekDoors(instance)
                 end)
             end
         else
             RestoreSeekDoors()
 
-            if SeekDoorConnection then
-                SeekDoorConnection:Disconnect()
-                SeekDoorConnection = nil
+            if _G.msdoors_SeekDoorConnection then
+                _G.msdoors_SeekDoorConnection:Disconnect()
+                _G.msdoors_SeekDoorConnection = nil
             end
         end
     end,
