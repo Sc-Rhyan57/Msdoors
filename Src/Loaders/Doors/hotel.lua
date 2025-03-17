@@ -3371,54 +3371,40 @@ MenuGroup:AddButton("Unload", function()
 end)
 
 
+local webhookAPI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/internal/Webhook.lua"))()
+
 _G.msdoors_webhooktoggle = _G.msdoors_webhooktoggle or false
 _G.msdoors_webhook = ""
-local function EnviarEmbed(config)
+
+local function EnviarEmbed()
     if not _G.msdoors_webhooktoggle then
-        print("[ Msdoors ] » ❌ Envio de Embed desativado!")
+        print("[ Msdoors ] » ❌ Envio de Webhook desativado!")
         return
     end
     if _G.msdoors_webhook == "" then
         warn("[ Msdoors ] » ❌ Nenhum Webhook configurado!")
         return
     end
-
-    local Embed = {
-        title = config.Titulo or "Título Padrão",
-        description = config.Descricao or "Descrição padrão",
-        url = config.URL or nil,
-        color = config.Cor or 16711680,
-
-        author = config.Autor and {
-            name = config.Autor.Nome or "Nome do Autor",
-            icon_url = config.Autor.Icone or nil,
-            url = config.Autor.URL or nil
-        } or nil,
-
-        image = config.Imagem and { url = config.Imagem } or nil,
-        thumbnail = config.Thumbnail and { url = config.Thumbnail } or nil,
-        footer = config.Rodape and { text = config.Rodape.Texto or "Rodapé padrão", icon_url = config.Rodape.Icone or nil } or nil,
-        timestamp = config.Temporizador and os.date("!%Y-%m-%dT%H:%M:%S", os.time()).."Z" or nil,
-        fields = config.Campos or nil
+    _G.bot_config = {
+        webhook_link = _G.msdoors_webhook,
+        NAME = "Msdoors Notifier",
+        FotoPerfil = "https://i.imgur.com/your-bot-avatar.png"
     }
 
-    local Data = {
-        username = config.BotNome or "Meu Bot",
-        avatar_url = config.BotIcone or "https://i.imgur.com/your-avatar.png",
-        embeds = {Embed}
+    _G.webhook_config = {
+        titulo = "🚀 Notificação de Evento",
+        descricao = "Um evento ocorreu no jogo!",
+        mensagem = "**Aviso**: Algo aconteceu no jogo.",
+        cor = 255,
+        rodape = "Enviado via Msdoors",
+        campos = {
+            { name = "💡 Detalhes", value = "Mais informações aqui.", inline = true }
+        }
     }
-
-    local Sucesso, Erro = pcall(function()
-        HttpService:PostAsync(_G.msdoors_webhook, HttpService:JSONEncode(Data), Enum.HttpContentType.ApplicationJson)
-    end)
-
-    if Sucesso then
-        print("✅ Embed enviado com sucesso!")
-    else
-        warn("❌ Erro ao enviar Embed: " .. Erro)
-    end
+    webhookAPI.sendWebhook()
 end
-MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
+
+MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico \n no <font color="#9DABFF">Discord</font>')
 MenuDiscord:AddToggle("Webhook", {
 	Text = "Webhook",
 	DisabledTooltip = "I am disabled!",
@@ -3428,6 +3414,7 @@ MenuDiscord:AddToggle("Webhook", {
         _G.msdoors_webhooktoggle = Value
 	end,
 })
+
 MenuDiscord:AddDivider()
 MenuDiscord:AddInput("webhooklink", {
 	Default = "URL do Webhook",
@@ -3446,7 +3433,6 @@ MenuDiscord:AddButton({
 	    Notify({
             Title = "SUCESSO!",
             Description = "Webhook atualizado!",
-            Reason = "",
             Image = "rbxassetid://95869322194132",
             Color = Color3.fromRGB(0, 0, 255),
             Style = "SISTEMA",
@@ -3457,7 +3443,6 @@ MenuDiscord:AddButton({
 	    Notify({
             Title = "ERRO",
             Description = "Webhook inválido!",
-            Reason = "",
             Image = "rbxassetid://95869322194132",
             Color = Color3.fromRGB(255, 0, 0),
             Style = "SISTEMA",
@@ -3475,30 +3460,7 @@ MenuDiscord:AddDivider()
 MenuDiscord:AddButton({
 	Text = "Testar webhook",
 	Func = function()
-        EnviarEmbed({
-            Titulo = "🚀 Teste de Webhook",
-            Descricao = "Isso é um **teste de embed** enviado via msdoors!",
-            URL = "https://www.roblox.com",
-            Cor = 255,
-            Autor = {
-                Nome = "Sistema de Alertas",
-                Icone = "https://i.imgur.com/your-avatar.png",
-                URL = "https://discord.com"
-            },
-            Imagem = "https://i.imgur.com/your-image.png",
-            Thumbnail = "https://i.imgur.com/your-thumbnail.png",
-            Rodape = {
-                Texto = "Enviado automaticamente via Roblox",
-                Icone = "https://i.imgur.com/your-footer.png"
-            },
-            Temporizador = true,
-            Campos = {
-                { name = "💡 Informação 1", value = "Este é um campo de teste.", inline = true },
-                { name = "📌 Informação 2", value = "Outro campo importante!", inline = true }
-            },
-            BotNome = "Notificador",
-            BotIcone = "https://i.imgur.com/your-bot-avatar.png"
-        })
+        EnviarEmbed()
 	end,
 	DoubleClick = false,
 	Tooltip = "Testar Webhook",
@@ -3507,7 +3469,6 @@ MenuDiscord:AddButton({
 	Visible = true,
 	Risky = false,
 })
-
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
