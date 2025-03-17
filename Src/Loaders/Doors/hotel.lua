@@ -3404,7 +3404,7 @@ local function EnviarEmbed()
     webhookAPI.sendWebhook()
 end
 
-MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico \n no <font color="#9DABFF">Discord</font>')
+MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
 MenuDiscord:AddToggle("Webhook", {
 	Text = "Webhook",
 	DisabledTooltip = "I am disabled!",
