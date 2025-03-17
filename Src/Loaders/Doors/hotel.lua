@@ -355,7 +355,7 @@ _G.msdoors_CLOCK_FUNCTIONS.HideCaptions = function()
     end
 end
 
-FloorTab:AddToggle("HasteClockToggle", {
+GroupHotel:AddToggle("HasteClockToggle", {
     Text = "Haste Clock",
     Tooltip = "Shows a timer for Haste events",
     DisabledTooltip = "Haste Clock is disabled",
