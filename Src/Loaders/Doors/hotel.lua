@@ -3356,30 +3356,7 @@ MenuGroup:AddButton("Unload", function()
         Time = 5,
     })
 
-    for _, toggle in pairs(Library.Flags) do
-        if type(toggle) == "boolean" then
-            Library.Flags[_] = false
-        end
-    end
-
-    for _, element in pairs(Library.Elements) do
-        if element.Type == "TextLabel" then
-            element.Instance.Text = ""
-        elseif element.Type == "Dropdown" then
-            element:SetValue(element.Default)
-        elseif element.Type == "Button" or element.Type == "Toggle" then
-            element:SetValue(false)
-        elseif element.Type == "Slider" then
-            element:SetValue(element.Min)
-        elseif element.Type == "Textbox" then
-            element:SetValue("")
-        elseif element.Type == "Keybind" then
-            element:SetValue(nil)
-        elseif element.Type == "ColorPicker" then
-            element:SetValue(Color3.new(1, 1, 1))
-        end
-    end
-
+   
     _G.msdoors_LibraryNotif = "Linoria"
     _G.msdoors_DupeRunning = false
     _G.msdoors_AntiDupe = false
