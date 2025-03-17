@@ -2726,6 +2726,7 @@ GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
     Min = 7,
     Max = 13,
+    Rounding = 1,
     Default = _G.MaxActivationDistance,
     Increment = 0.1,
     Callback = function(value)
