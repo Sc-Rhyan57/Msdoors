@@ -3370,13 +3370,11 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
-
 local webhookAPI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/internal/Webhook.lua"))()
 
 _G.msdoors_webhooktoggle = _G.msdoors_webhooktoggle or false
 _G.msdoors_webhook = ""
 
-if _G.msdoors_webhooktoggle then
 local function EnviarEmbed()
     if not _G.msdoors_webhooktoggle then
         print("[ Msdoors ] » ❌ Envio de Webhook desativado!")
@@ -3402,8 +3400,8 @@ local function EnviarEmbed()
             { name = "💡 Detalhes", value = "Mais informações aqui.", inline = true }
         }
     }
+    
     webhookAPI.sendWebhook()
-end
 end
 
 MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
