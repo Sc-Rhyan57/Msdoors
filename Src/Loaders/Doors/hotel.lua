@@ -3370,53 +3370,73 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
-
-_G.webhookEnabled = _G.webhookEnabled or false
+_G.webhookEnabled = _G.webhookEnabled or true
 _G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu_id/seu_token"
 
-function SendEmbed(title, description, color, fields, avatarURL, embedImageURL, author)
+function SendEmbed(options)
     if not _G.webhookEnabled then
-        print("[Aviso] Webhook está desabilitado! Mensagem não enviada.")
+        warn("[Aviso] Webhook está desabilitado! Mensagem não enviada.")
         return
     end
     
+    options = options or {}
     local OSTime = os.time()
     local Time = os.date("!*t", OSTime)
     
-    local Content = "Msdoors"
-    local Embed = {
-        title = title,
-        description = description,
-        color = color,
-        footer = { text = game.JobId },
-        fields = fields,
-        timestamp = string.format("%d-%d-%dT%02d:%02d:%02dZ", Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec)
+    local webhookData = {
+        content = options.content or "discord webhooks thru synapse",
+        username = options.username,       
+        avatar_url = options.avatar_url,   
+        tts = options.tts or false,         
+        embeds = {}
     }
-    
-    if author then
-        Embed.author = author
-    else
-        Embed.author = { 
-            name = "MSDOORS", 
-            url = "https://msdoors-gg.vercel.app/favicon.ico"
+    if options.title or options.description then
+        local embed = {
+            title = options.title,
+            description = options.description,
+            url = options.url,      
+            color = options.color or 0,     
+            timestamp = options.timestamp or string.format("%d-%d-%dT%02d:%02d:%02dZ", 
+                Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec),
+            fields = options.fields or {},
         }
         
-        if avatarURL and avatarURL ~= "" then
-            Embed.author.icon_url = avatarURL
+        if options.author_name then
+            embed.author = {
+                name = options.author_name,
+                url = options.author_url,
+                icon_url = options.author_icon_url
+            }
         end
+
+        if options.footer_text then
+            embed.footer = {
+                text = options.footer_text or game.JobId,
+                icon_url = options.footer_icon_url
+            }
+        else
+            embed.footer = { text = game.JobId }
+        end
+        
+        if options.image_url then
+            embed.image = {
+                url = options.image_url
+            }
+        end
+
+        if options.thumbnail_url then
+            embed.thumbnail = {
+                url = options.thumbnail_url
+            }
+        end
+        
+        table.insert(webhookData.embeds, embed)
     end
-    
-    if embedImageURL and embedImageURL ~= "" then
-        Embed.image = { url = embedImageURL }
-    end
-    
-    local requestData = { content = Content, embeds = { Embed } }
-    
     (syn and syn.request or http_request) {
         Url = _G.msdoors_webhook,
         Method = "POST",
         Headers = { ["Content-Type"] = "application/json" },
-        Body = game:GetService("HttpService"):JSONEncode(requestData)
+        Body = game:GetService("HttpService"):JSONEncode(webhookData)
     }
 
     print("[Sucesso] Webhook enviado!")
@@ -3425,7 +3445,7 @@ end
 MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
 MenuDiscord:AddToggle("Webhook", {
     Text = "Webhook",
-    Default = true,
+    Default = false,
     Disabled = false,
     Callback = function(Value)
         _G.webhookEnabled = Value
@@ -3460,24 +3480,31 @@ MenuDiscord:AddDivider()
 MenuDiscord:AddButton({
     Text = "Testar webhook",
     Func = function()
-        SendEmbed(
-            "🚀 Teste de Webhook", 
-            "Mensagem de teste!", 
-            65280, 
-            {
+        SendEmbed({
+            username = "Msdoors bot",
+            avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            content = "dsc.gg/msdoors-gg",      
+            title = "Entidade spawnou!",             
+            description = "**Rush** Spawnou!",          
+            url = "https://www.roblox.com/games/",       
+            color = 65280,                                 
+            author_name = "Rush",
+            author_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            author_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            footer_text = "msdoors • " .. game.JobId,
+            footer_icon_url = "https://i.imgur.com/footer.png",
+            image_url = "https://i.imgur.com/imagem.png",
+            thumbnail_url = "https://i.imgur.com/thumb.png",
+            fields = {
                 { name = "Campo 1", value = "Valor 1", inline = true },
-                { name = "Campo 2", value = "Valor 2", inline = false }
-            },
-            "https://msdoors-gg.vercel.app/favicon.ico",
-            "https://google.com/favicon.ico",
-            {
-                name = "Nome do Autor",
-                url = "https://www.roblox.com/users/123456789/profile", -- Link do perfil do autor
-                icon_url = "https://i.imgur.com/exemplo_avatar_autor.png" -- Avatar do autor
+                { name = "Campo 2", value = "Valor 2", inline = true },
+                { name = "Campo 3", value = "Valor 3", inline = false }
             }
-        )
+        })
     end
 })
+
+
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
