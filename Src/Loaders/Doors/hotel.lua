@@ -3370,6 +3370,123 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
+_G.webhookEnabled = _G.webhookEnabled or true
+_G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu_id/seu_token"
+
+local HttpService = game:GetService("HttpService")
+
+function SendEmbed(title, description, color, fields)
+    if not _G.webhookEnabled then
+        return
+    end
+
+    if type(title) ~= "string" or type(description) ~= "string" then
+        return
+    end
+    if type(color) ~= "number" then
+        return
+    end
+    if fields and type(fields) ~= "table" then
+        return
+    end
+
+    local OSTime = os.time()
+    local Time = os.date("!*t", OSTime)
+
+    local Embed = {
+        title = title,
+        description = description,
+        color = color,
+        footer = { text = game.JobId },
+        author = {
+            name = "ROBLOX",
+            url = "https://www.roblox.com/"
+        },
+        fields = fields or {},
+        timestamp = string.format("%d-%d-%dT%02d:%02d:%02dZ", Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec)
+    }
+
+    local Payload = HttpService:JSONEncode({
+        content = "discord webhooks thru roblox HttpService",
+        embeds = { Embed }
+    })
+
+    local Success, Response = pcall(function()
+        return HttpService:PostAsync(_G.msdoors_webhook, Payload, Enum.HttpContentType.ApplicationJson)
+    end)
+end
+
+MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
+MenuDiscord:AddToggle("Webhook", {
+    Text = "Webhook",
+    Default = true,
+    Disabled = false,
+    Callback = function(Value)
+        _G.webhookEnabled = Value
+    end,
+})
+MenuDiscord:AddDivider()
+MenuDiscord:AddInput("webhooklink", {
+    Default = "URL do Webhook",
+    Numeric = false,
+    Finished = false, 
+    ClearTextOnFocus = true,
+    Text = "Insira o link do Webhook",
+    Callback = function(Value)
+        _G.msdoors_webhook = Value
+    end,
+})
+MenuDiscord:AddButton({
+    Text = "Definir Webhook",
+    Func = function()
+        if _G.msdoors_webhook ~= "" then
+            Notify({
+                Title = "SUCESSO!",
+                Description = "Webhook atualizado!",
+                Image = "rbxassetid://95869322194132",
+                Color = Color3.fromRGB(0, 0, 255),
+                Style = "SISTEMA",
+                Duration = 6,
+                NotifyStyle = _G.msdoors_LibraryNotif
+            })
+        else 
+            Notify({
+                Title = "ERRO",
+                Description = "Webhook inválido!",
+                Image = "rbxassetid://95869322194132",
+                Color = Color3.fromRGB(255, 0, 0),
+                Style = "SISTEMA",
+                Duration = 6,
+                NotifyStyle = _G.msdoors_LibraryNotif
+            })
+        end
+    end,
+    DoubleClick = false,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+})
+MenuDiscord:AddDivider()
+MenuDiscord:AddButton({
+    Text = "Testar webhook",
+    Func = function()
+        SendEmbed(
+            "🚀 Notificação Importante", 
+            "Este é um teste de webhook altamente configurável!", 
+            65280,
+            {
+                { name = "📊 Estatísticas", value = "Valor: 200\nPontuação: 95%", inline = true },
+                { name = "🔧 Configuração", value = "Modo: Turbo\nNível: Ultra", inline = true },
+                { name = "📝 Nota", value = "Este campo ocupa a linha inteira.", inline = false }
+            }
+        )
+    end,
+    DoubleClick = false,
+    Tooltip = "Testar Webhook",
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+})
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
