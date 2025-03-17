@@ -31,6 +31,7 @@ local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
+_G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_DupeRunning = _G.msdoors_DupeRunning or false
 _G.msdoors_AntiDupe = _G.msdoors_AntiDupe or false
 _G.msdoors_AntiFlood = _G.msdoors_AntiFlood or false
@@ -2747,7 +2748,7 @@ GroupNot:AddToggle("Visual-Notifier-Entities", {
 
 GroupNotC:AddToggle("Chat-Notifier", {
     Text = "Enviar notificações no chat",
-    Default = false,
+    Default = _G.msdoors_chatActive = value,
     Callback = function(value)
         _G.msdoors_chatActive = value
     end,
