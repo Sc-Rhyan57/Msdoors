@@ -2009,7 +2009,7 @@ _G.msdoors.autoInteract.Script.Functions = {
 GroupAuto:AddToggle("Auto-interact", {
 	Text = "Auto Interact",
 	DisabledTooltip = "I am disabled!",
-	Default = false,
+	Default = _G.msdoors.autoInteract.Enabled,
 	Disabled = false,
 	Visible = true,
 	Risky = false,
