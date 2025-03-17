@@ -3370,6 +3370,138 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
+_G.webhookEnabled = _G.webhookEnabled or true
+ _G.msdoors_webhook =  _G.msdoors_webhook or https://discord.com/api/webhooks/seu_id/seu_token
+_G.bot_config = {
+    webhook_link =  _G.msdoors_webhook,
+    NAME = "Msdoors",
+    FotoPerfil = "https://msdoors-gg.vercel.app/favicon.ico"
+}
+
+local success, webhookAPI = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/internal/Webhook.lua"))()
+end)
+
+if not success then
+    warn("[⚠️] Erro ao carregar a API do Webhook! Verifique a URL.")
+    return
+end
+
+function SendEmbed(title, description, color, fields)
+    if not _G.webhookEnabled then
+        print("[⚠️] Webhook está desativado. Nenhuma mensagem foi enviada.")
+        return
+    end
+
+    if type(title) ~= "string" or type(description) ~= "string" then
+        warn("[❌] Erro: O título e a descrição devem ser strings!")
+        return
+    end
+    if type(color) ~= "number" then
+        warn("[❌] Erro: A cor deve ser um número (exemplo: 16711680 para vermelho).")
+        return
+    end
+    if fields and type(fields) ~= "table" then
+        warn("[❌] Erro: Os campos devem estar dentro de uma tabela!")
+        return
+    end
+
+    local embedData = {
+        titulo = title,
+        descricao = description,
+        cor = color,
+        mensagem = "",
+        rodape = "Enviado por Msdoors • " .. os.date("%d/%m/%Y %H:%M"), 
+        campos = fields or {} 
+    }
+
+    local successWebhook, err = pcall(function()
+        webhookAPI.sendWebhook(embedData)
+    end)
+
+    if successWebhook then
+    else
+        warn("[❌] Falha ao enviar o webhook: " .. tostring(err))
+    end
+end
+
+MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
+MenuDiscord:AddToggle("Webhook", {
+	Text = "Webhook",
+	DisabledTooltip = "I am disabled!",
+	Default = true,
+	Disabled = false,
+	Callback = function(Value)
+   _G.webhookEnabled = Value
+	end,
+})
+MenuDiscord:AddDivider()
+MenuDiscord:AddInput("webhooklink", {
+	Default = "URL do Webhook",
+	Numeric = false,
+	Finished = false, 
+	ClearTextOnFocus = true,
+	Text = "Insira o link do Webhook",
+	Callback = function(Value)
+        _G.msdoors_webhook = Value
+	end,
+})
+MenuDiscord:AddButton({
+	Text = "Definir Webhook",
+	Func = function()
+	if _G.msdoors_webhook ~= "" then
+	    Notify({
+            Title = "SUCESSO!",
+            Description = "Webhook atualizado!",
+            Reason = "",
+            Image = "rbxassetid://95869322194132",
+            Color = Color3.fromRGB(0, 0, 255),
+            Style = "SISTEMA",
+            Duration = 6,
+            NotifyStyle = _G.msdoors_LibraryNotif
+            })
+        else 
+	    Notify({
+            Title = "ERRO",
+            Description = "Webhook inválido!",
+            Reason = "",
+            Image = "rbxassetid://95869322194132",
+            Color = Color3.fromRGB(255, 0, 0),
+            Style = "SISTEMA",
+            Duration = 6,
+            NotifyStyle = _G.msdoors_LibraryNotif
+            })
+        end
+	end,
+	DoubleClick = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+})
+MenuDiscord:AddDivider()
+MenuDiscord:AddButton({
+	Text = "Testar webhook",
+	Func = function()
+SendEmbed(
+    "🚀 Notificação Importante", 
+    "Este é um teste de webhook altamente configurável!", 
+    65280,
+    {
+        { name = "📊 Estatísticas", value = "Valor: 200\nPontuação: 95%", inline = true },
+        { name = "🔧 Configuração", value = "Modo: Turbo\nNível: Ultra", inline = true },
+        { name = "📝 Nota", value = "Este campo ocupa a linha inteira.", inline = false }
+    }
+)
+	end,
+	DoubleClick = false,
+	Tooltip = "Testar Webhook",
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+})
+
+
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
                  (_G.msdoors_floor == "Backdoor" and "Backdoor") or  
