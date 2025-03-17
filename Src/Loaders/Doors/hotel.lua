@@ -3410,7 +3410,7 @@ MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em
 MenuDiscord:AddToggle("Webhook", {
 	Text = "Webhook",
 	DisabledTooltip = "I am disabled!",
-	Default = true,
+	Default = false,
 	Disabled = false,
 	Callback = function(Value)
         _G.msdoors_webhooktoggle = Value
