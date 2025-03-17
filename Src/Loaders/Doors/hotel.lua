@@ -3539,17 +3539,19 @@ MenuInterface:AddDropdown("LibraryDropdown", {
 MenuInterface:AddButton({
 	Text = "Recarregar",
 	Func = function()
+			
 	Library:Unload()
+	wait(2)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Loaders/Doors/hotel.lua"))()
 	_G.ObsidianaLib = false
 	_G.MsdoorsLoaded = false
-	task.wait(1)
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sc-Rhyan57/Msdoors/refs/heads/main/Src/Loaders/Doors/hotel.lua"))()
+			
 	end,
 	DoubleClick = false,
 	DisabledTooltip = "I am disabled!",
 	Disabled = false,
 	Visible = true,
-	Risky = false,
+	Risky = false
 })
 
 --[[ VERIFICAÇÃO CONSTANTE DE SALA ]]--
