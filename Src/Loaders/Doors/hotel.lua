@@ -3371,7 +3371,7 @@ MenuGroup:AddButton("Unload", function()
 end)
 
 _G.webhookEnabled = _G.webhookEnabled or true
- _G.msdoors_webhook =  _G.msdoors_webhook or https://discord.com/api/webhooks/seu_id/seu_token
+ _G.msdoors_webhook = null
 _G.bot_config = {
     webhook_link =  _G.msdoors_webhook,
     NAME = "Msdoors",
