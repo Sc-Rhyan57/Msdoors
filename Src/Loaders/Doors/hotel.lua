@@ -3413,7 +3413,6 @@ _G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu
 
 function SendEmbed(options)
     if not _G.webhookEnabled then
-        warn("[Aviso] Webhook está desabilitado! Mensagem não enviada.")
         return
     end
     
@@ -3477,7 +3476,6 @@ function SendEmbed(options)
         Body = game:GetService("HttpService"):JSONEncode(webhookData)
     }
 
-    print("[Sucesso] Webhook enviado!")
 end
 
 MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
@@ -3575,7 +3573,8 @@ local function NotificarMudancaDeSala(salaAnterior, salaAtual)
         SendEmbed({
             username = "Msdoors bot",
             avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
-            content = string.format("**%s mudou de sala!**\nSala %s → Sala %s (%s)", 
+	    title = "Mudança de sala detectada!",             
+            description = string.format("**%s mudou de sala!**\nSala %s → Sala %s (%s)", 
                                     player.Name, 
                                     tostring(salaAnterior or "?"), 
                                     tostring(salaAtual or "?"),
