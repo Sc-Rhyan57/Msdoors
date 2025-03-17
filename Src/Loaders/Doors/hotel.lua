@@ -3542,6 +3542,67 @@ MenuDiscord:AddButton({
     end
 })
 
+--[[ VERIFICAÇÃO CONSTANTE DE SALA ]]--
+if not _G.Config then
+    _G.Config = {}
+end
+
+_G.Config.salaAnterior = nil
+_G.Config.salaAtual = nil
+
+local ultimaNotificacao = nil
+
+local function NotificarMudancaDeSala(salaAnterior, salaAtual)
+    if not _G.webhookEnabled then return end
+
+    local nomeSalaAnterior = "Desconhecido"
+    local nomeSalaAtual = "Desconhecido"
+    if salaAnterior then
+        local roomAnterior = workspace.CurrentRooms:FindFirstChild(tostring(salaAnterior))
+        if roomAnterior and roomAnterior:GetAttribute("RawName") then
+            nomeSalaAnterior = roomAnterior:GetAttribute("RawName")
+        end
+    end
+    
+    if salaAtual then
+        local roomAtual = workspace.CurrentRooms:FindFirstChild(tostring(salaAtual))
+        if roomAtual and roomAtual:GetAttribute("RawName") then
+            nomeSalaAtual = roomAtual:GetAttribute("RawName")
+        end
+    end
+    if ultimaNotificacao ~= salaAtual then
+        ultimaNotificacao = salaAtual
+        SendEmbed({
+            username = "Msdoors bot",
+            avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            content = string.format("**%s mudou de sala!**\nSala %s → Sala %s (%s)", 
+                                    player.Name, 
+                                    tostring(salaAnterior or "?"), 
+                                    tostring(salaAtual or "?"),
+                                    nomeSalaAtual),
+            color = 65280, 
+            footer_text = "msdoors • " .. game.JobId,
+            footer_icon_url = "https://discord.com/favicon.ico"
+        })
+    end
+end
+
+local function VerificarMudancaDeSala()
+    if not _G.webhookEnabled then return end
+    local currentRoom = player:GetAttribute("CurrentRoom")
+    if currentRoom and currentRoom ~= _G.Config.salaAtual then
+        local salaAnterior = _G.Config.salaAtual
+        _G.Config.salaAtual = currentRoom
+        NotificarMudancaDeSala(salaAnterior, currentRoom)
+    end
+end
+local function ConfigurarDeteccaoDeSalas()
+    player:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+        VerificarMudancaDeSala()
+    end)
+    VerificarMudancaDeSala()
+end
+ConfigurarDeteccaoDeSalas()
 
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
