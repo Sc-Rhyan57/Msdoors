@@ -32,8 +32,11 @@ local floorName = _G.msdoors_floor
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
+_G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions ir false
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
+_G.msdoors_AntiSnare = _G.msdoors_AntiSnare or false
 _G.msdoors_DupeRunning = _G.msdoors_DupeRunning or false
+_G.msdoors_AntiGloomEgg = _G.msdoors_AntiGloomEgg or false
 _G.msdoors_AntiDupe = _G.msdoors_AntiDupe or false
 _G.msdoors_AntiFlood = _G.msdoors_AntiFlood or false
 _G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
@@ -196,7 +199,7 @@ GroupModifiers:AddToggle("Anti-Giggle", {
 })
 		
 	--[[ ANTI A-90 ]]--
-	local function toggleA90(enabled)
+    local function toggleA90(enabled)
     local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
     
@@ -518,7 +521,6 @@ GroupModifiers:AddToggle("Anti-A90", {
         })
 
 
-_G.msdoors_AntiGloomEgg = false
 _G.msdoors_ProcessedGloomEggs = {}
 _G.msdoors_GloomEggConnection = nil
 
@@ -578,14 +580,17 @@ GroupHotel:AddToggle("AntiGloomEgg", {
         end
     end
 })
-		
+
+_G.msdoors_SnareConnection = nil
+
 GroupModifiers:AddToggle("Anti-Snare", {
     Text = "Anti Snare",
-    Default = false,
+    Default = _G.msdoors_AntiSnare,
     Callback = function(state)
-        local connection
-        if state then
-            connection = workspace.DescendantAdded:Connect(function(descendant)
+        _G.msdoors_AntiSnare = state
+
+        if state and not _G.msdoors_SnareConnection then
+            _G.msdoors_SnareConnection = workspace.DescendantAdded:Connect(function(descendant)
                 if descendant.Name == "Snare" then
                     local hitbox = descendant:FindFirstChild("Hitbox")
                     if hitbox then
@@ -593,9 +598,11 @@ GroupModifiers:AddToggle("Anti-Snare", {
                     end
                 end
             end)
-        elseif connection then
-            connection:Disconnect()
+        elseif not state and _G.msdoors_SnareConnection then
+            _G.msdoors_SnareConnection:Disconnect()
+            _G.msdoors_SnareConnection = nil
         end
+
         for _, snare in pairs(workspace:GetDescendants()) do
             if snare.Name == "Snare" then
                 local hitbox = snare:FindFirstChild("Hitbox")
@@ -606,17 +613,20 @@ GroupModifiers:AddToggle("Anti-Snare", {
         end
     end
 })
-		
-        local TempBridges = {}
-        local Connection = nil
-        local function ProtectBridges(room)
+
+_G.msdoors_TempBridges = {}
+_G.msdoors_BridgeConnection = nil
+
+local function ProtectBridges(room)
     if not room:FindFirstChild("Parts") then return end
 
     for _, bridge in pairs(room.Parts:GetChildren()) do
         if bridge.Name == "Bridge" then
             for _, barrier in pairs(bridge:GetChildren()) do
-                if not (barrier.Name == "PlayerBarrier" and barrier.Size.Y == 2.75 and (barrier.Rotation.X == 0 or barrier.Rotation.X == 180)) then continue end
-                
+                if not (barrier.Name == "PlayerBarrier" and barrier.Size.Y == 2.75 and (barrier.Rotation.X == 0 or barrier.Rotation.X == 180)) then 
+                    continue 
+                end
+
                 local clone = barrier:Clone()
                 clone.CFrame = clone.CFrame * CFrame.new(0, 0, -5)
                 clone.Color = Color3.new(1, 1, 1)
@@ -624,39 +634,41 @@ GroupModifiers:AddToggle("Anti-Snare", {
                 clone.Size = Vector3.new(clone.Size.X, clone.Size.Y, 11)
                 clone.Transparency = 0
                 clone.Parent = bridge
-                
-                table.insert(TempBridges, clone)
+
+                table.insert(_G.msdoors_TempBridges, clone)
             end
         end
     end
 end
-		
+
 GroupHotel:AddToggle("AntiSeekObstructions", {
     Text = "Anti Bridge Fall",
-    Default = false,
+    Default = _G.msdoors_AntiSeekObstructions,
     Callback = function(value)
+        _G.msdoors_AntiSeekObstructions = value
+
         if value then
             for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
                 ProtectBridges(room)
             end
-            Connection = workspace.CurrentRooms.ChildAdded:Connect(function(room)
+            _G.msdoors_BridgeConnection = workspace.CurrentRooms.ChildAdded:Connect(function(room)
                 ProtectBridges(room)
             end)
         else
-            for _, bridge in pairs(TempBridges) do
+            for _, bridge in pairs(_G.msdoors_TempBridges) do
                 if bridge and bridge.Parent then
                     bridge:Destroy()
                 end
             end
-            TempBridges = {}
-            if Connection then
-                Connection:Disconnect()
-                Connection = nil
+            _G.msdoors_TempBridges = {}
+
+            if _G.msdoors_BridgeConnection then
+                _G.msdoors_BridgeConnection:Disconnect()
+                _G.msdoors_BridgeConnection = nil
             end
         end
-		
     end
-})   
+})
 
 --[[ ANTI SEEK DOOR ]]--
 local SeekDoorConnection = nil
