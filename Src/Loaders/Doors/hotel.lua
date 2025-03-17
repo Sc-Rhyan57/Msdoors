@@ -295,10 +295,11 @@ GroupHotel:AddToggle("AntiBanana", {
         
     elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
-	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Visuals")
 
   --[[ Show Haste Clock ]]--
-_G.msdoors_HasteClockEnabled = true
+_G.msdoors_HasteClockEnabled = false
 _G.msdoors_DigitalTimerValue = 0
 _G.msdoors_ScaryStartsNowValue = false
 _G.msdoors_TimerLabel = nil
@@ -359,8 +360,7 @@ GroupHotel:AddToggle("HasteClockToggle", {
     Text = "Haste Clock",
     Tooltip = "Shows a timer for Haste events",
     DisabledTooltip = "Haste Clock is disabled",
-    
-    Default = true,
+    Default = false,
     Disabled = false,
     Visible = true,
     Risky = false,
