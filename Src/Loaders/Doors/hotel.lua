@@ -2,7 +2,8 @@ if _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
 end
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+_G.msdoors_syslibrary = "https://raw.githubusercontent.com/mstudio45/linoria-lib/main/"
+local repo = _G.msdoors_syslibrary
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
@@ -3313,6 +3314,7 @@ GroupCredits:AddButton({
 
 
 -- UI Settings
+local MenuInterface = Tabs["UI Settings"]:AddLeftGroupbox("Interface")
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu")
 local MenuDiscord = Tabs["UI Settings"]:AddRightGroupbox("Discord")
 
@@ -3537,6 +3539,21 @@ MenuDiscord:AddButton({
                 { name = "Campo 3", value = "Valor 3", inline = false }
             }
         })
+    end
+})
+
+MenuInterface:AddDropdown("LibraryDropdown", {
+    Values = { "Obsidian", "Linoria" },
+    Default = "Obsidian",
+    Multi = false,
+    Text = "Escolha a Biblioteca",
+    Tooltip = "Selecione qual biblioteca usar",
+    Callback = function(selected)
+        if selected == "Obsidian" then
+            _G.msdoors_syslibrary = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+        elseif selected == "Linoria" then
+            _G.msdoors_syslibrary = "https://raw.githubusercontent.com/mstudio45/linoria-lib/main/"
+        end
     end
 })
 
