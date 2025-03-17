@@ -32,6 +32,7 @@ local floorName = _G.msdoors_floor
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
+_G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
 _G.msdoors_DupeRunning = _G.msdoors_DupeRunning or false
 _G.msdoors_AntiDupe = _G.msdoors_AntiDupe or false
 _G.msdoors_AntiFlood = _G.msdoors_AntiFlood or false
@@ -163,9 +164,11 @@ end)
         --[[ ANTI GIGGLE ]]--
 GroupModifiers:AddToggle("Anti-Giggle", {
     Text = "Anti Giggle",
-    Default = false,
+    Default = _G.msdoors_AntiGiggle,
     Callback = function(state)
+        _G.msdoors_AntiGiggle = state
         local connection
+
         if state then
             connection = workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
                 if descendant.Name == "GiggleCeiling" then
@@ -178,7 +181,7 @@ GroupModifiers:AddToggle("Anti-Giggle", {
         elseif connection then
             connection:Disconnect()
         end
-        
+
         for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
             for _, giggle in pairs(room:GetDescendants()) do
                 if giggle.Name == "GiggleCeiling" then
@@ -515,27 +518,30 @@ GroupModifiers:AddToggle("Anti-A90", {
         })
 
 
-local ProcessedGloomEggs = {}
-local GloomEggConnection = nil
+_G.msdoors_AntiGloomEgg = false
+_G.msdoors_ProcessedGloomEggs = {}
+_G.msdoors_GloomEggConnection = nil
 
 GroupHotel:AddToggle("AntiGloomEgg", {
     Text = "Anti Gloom Egg",
-    Default = false,
+    Default = _G.msdoors_AntiGloomEgg,
     Callback = function(value)
+        _G.msdoors_AntiGloomEgg = value
+
         local function processGloomEgg(gloomEgg)
             if value then
-                if not ProcessedGloomEggs[gloomEgg] then
-                    ProcessedGloomEggs[gloomEgg] = gloomEgg.CanTouch
+                if not _G.msdoors_ProcessedGloomEggs[gloomEgg] then
+                    _G.msdoors_ProcessedGloomEggs[gloomEgg] = gloomEgg.CanTouch
                 end
                 gloomEgg.CanTouch = false
             else
-                if ProcessedGloomEggs[gloomEgg] ~= nil then
-                    gloomEgg.CanTouch = ProcessedGloomEggs[gloomEgg]
-                    ProcessedGloomEggs[gloomEgg] = nil
+                if _G.msdoors_ProcessedGloomEggs[gloomEgg] ~= nil then
+                    gloomEgg.CanTouch = _G.msdoors_ProcessedGloomEggs[gloomEgg]
+                    _G.msdoors_ProcessedGloomEggs[gloomEgg] = nil
                 end
             end
         end
-        
+
         for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
             for _, gloomPile in pairs(room:GetChildren()) do
                 if gloomPile.Name == "GloomPile" then
@@ -547,9 +553,9 @@ GroupHotel:AddToggle("AntiGloomEgg", {
                 end
             end
         end
-        
-        if value and not GloomEggConnection then
-            GloomEggConnection = workspace.CurrentRooms.ChildAdded:Connect(function(room)
+
+        if value and not _G.msdoors_GloomEggConnection then
+            _G.msdoors_GloomEggConnection = workspace.CurrentRooms.ChildAdded:Connect(function(room)
                 room.ChildAdded:Connect(function(child)
                     if child.Name == "GloomPile" then
                         for _, gloomEgg in pairs(child:GetDescendants()) do
@@ -557,7 +563,7 @@ GroupHotel:AddToggle("AntiGloomEgg", {
                                 processGloomEgg(gloomEgg)
                             end
                         end
-                        
+
                         child.DescendantAdded:Connect(function(descendant)
                             if descendant.Name == "Egg" and value then
                                 processGloomEgg(descendant)
@@ -566,9 +572,9 @@ GroupHotel:AddToggle("AntiGloomEgg", {
                     end
                 end)
             end)
-        elseif not value and GloomEggConnection then
-            GloomEggConnection:Disconnect()
-            GloomEggConnection = nil
+        elseif not value and _G.msdoors_GloomEggConnection then
+            _G.msdoors_GloomEggConnection:Disconnect()
+            _G.msdoors_GloomEggConnection = nil
         end
     end
 })
