@@ -1868,28 +1868,37 @@ GroupAuto:AddToggle("Main-Insta-Interact", {
 	end,
 })
 
-
-shared = {
+_G.msdoors = _G.msdoors or {}
+_G.msdoors.autoInteract = {
     Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait(),
     LocalPlayer = game.Players.LocalPlayer,
     Humanoid = nil,
+    Enabled = false,
+    IgnoreSettings = {
+        ["Jeff Items"] = true,
+        ["Unlock w/ Lockpick"] = false,
+        ["Paintings"] = true,
+        ["Gold"] = false,
+        ["Light Source Items"] = false,
+        ["Skull Prompt"] = false
+    }
 }
 
 local function InitializeScript()
-    shared.Humanoid = shared.Character:WaitForChild("Humanoid")
+    _G.msdoors.autoInteract.Humanoid = _G.msdoors.autoInteract.Character:WaitForChild("Humanoid")
     game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
-        shared.Character = char
-        shared.Humanoid = char:WaitForChild("Humanoid")
+        _G.msdoors.autoInteract.Character = char
+        _G.msdoors.autoInteract.Humanoid = char:WaitForChild("Humanoid")
     end)
 end
 
-shared.fireproximityprompt = function(prompt)
+_G.msdoors.autoInteract.fireproximityprompt = function(prompt)
     if prompt.ClassName == "ProximityPrompt" then
         fireproximityprompt(prompt)
     end
 end
 
-local Script = {
+_G.msdoors.autoInteract.Script = {
     PromptTable = {
         GamePrompts = {},
         Aura = {
@@ -1948,7 +1957,7 @@ local Script = {
     }
 }
 
-Script.Functions = {
+_G.msdoors.autoInteract.Script.Functions = {
     GetAllPromptsWithCondition = function(condition)
         local prompts = {}
         for _, v in pairs(game:GetService("Workspace"):GetDescendants()) do
@@ -1962,7 +1971,7 @@ Script.Functions = {
     end,
 
     DistanceFromCharacter = function(object)
-        if not shared.Character or not shared.Character:FindFirstChild("HumanoidRootPart") or not object then
+        if not _G.msdoors.autoInteract.Character or not _G.msdoors.autoInteract.Character:FindFirstChild("HumanoidRootPart") or not object then
             return math.huge
         end
         local objectPosition = object:IsA("BasePart") and object.Position or 
@@ -1971,10 +1980,11 @@ Script.Functions = {
         if not objectPosition then
             return math.huge
         end
-        return (shared.Character.HumanoidRootPart.Position - objectPosition).Magnitude
+        return (_G.msdoors.autoInteract.Character.HumanoidRootPart.Position - objectPosition).Magnitude
     end,
     
     IsExcluded = function(prompt)
+        local Script = _G.msdoors.autoInteract.Script
         for _, excludedName in ipairs(Script.PromptTable.Excluded.Prompt) do
             if prompt.Name == excludedName then return true end
         end
@@ -1993,15 +2003,6 @@ Script.Functions = {
     end
 }
 
-local AutoInteractEnabled = false
-local IgnoreSettings = {
-    ["Jeff Items"] = true,
-    ["Unlock w/ Lockpick"] = false,
-    ["Paintings"] = true,
-    ["Gold"] = false,
-    ["Light Source Items"] = false,
-    ["Skull Prompt"] = false
-}
 --// Este sistema de auto interact é originalmente dá mspaint \\--
 
 GroupAuto:AddToggle("Auto-interact", {
@@ -2012,7 +2013,7 @@ GroupAuto:AddToggle("Auto-interact", {
 	Visible = true,
 	Risky = false,
 	Callback = function(Value)
-        AutoInteractEnabled = Value
+        _G.msdoors.autoInteract.Enabled = Value
 	end,
 }):AddKeyPicker("KeyP-autointeract", {
 	Default = "P",
@@ -2021,7 +2022,7 @@ GroupAuto:AddToggle("Auto-interact", {
 	Text = "Auto interact",
 	NoUI = false,
 	Callback = function(Value)
-        AutoInteractEnabled = Value
+        _G.msdoors.autoInteract.Enabled = Value
 	end,
 })
 
@@ -2033,64 +2034,65 @@ GroupAuto:AddDropdown("Auto-interact-drop", {
 	DisabledTooltip = "I am disabled!",
 	Searchable = false,
 	Callback = function(Value)
-        for k, _ in pairs(IgnoreSettings) do
-            IgnoreSettings[k] = false
+        for k, _ in pairs(_G.msdoors.autoInteract.IgnoreSettings) do
+            _G.msdoors.autoInteract.IgnoreSettings[k] = false
         end
         for _, v in pairs(Value) do
-            IgnoreSettings[v] = true
-			end
+            _G.msdoors.autoInteract.IgnoreSettings[v] = true
+        end
 	end,
 	Disabled = false,
 	Visible = true, 
 })
 
-
 local function AutoInteractLoop()
     while true do
         task.wait()
-        if AutoInteractEnabled then
-            local prompts = Script.Functions.GetAllPromptsWithCondition(function(prompt)
+        if _G.msdoors.autoInteract.Enabled then
+            local prompts = _G.msdoors.autoInteract.Script.Functions.GetAllPromptsWithCondition(function(prompt)
                 if not prompt.Parent then return false end
-                if IgnoreSettings["Jeff Items"] and prompt.Parent:GetAttribute("JeffShop") then return false end
-                if IgnoreSettings["Unlock w/ Lockpick"] and (prompt.Name == "UnlockPrompt" or prompt.Parent:GetAttribute("Locked")) and shared.Character:FindFirstChild("Lockpick") then return false end
-                if IgnoreSettings["Paintings"] and prompt.Name == "PropPrompt" then return false end
-                if IgnoreSettings["Gold"] and prompt.Name == "LootPrompt" then return false end
-                if IgnoreSettings["Light Source Items"] and prompt.Parent:GetAttribute("Tool_LightSource") and not prompt.Parent:GetAttribute("Tool_CanCutVines") then return false end
-                if IgnoreSettings["Skull Prompt"] and prompt.Name == "SkullPrompt" then return false end
-                if prompt.Parent:GetAttribute("PropType") == "Battery" and not (shared.Character:FindFirstChildOfClass("Tool") and (shared.Character:FindFirstChildOfClass("Tool"):GetAttribute("RechargeProp") == "Battery" or shared.Character:FindFirstChildOfClass("Tool"):GetAttribute("StorageProp") == "Battery")) then return false end 
-                if prompt.Parent:GetAttribute("PropType") == "Heal" and shared.Humanoid and shared.Humanoid.Health == shared.Humanoid.MaxHealth then return false end
+                if _G.msdoors.autoInteract.IgnoreSettings["Jeff Items"] and prompt.Parent:GetAttribute("JeffShop") then return false end
+                if _G.msdoors.autoInteract.IgnoreSettings["Unlock w/ Lockpick"] and (prompt.Name == "UnlockPrompt" or prompt.Parent:GetAttribute("Locked")) and _G.msdoors.autoInteract.Character:FindFirstChild("Lockpick") then return false end
+                if _G.msdoors.autoInteract.IgnoreSettings["Paintings"] and prompt.Name == "PropPrompt" then return false end
+                if _G.msdoors.autoInteract.IgnoreSettings["Gold"] and prompt.Name == "LootPrompt" then return false end
+                if _G.msdoors.autoInteract.IgnoreSettings["Light Source Items"] and prompt.Parent:GetAttribute("Tool_LightSource") and not prompt.Parent:GetAttribute("Tool_CanCutVines") then return false end
+                if _G.msdoors.autoInteract.IgnoreSettings["Skull Prompt"] and prompt.Name == "SkullPrompt" then return false end
+                if prompt.Parent:GetAttribute("PropType") == "Battery" and not (_G.msdoors.autoInteract.Character:FindFirstChildOfClass("Tool") and (_G.msdoors.autoInteract.Character:FindFirstChildOfClass("Tool"):GetAttribute("RechargeProp") == "Battery" or _G.msdoors.autoInteract.Character:FindFirstChildOfClass("Tool"):GetAttribute("StorageProp") == "Battery")) then return false end 
+                if prompt.Parent:GetAttribute("PropType") == "Heal" and _G.msdoors.autoInteract.Humanoid and _G.msdoors.autoInteract.Humanoid.Health == _G.msdoors.autoInteract.Humanoid.MaxHealth then return false end
                 if prompt.Parent.Name == "MinesAnchor" then return false end
-                if Script.IsRetro and prompt.Parent.Parent.Name == "RetroWardrobe" then return false end
-                return Script.PromptTable.Aura[prompt.Name] ~= nil
+                if _G.msdoors.autoInteract.Script.IsRetro and prompt.Parent.Parent.Name == "RetroWardrobe" then return false end
+                return _G.msdoors.autoInteract.Script.PromptTable.Aura[prompt.Name] ~= nil
             end)
 
             for _, prompt in pairs(prompts) do
                 task.spawn(function()
-                    if Script.Functions.DistanceFromCharacter(prompt.Parent) < prompt.MaxActivationDistance and (not prompt:GetAttribute("Interactions" .. shared.LocalPlayer.Name) or Script.PromptTable.Aura[prompt.Name] or table.find(Script.PromptTable.AuraObjects, prompt.Parent.Name)) then
+                    if _G.msdoors.autoInteract.Script.Functions.DistanceFromCharacter(prompt.Parent) < prompt.MaxActivationDistance and (not prompt:GetAttribute("Interactions" .. _G.msdoors.autoInteract.LocalPlayer.Name) or _G.msdoors.autoInteract.Script.PromptTable.Aura[prompt.Name] or table.find(_G.msdoors.autoInteract.Script.PromptTable.AuraObjects, prompt.Parent.Name)) then
                         if prompt.Parent.Name == "Slot" and prompt.Parent:GetAttribute("Hint") then
-                            if Script.Temp.PaintingDebounce[prompt] then return end
-                            local currentPainting = shared.Character:FindFirstChild("Prop")
+                            if _G.msdoors.autoInteract.Script.Temp.PaintingDebounce[prompt] then return end
+                            local currentPainting = _G.msdoors.autoInteract.Character:FindFirstChild("Prop")
                             local slotPainting = prompt.Parent:FindFirstChild("Prop")
                             local currentHint = (currentPainting and currentPainting:GetAttribute("Hint"))
                             local slotHint = (slotPainting and slotPainting:GetAttribute("Hint"))
                             local promptHint = prompt.Parent:GetAttribute("Hint")
                             if slotHint ~= promptHint and (currentHint == promptHint or slotPainting) then
-                                Script.Temp.PaintingDebounce[prompt] = true
-                                shared.fireproximityprompt(prompt)
+                                _G.msdoors.autoInteract.Script.Temp.PaintingDebounce[prompt] = true
+                                _G.msdoors.autoInteract.fireproximityprompt(prompt)
                                 task.wait(0.3)
-                                Script.Temp.PaintingDebounce[prompt] = false    
+                                _G.msdoors.autoInteract.Script.Temp.PaintingDebounce[prompt] = false    
                             end
                             return
                         end
-                        shared.fireproximityprompt(prompt)
+                        _G.msdoors.autoInteract.fireproximityprompt(prompt)
                     end
                 end)
             end
         end
     end
 end
+
 InitializeScript()
 task.spawn(AutoInteractLoop)
+
 
 GroupPlayer:AddToggle("EnableJump", {
     Text = "Habilitar Pulo",
