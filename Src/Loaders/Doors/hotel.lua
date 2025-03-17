@@ -3370,30 +3370,87 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
+local WebhookAPI = {}
+function WebhookAPI.sendWebhook()
+    if not _G.bot_config or not _G.webhook_config then
+        error("As configurações globais (_G.bot_config e _G.webhook_config) não foram definidas corretamente.")
+        return false
+    end
+    
+    local webhookUrl = _G.bot_config.webhook_link or ""
+    
+    if webhookUrl == "" or not string.find(webhookUrl, "discord.com/api/webhooks/") then
+        warn("[Webhook] ❌ URL de webhook inválida!")
+        return false
+    end
+    
+    local embed = {
+        title = _G.webhook_config.titulo or "Mensagem do Webhook",
+        description = _G.webhook_config.descricao or "Nenhuma descrição fornecida.",
+        color = _G.webhook_config.cor or 16711680,
+        fields = _G.webhook_config.campos or {},
+        footer = {
+            text = _G.webhook_config.rodape or "Enviado automaticamente.",
+            icon_url = _G.bot_config.FotoPerfil
+        }
+    }
+    
+    local payload = {
+        content = _G.webhook_config.mensagem or "**Aviso Automático**: Sistema Webhook Executado.",
+        username = _G.bot_config.NAME or "Webhook Bot",
+        avatar_url = _G.bot_config.FotoPerfil or "https://cdn.discordapp.com/embed/avatars/4.png",
+        embeds = { embed }
+    }
+    
+    local request = (syn and syn.request or http_request) or request or http and http.request
+    if not request then
+        error("Nenhuma função de solicitação HTTP compatível foi encontrada.")
+        return false
+    end
+    
+    local response = request({
+        Url = webhookUrl,
+        Method = "POST",
+        Headers = { ["Content-Type"] = "application/json" },
+        Body = HttpService:JSONEncode(payload)
+    })
+    
+    if response and response.StatusCode == 204 then
+        print("[Sucesso] Webhook enviado com sucesso!")
+        return true
+    else
+        warn("[Erro] Falha ao enviar webhook. Detalhes:", response and response.StatusMessage or "Desconhecido")
+        return false
+    end
+end
+
+return { sendWebhook = WebhookAPI.sendWebhook }
+
+_G.msdoors_webhooktoggle = false
+_G.msdoors_webhook = ""
+
 local webhookAPI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/internal/Webhook.lua"))()
 if not webhookAPI or not webhookAPI.sendWebhook then
     error("[Msdoors] ❌ Erro ao carregar a API de webhook!")
 end
 
-_G.msdoors_webhooktoggle = _G.msdoors_webhooktoggle or false
-_G.msdoors_webhook = ""
-
 local function EnviarEmbed()
     if not _G.msdoors_webhooktoggle then
         print("[Msdoors] ❌ Envio de Webhook está desativado!")
-        return
+        return false
     end
+    
     if _G.msdoors_webhook == "" or not string.find(_G.msdoors_webhook, "discord.com/api/webhooks/") then
         warn("[Msdoors] ❌ Nenhum Webhook configurado ou URL inválida!")
-        return
+        return false
     end
-
+    
     _G.bot_config = {
         webhook_link = _G.msdoors_webhook,
         NAME = "Msdoors",
         FotoPerfil = "https://msdoors-gg.vercel.app/favicon.ico"
     }
-
+    
     _G.webhook_config = {
         titulo = "🚀 Notificação de Evento",
         descricao = "Um evento ocorreu no jogo!",
@@ -3404,63 +3461,87 @@ local function EnviarEmbed()
             { name = "💡 Detalhes", value = "Mais informações aqui.", inline = true }
         }
     }
-
+    
+    print("[Msdoors] 🔄 Enviando webhook para:", _G.msdoors_webhook)
+    
     local success, err = pcall(function()
-        webhookAPI.sendWebhook()
+        return webhookAPI.sendWebhook()
     end)
-
+    
     if success then
         print("[Msdoors] ✅ Webhook enviado com sucesso!")
+        return true
     else
         warn("[Msdoors] ❌ Erro ao enviar webhook:", err)
+        return false
     end
 end
 
-MenuDiscord:AddLabel('• Enviar informações do jogo no <font color="#9DABFF">Discord</font>')
+if MenuDiscord then
+    MenuDiscord:AddLabel('• Enviar informações do jogo no <font color="#9DABFF">Discord</font>')
+    
+    MenuDiscord:AddToggle("Webhook", {
+        Text = "Ativar Webhook",
+        Default = _G.msdoors_webhooktoggle,
+        Callback = function(Value)
+            _G.msdoors_webhooktoggle = Value
+            print("[Msdoors] 🔄 Webhook ativado:", Value)
+        end,
+    })
+    
+    MenuDiscord:AddInput("webhooklink", {
+        Default = "URL do Webhook",
+        Text = "Insira o link do Webhook",
+        Callback = function(Value)
+            _G.msdoors_webhook = Value
+            print("[Msdoors] 🔄 Webhook atualizado para:", Value)
+        end,
+    })
+    
+    MenuDiscord:AddButton({
+        Text = "Definir Webhook",
+        Func = function()
+            if _G.msdoors_webhook ~= "" then
+                Notify({
+                    Title = "SUCESSO!",
+                    Description = "Webhook atualizado!",
+                    Color = Color3.fromRGB(0, 255, 0),
+                    Duration = 4
+                })
+                print("[Msdoors] ✅ Webhook atualizado!")
+            else
+                Notify({
+                    Title = "ERRO",
+                    Description = "Webhook inválido!",
+                    Color = Color3.fromRGB(255, 0, 0),
+                    Duration = 4
+                })
+                warn("[Msdoors] ❌ Webhook inválido!")
+            end
+        end,
+    })
+    
+    MenuDiscord:AddButton({
+        Text = "Testar Webhook",
+        Func = function()
+            print("[Msdoors] 🔄 Testando Webhook...")
+            local success = EnviarEmbed()
+            
+            if not success then
+                Notify({
+                    Title = "ERRO",
+                    Description = "Erro ao enviar webhook!",
+                    Color = Color3.fromRGB(255, 0, 0),
+                    Duration = 4
+                })
+            end
+        end,
+    })
+end
 
-MenuDiscord:AddToggle("Webhook", {
-	Text = "Ativar Webhook",
-	Default = false,
-	Callback = function(Value)
-        _G.msdoors_webhooktoggle = Value
-	end,
-})
-
-MenuDiscord:AddInput("webhooklink", {
-	Default = "URL do Webhook",
-	Text = "Insira o link do Webhook",
-	Callback = function(Value)
-        _G.msdoors_webhook = Value
-	end,
-})
-
-MenuDiscord:AddButton({
-	Text = "Definir Webhook",
-	Func = function()
-	    if _G.msdoors_webhook ~= "" then
-	        Notify({
-                Title = "SUCESSO!",
-                Description = "Webhook atualizado!",
-                Color = Color3.fromRGB(0, 255, 0),
-                Duration = 4
-            })
-        else
-	        Notify({
-                Title = "ERRO",
-                Description = "Webhook inválido!",
-                Color = Color3.fromRGB(255, 0, 0),
-                Duration = 4
-            })
-        end
-	end,
-})
-
-MenuDiscord:AddButton({
-	Text = "Testar Webhook",
-	Func = function()
-        EnviarEmbed()
-	end,
-})
+return {
+    EnviarEmbed = EnviarEmbed
+}
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
                  (_G.msdoors_floor == "Rooms" and "Rooms") or  
