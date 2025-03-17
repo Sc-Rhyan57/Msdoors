@@ -2,7 +2,8 @@ if _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
 end
-_G.msdoors_syslibrary = "https://raw.githubusercontent.com/mstudio45/linoria-lib/main/"
+-- Definir um valor padrão para a variável global
+_G.msdoors_syslibrary = _G.msdoors_syslibrary or "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
 local repo = _G.msdoors_syslibrary
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
