@@ -3373,12 +3373,11 @@ end)
 _G.webhookEnabled = _G.webhookEnabled or true
 _G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu_id/seu_token"
 
-local HttpService = game:GetService("HttpService")
-
 function SendEmbed(title, description, color, fields)
     local OSTime = os.time()
     local Time = os.date("!*t", OSTime)
-
+    
+    local Content = "discord webhooks thru synapse"
     local Embed = {
         title = title,
         description = description,
@@ -3389,12 +3388,13 @@ function SendEmbed(title, description, color, fields)
         timestamp = string.format("%d-%d-%dT%02d:%02d:%02dZ", Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec)
     }
 
-    local Payload = HttpService:JSONEncode({
-        content = "discord webhooks thru roblox HttpService",
-        embeds = { Embed }
-    })
+    (syn and syn.request or http_request) {
+        Url = _G.msdoors_webhook,
+        Method = "POST",
+        Headers = { ["Content-Type"] = "application/json" },
+        Body = game:GetService("HttpService"):JSONEncode({ content = Content, embeds = { Embed } })
+    }
 
-    HttpService:PostAsync(_G.msdoors_webhook, Payload, Enum.HttpContentType.ApplicationJson)
     print("[Sucesso] Webhook enviado!")
 end
 
