@@ -3371,19 +3371,23 @@ MenuGroup:AddButton("Unload", function()
 end)
 
 local webhookAPI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Msdoors/Msdoors.gg/refs/heads/main/Scripts/Msdoors/internal/Webhook.lua"))()
+if not webhookAPI or not webhookAPI.sendWebhook then
+    error("[Msdoors] ❌ Erro ao carregar a API de webhook!")
+end
 
 _G.msdoors_webhooktoggle = _G.msdoors_webhooktoggle or false
 _G.msdoors_webhook = ""
 
 local function EnviarEmbed()
     if not _G.msdoors_webhooktoggle then
-        print("[ Msdoors ] » ❌ Envio de Webhook desativado!")
+        print("[Msdoors] ❌ Envio de Webhook está desativado!")
         return
     end
-    if _G.msdoors_webhook == "" then
-        warn("[ Msdoors ] » ❌ Nenhum Webhook configurado!")
+    if _G.msdoors_webhook == "" or not string.find(_G.msdoors_webhook, "discord.com/api/webhooks/") then
+        warn("[Msdoors] ❌ Nenhum Webhook configurado ou URL inválida!")
         return
     end
+
     _G.bot_config = {
         webhook_link = _G.msdoors_webhook,
         NAME = "Msdoors",
@@ -3400,74 +3404,62 @@ local function EnviarEmbed()
             { name = "💡 Detalhes", value = "Mais informações aqui.", inline = true }
         }
     }
-    
-    webhookAPI.sendWebhook()
+
+    local success, err = pcall(function()
+        webhookAPI.sendWebhook()
+    end)
+
+    if success then
+        print("[Msdoors] ✅ Webhook enviado com sucesso!")
+    else
+        warn("[Msdoors] ❌ Erro ao enviar webhook:", err)
+    end
 end
 
-MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
+MenuDiscord:AddLabel('• Enviar informações do jogo no <font color="#9DABFF">Discord</font>')
+
 MenuDiscord:AddToggle("Webhook", {
-	Text = "Webhook",
-	DisabledTooltip = "I am disabled!",
+	Text = "Ativar Webhook",
 	Default = false,
-	Disabled = false,
 	Callback = function(Value)
         _G.msdoors_webhooktoggle = Value
 	end,
 })
 
-MenuDiscord:AddDivider()
 MenuDiscord:AddInput("webhooklink", {
 	Default = "URL do Webhook",
-	Numeric = false,
-	Finished = false, 
-	ClearTextOnFocus = true,
 	Text = "Insira o link do Webhook",
 	Callback = function(Value)
         _G.msdoors_webhook = Value
 	end,
 })
+
 MenuDiscord:AddButton({
 	Text = "Definir Webhook",
 	Func = function()
-	if _G.msdoors_webhook ~= "" then
-	    Notify({
-            Title = "SUCESSO!",
-            Description = "Webhook atualizado!",
-            Image = "rbxassetid://95869322194132",
-            Color = Color3.fromRGB(0, 0, 255),
-            Style = "SISTEMA",
-            Duration = 6,
-            NotifyStyle = _G.msdoors_LibraryNotif
+	    if _G.msdoors_webhook ~= "" then
+	        Notify({
+                Title = "SUCESSO!",
+                Description = "Webhook atualizado!",
+                Color = Color3.fromRGB(0, 255, 0),
+                Duration = 4
             })
-        else 
-	    Notify({
-            Title = "ERRO",
-            Description = "Webhook inválido!",
-            Image = "rbxassetid://95869322194132",
-            Color = Color3.fromRGB(255, 0, 0),
-            Style = "SISTEMA",
-            Duration = 6,
-            NotifyStyle = _G.msdoors_LibraryNotif
+        else
+	        Notify({
+                Title = "ERRO",
+                Description = "Webhook inválido!",
+                Color = Color3.fromRGB(255, 0, 0),
+                Duration = 4
             })
         end
 	end,
-	DoubleClick = false,
-	Disabled = false,
-	Visible = true,
-	Risky = false,
 })
-MenuDiscord:AddDivider()
+
 MenuDiscord:AddButton({
-	Text = "Testar webhook",
+	Text = "Testar Webhook",
 	Func = function()
         EnviarEmbed()
 	end,
-	DoubleClick = false,
-	Tooltip = "Testar Webhook",
-	DisabledTooltip = "I am disabled!",
-	Disabled = false,
-	Visible = true,
-	Risky = false,
 })
 
 local FolderFloor = (_G.msdoors_floor == "Hotel" and "Hotel") or  
