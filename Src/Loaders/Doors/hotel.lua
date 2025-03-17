@@ -867,6 +867,25 @@ Notify({
     Duration = 6,
     NotifyStyle = _G.msdoors_LibraryNotif
 })
+
+--[[ EMBED ]]--
+        SendEmbed({
+            username = "Msdoors bot",
+            avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            content = "dsc.gg/msdoors-gg",      
+            title = notificationData.Title,             
+            description = notificationData.Description,          
+            url = "https://dsc.gg/msdoors-gg",       
+            color = 65280,                                 
+            author_name = notificationData.Title,
+            author_url = "https://msdoors-gg.vercel.app/shop",
+            author_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            footer_text = "msdoors • " .. game.JobId,
+            footer_icon_url = "https://discord.com/favicon.ico",
+            image_url = "",
+            thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            fields = { }
+        })
             if _G.msdoors_chatActive then
                 TrySendChatMessage("[" .. notificationData.Title .. "] - " .. notificationData.Description)
             end
@@ -907,6 +926,25 @@ function NotifyRoom(roomName)
     Duration = 6,
     NotifyStyle = _G.msdoors_LibraryNotif
     })
+
+--[[ EMBED ]]--
+        SendEmbed({
+            username = "Msdoors bot",
+            avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            content = "dsc.gg/msdoors-gg",      
+            title = roomData.Title,             
+            description = roomData.Description,          
+            url = "https://dsc.gg/msdoors-gg",       
+            color = 65280,                                 
+            author_name = roomData.Title,
+            author_url = "https://msdoors-gg.vercel.app/shop",
+            author_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            footer_text = "msdoors • " .. game.JobId,
+            footer_icon_url = "https://discord.com/favicon.ico",
+            image_url = "",
+            thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
+            fields = { }
+        })
             if _G.msdoors_chatActive then
                 TrySendChatMessage("[" .. roomData.Title .. "] - " .. roomData.Description)
             end
