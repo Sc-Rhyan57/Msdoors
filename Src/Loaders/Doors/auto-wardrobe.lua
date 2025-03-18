@@ -41,7 +41,7 @@ local Tabs = {
     Credits = Window:AddTab("Créditos", "axe"),
 }
 
-local AutomationGroupBox = Tabs.Main:AddRightGroupbox("Automoção")
+local GroupAuto = Tabs.Main:AddRightGroupbox("Automoção")
 
 -- Variáveis principais
 local AutoWardrobeEntities = {}
