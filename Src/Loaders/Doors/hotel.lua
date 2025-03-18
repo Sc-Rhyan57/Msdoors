@@ -33,6 +33,7 @@ _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
+_G.msdoors_DoorReach = _G.msdoors_DoorReach or false
 _G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
 _G.msdoors_ThoughtsEnabled = _G.msdoors_ThoughtsEnabled or false
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
@@ -2756,6 +2757,33 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
+
+GroupReach:AddToggle("DoorReach", {
+    Text = "Door Reach",
+    Default = _G.msdoors_DoorReach,
+    Callback = function(Value)
+        _G.msdoors_DoorReach = Value
+
+        if state then
+            local connection
+            connection = RunService.Heartbeat:Connect(function()
+                if not _G.msdoors_DoorReach then
+                    connection:Disconnect()
+                    return
+                end
+
+                if Toggles.DoorReach.Value and workspace.CurrentRooms:FindFirstChild(Script.LatestRoom.Value) then
+                    local door = workspace.CurrentRooms[Script.LatestRoom.Value]:FindFirstChild("Door")
+
+                    if door and door:FindFirstChild("ClientOpen") then
+                        door.ClientOpen:FireServer()
+                    end
+                end
+            end)
+        end
+    end
+})
+
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
     Min = 7,
@@ -2957,8 +2985,6 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
 
 --// SPEED BYPASS \\--
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-
-
 _G.MSDoors_EnableJump = false
 _G.MSDoors_FlySpeed = 15
 
@@ -3042,7 +3068,7 @@ end
 
 
 GroupPlayer:AddToggle("WalkSpeed", {
-	Text = "Habilitar WalkSpeed",
+	Text = "WalkSpeed",
 	DisabledTooltip = "I am disabled!",
 	Default = false,
 	Disabled = false,
@@ -3061,7 +3087,7 @@ GroupPlayer:AddSlider("WalkSpeedVelocity", {
 	Rounding = 1,
 	Compact = false,
 	Callback = function(Value)
-        _G.MSDoors_WalkSpeed = Value
+	_G.MSDoors_WalkSpeed = value
         MSDoors_UpdateSpeeds()
 	end,
 	DisabledTooltip = "I am disabled!",
