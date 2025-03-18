@@ -34,6 +34,7 @@ _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
 _G.msdoors_DoorReach = _G.msdoors_DoorReach or false
+_G.msdoors_FigureDeaf = _G.msdoors_FigureDeaf or false
 _G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
 _G.msdoors_ThoughtsEnabled = _G.msdoors_ThoughtsEnabled or false
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
@@ -2656,15 +2657,42 @@ GroupAntiEntity:AddToggle("Anti-Dupe", {
     end,
 })
 
-
 GroupAntiEntity:AddToggle("AntiHearing", {
-    Text = "Anti-Figure Hearing[MANUTENÇÃO]",
-    Default = false,
-    Disabled = true,
+    Text = "Anti-Figure Hearing",
+    Default = _G.msdoors_FigureDeaf,
     Callback = function(state)
-        local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
-        if remote and remote:IsA("RemoteEvent") then
-            remote:FireServer(state)
+        _G.msdoors_FigureDeaf = state
+        
+        if state then
+            local lastSendTime = 0
+            local sendInterval = 0.1
+            _G.HeartbeatConnection = RunService.Heartbeat:Connect(function(deltaTime)
+                local currentTime = tick()
+                
+                if currentTime - lastSendTime >= sendInterval then
+                    lastSendTime = currentTime
+                    local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
+                    if remote and remote:IsA("RemoteEvent") then
+                        remote:FireServer(true)
+                    end
+                end
+                if not _G.msdoors_FigureDeaf then
+                    if _G.HeartbeatConnection then
+                        _G.HeartbeatConnection:Disconnect()
+                        _G.HeartbeatConnection = nil
+                    end
+                end
+            end)
+        else
+            if _G.HeartbeatConnection then
+                _G.HeartbeatConnection:Disconnect()
+                _G.HeartbeatConnection = nil
+            end
+				
+            local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
+            if remote and remote:IsA("RemoteEvent") then
+                remote:FireServer(false)
+            end
         end
     end
 })
