@@ -2792,7 +2792,7 @@ GroupNot:AddToggle("Visual-Notifier-Entities", {
 
 GroupNotC:AddToggle("Chat-Notifier", {
     Text = "Enviar notificações no chat",
-    Default = _G.msdoors_chatActive = value,
+    Default = _G.msdoors_chatActive,
     Callback = function(value)
         _G.msdoors_chatActive = value
     end,
