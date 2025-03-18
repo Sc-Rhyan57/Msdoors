@@ -1,4 +1,4 @@
-if _G.ObsidianaLib then
+pplif _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
 end
