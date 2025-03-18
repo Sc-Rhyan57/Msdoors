@@ -3087,7 +3087,7 @@ GroupPlayer:AddSlider("WalkSpeedVelocity", {
 	Rounding = 1,
 	Compact = false,
 	Callback = function(Value)
-	_G.MSDoors_WalkSpeed = value
+	_G.MSDoors_WalkSpeed = Value
         MSDoors_UpdateSpeeds()
 	end,
 	DisabledTooltip = "I am disabled!",
