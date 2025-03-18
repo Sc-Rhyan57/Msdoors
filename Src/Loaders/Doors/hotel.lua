@@ -2659,23 +2659,27 @@ GroupAntiEntity:AddToggle("Anti-Dupe", {
 
 GroupAntiEntity:AddToggle("AntiHearing", {
     Text = "Anti-Figure Hearing",
-    Default = _G.msdoors_FigureDeaf,
+    Default = false,
     Callback = function(state)
         _G.msdoors_FigureDeaf = state
         
         if state then
             local lastSendTime = 0
             local sendInterval = 0.1
+            
             _G.HeartbeatConnection = RunService.Heartbeat:Connect(function(deltaTime)
                 local currentTime = tick()
                 
                 if currentTime - lastSendTime >= sendInterval then
                     lastSendTime = currentTime
-                    local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
+                    
+                    local args = { [1] = true }
+                    local remote = game:GetService("ReplicatedStorage").RemotesFolder.Crouch
                     if remote and remote:IsA("RemoteEvent") then
-                        remote:FireServer(true)
+                        remote:FireServer(unpack(args))
                     end
                 end
+                
                 if not _G.msdoors_FigureDeaf then
                     if _G.HeartbeatConnection then
                         _G.HeartbeatConnection:Disconnect()
@@ -2688,10 +2692,14 @@ GroupAntiEntity:AddToggle("AntiHearing", {
                 _G.HeartbeatConnection:Disconnect()
                 _G.HeartbeatConnection = nil
             end
-				
-            local remote = game.ReplicatedStorage:FindFirstChild("Crouch")
+            
+            local args = {
+                [1] = false
+            }
+            
+            local remote = game:GetService("ReplicatedStorage").RemotesFolder.Crouch
             if remote and remote:IsA("RemoteEvent") then
-                remote:FireServer(false)
+                remote:FireServer(unpack(args))
             end
         end
     end
