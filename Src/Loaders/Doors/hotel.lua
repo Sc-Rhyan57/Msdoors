@@ -32,7 +32,8 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions ir false
-_G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false  
+_G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
+_G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
 _G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
 _G.msdoors_AntiSnare = _G.msdoors_AntiSnare or false
@@ -1788,17 +1789,20 @@ GroupEspConfig:AddDropdown("LocalTrace", {
 GroupVPlayer:AddToggle("Visual-no-ambience", {
 	Text = "No Ambience",
 	DisabledTooltip = "I am disabled!",
-	Default = false,
+	Default = _G.msdoors_NoAmbienceEnabled,
 	Disabled = false,
 	Visible = true,
 	Risky = false,
 	Callback = function(Value)
+        _G.msdoors_NoAmbienceEnabled = Value  
+
         if not game.SoundService:FindFirstChild("AmbienceRemove") then
             local ambiencerem = Instance.new("BoolValue")
             ambiencerem.Name = "AmbienceRemove"
             ambiencerem.Parent = game.SoundService
         end
-        if Value then
+
+        if _G.msdoors_NoAmbienceEnabled then
             workspace.Ambience_Dark.Volume = 0
             if workspace:FindFirstChild("AmbienceMines") then
                 workspace.AmbienceMines.Volume = 0
@@ -1826,7 +1830,6 @@ GroupVPlayer:AddToggle("Visual-no-ambience", {
             end
             game.SoundService.AmbienceRemove.Value = false
         end
-
 	end,
 })
 
@@ -1878,7 +1881,7 @@ end)
 GroupAuto:AddToggle("Main-Insta-Interact", {
 	Text = "Instant Interaction",
 	DisabledTooltip = "I am disabled!",
-	Default = false,
+	Default = _G.msdoors_InstaInteractEnabled,
 	Disabled = false,
 	Visible = true,
 	Risky = false,
