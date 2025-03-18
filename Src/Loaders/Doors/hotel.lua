@@ -30,7 +30,6 @@ local floorName = _G.msdoors_floor
 ----------------------------
 --[[ VARIAVEIS GLOBAIS ]]--
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
-_G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
 
