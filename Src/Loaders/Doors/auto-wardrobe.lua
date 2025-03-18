@@ -406,7 +406,7 @@ local floorName = _G.msdoors_floor or "Hotel"
 
 -- Adicionando os toggles diretamente na interface LinoriaLib
 -- Toggle para Auto Armário
-LeftGroupBox:AddToggle("AutoHide", {
+GroupAuto:AddToggle("AutoHide", {
 	Text = "Auto " .. HidingPlaceName[floorName],
 	DisabledTooltip = "I am disabled!",
 	Default = false,
