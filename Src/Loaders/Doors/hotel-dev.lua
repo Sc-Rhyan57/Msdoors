@@ -3691,11 +3691,6 @@ player:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
     local currentRoom = player:GetAttribute("CurrentRoom")
 end)
 
-
-return {
-    AutoWardrobe = AutoWardrobe
-}
-
 -- Credits[ Tenha bom senso ]
 GroupCredits:AddLabel('<font color="#00FFFF">Créditos</font>')
 GroupCredits:AddLabel('• Rhyan57 - <font color="#FFA500">DONO</font>')
@@ -4055,3 +4050,7 @@ SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
+
+return {
+    AutoWardrobe = AutoWardrobe
+}
