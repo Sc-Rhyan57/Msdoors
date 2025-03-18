@@ -407,11 +407,10 @@ local floorName = _G.msdoors_floor or "Hotel"
 -- Adicionando os toggles diretamente na interface LinoriaLib
 -- Toggle para Auto Armário
 GroupAuto:AddToggle("AutoWardrobe", {
-    Text = "Auto " .. HidingPlaceName[floorName],
+    Text = "Auto armário",
     Default = false,
     Tooltip = "Pode falhar com múltiplas entidades (Rush & Ambush, 3+ Rush spawns)",
     Risky = true,
-    
     Callback = function(Value)
         _G.msdoors_autohide = Value
     end,
