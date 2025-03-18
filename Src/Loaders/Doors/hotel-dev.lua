@@ -3217,6 +3217,484 @@ RunService.Heartbeat:Connect(function()
 end)
 
 
+_G.msdoors_autohide = false
+_G.msdoors_autohide_notifications = true
+
+local player = game.Players.LocalPlayer
+local hideTimeValues = {
+    {min = 1, max = 5, a = -1/6, b = 1, c = 20},
+    {min = 6, max = 19, a = -1/13, b = 6, c = 19},
+    {min = 19, max = 22, a = -1/4, b = 19, c = 18},
+    {min = 23, max = 26, a = 1/3, b = 23, c = 18},
+    {min = 26, max = 30, a = -1/4, b = 26, c = 19},
+    {min = 30, max = 35, a = -1/3, b = 30, c = 18},
+    {min = 36, max = 60, a = -1/12, b = 36, c = 18},
+    {min = 60, max = 90, a = -1/30, b = 60, c = 16},
+    {min = 90, max = 99, a = -1/6, b = 90, c = 15}
+}
+
+local hidingPlaceName = {
+    ["Hotel"] = "Closet",
+    ["Backdoor"] = "Closet",
+    ["Fools"] = "Closet",
+    ["Retro"] = "Closet",
+    ["Rooms"] = "Locker",
+    ["Mines"] = "Locker"
+}
+
+local entityDistances = {
+    ["RushMoving"] = {
+        Distance = 100,
+        Loader = 175
+    },
+    ["BackdoorRush"] = {
+        Distance = 100,
+        Loader = 175
+    },
+    ["AmbushMoving"] = {
+        Distance = 155,
+        Loader = 200
+    },
+    ["A60"] = {
+        Distance = 200,
+        Loader = 200
+    },
+    ["A120"] = {
+        Distance = 200,
+        Loader = 200
+    }
+}
+
+local trackedEntities = {
+    "RushMoving",
+    "AmbushMoving",
+    "BackdoorRush",
+    "A60",
+    "A120"
+}
+
+local autoWardrobeEntities = {}
+
+local function Notify(options)
+    if not _G.msdoors_autohide_notifications then return end
+    
+    _G.Notify({
+        Title = options.Title or "",
+        Description = options.Description or "",
+        Image = options.Image or "rbxassetid://95869322194132",
+        Color = options.Color or Color3.fromRGB(0, 0, 255),
+        Style = "SISTEMA",
+        Duration = options.Duration or 6,
+        NotifyStyle = _G.msdoors_LibraryNotif
+    })
+end
+
+local function DistanceFromCharacter(position)
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return math.huge end
+    
+    return (character.HumanoidRootPart.Position - position).Magnitude
+end
+
+local function IsAlive()
+    local character = player.Character
+    if not character or not character:FindFirstChild("Humanoid") then return false end
+    
+    return player:GetAttribute("Alive") ~= false
+end
+
+local function GetCurrentRoom()
+    return player:GetAttribute("CurrentRoom") or 0
+end
+
+local function IsInViewOfPlayer(part, maxDistance, exclusions)
+    local character = player.Character
+    if not character or not character:FindFirstChild("Head") then return false end
+    
+    maxDistance = maxDistance or 100
+    exclusions = exclusions or {}
+    
+    if DistanceFromCharacter(part.Position) > maxDistance then return false end
+    
+    local ray = Ray.new(character.Head.Position, (part.Position - character.Head.Position).Unit * maxDistance)
+    local hit, position = workspace:FindPartOnRayWithIgnoreList(ray, exclusions)
+    
+    return hit == part
+end
+
+local function CalculateHideTime(roomNumber)
+    for _, range in pairs(hideTimeValues) do
+        if roomNumber >= range.min and roomNumber <= range.max then
+            return range.a * roomNumber + range.b * range.c
+        end
+    end
+    return 20 -- Default hide time
+end
+
+local function GetNearestPromptWithCondition(condition)
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil end
+    
+    local nearestPrompt, nearestDistance = nil, math.huge
+    
+    local function checkModel(model)
+        for _, child in pairs(model:GetDescendants()) do
+            if child:IsA("ProximityPrompt") then
+                if condition(child) then
+                    local distance = DistanceFromCharacter(child.Parent:GetPivot().Position)
+                    if distance < nearestDistance then
+                        nearestPrompt = child
+                        nearestDistance = distance
+                    end
+                end
+            end
+        end
+    end
+    
+    local currentRoom = GetCurrentRoom()
+    if workspace.CurrentRooms:FindFirstChild(tostring(currentRoom)) then
+        checkModel(workspace.CurrentRooms[tostring(currentRoom)])
+    end
+    
+    if not nearestPrompt then
+        if workspace.CurrentRooms:FindFirstChild(tostring(currentRoom - 1)) then
+            checkModel(workspace.CurrentRooms[tostring(currentRoom - 1)])
+        end
+        if workspace.CurrentRooms:FindFirstChild(tostring(currentRoom + 1)) then
+            checkModel(workspace.CurrentRooms[tostring(currentRoom + 1)])
+        end
+    end
+    
+    return nearestPrompt
+end
+
+local function GenerateAutoWardrobeExclusions(targetWardrobePrompt)
+    local currentRoom = GetCurrentRoom()
+    if not workspace.CurrentRooms:FindFirstChild(tostring(currentRoom)) then return {targetWardrobePrompt.Parent} end
+    
+    local ignore = {targetWardrobePrompt.Parent}
+    
+    if workspace.CurrentRooms[tostring(currentRoom)]:FindFirstChild("Assets") then
+        for _, asset in pairs(workspace.CurrentRooms[tostring(currentRoom)].Assets:GetChildren()) do
+            if asset.Name == "Pillar" then table.insert(ignore, asset) end
+        end
+    end
+    
+    return ignore
+end
+
+local function AutoWardrobe(entity, entityIndex)
+    if not entity or not entity:IsDescendantOf(workspace) then 
+        if entityIndex then
+            table.remove(autoWardrobeEntities, entityIndex)
+        end
+        return 
+    end
+    
+    if not _G.msdoors_autohide or not IsAlive() then
+        if entityIndex then
+            table.remove(autoWardrobeEntities, entityIndex)
+        end
+        return
+    end
+    
+    local notifPrefix = "Auto " .. hidingPlaceName[_G.msdoors_floor]
+    Notify({
+        Title = notifPrefix,
+        Description = "Looking for a hiding place",
+    })
+    
+    local entityTrackingIndex = #autoWardrobeEntities + 1
+    autoWardrobeEntities[entityTrackingIndex] = entity
+    
+    local distance = entityDistances[entity.Name].Distance
+    local targetWardrobeChecker = function(prompt)
+        if not prompt.Parent then return false end
+        if not prompt.Parent:FindFirstChild("HiddenPlayer") then return false end
+        if prompt.Parent:FindFirstChild("Main") and prompt.Parent.Main:FindFirstChild("HideEntityOnSpot") then
+            if prompt.Parent.Main.HideEntityOnSpot.Whispers.Playing == true then return false end -- Hide
+        end
+        
+        return prompt.Name == "HidePrompt" and 
+               (prompt.Parent:GetAttribute("LoadModule") == "Wardrobe" or 
+                prompt.Parent:GetAttribute("LoadModule") == "Bed" or 
+                prompt.Parent.Name == "Rooms_Locker") and 
+               not prompt.Parent.HiddenPlayer.Value and 
+               (DistanceFromCharacter(prompt.Parent:GetPivot().Position) < prompt.MaxActivationDistance * 1.1) -- Default multiplier
+    end
+    
+    local targetWardrobePrompt = GetNearestPromptWithCondition(targetWardrobeChecker)
+    
+    local function getPrompt()
+        if not targetWardrobePrompt or DistanceFromCharacter(targetWardrobePrompt:FindFirstAncestorWhichIsA("Model"):GetPivot().Position) > 15 then
+            repeat task.wait()
+                targetWardrobePrompt = GetNearestPromptWithCondition(targetWardrobeChecker)
+            until targetWardrobePrompt ~= nil or 
+                  player.Character:GetAttribute("Hiding") or 
+                  (not _G.msdoors_autohide or not IsAlive() or not entity or not entity:IsDescendantOf(workspace))
+            
+            if not _G.msdoors_autohide or not IsAlive() or not entity or not entity:IsDescendantOf(workspace) then
+                return false
+            end
+        end
+        return true
+    end
+    
+    if not getPrompt() then return end
+    
+    if player.Character:GetAttribute("Hiding") then return end
+    if not _G.msdoors_autohide or not IsAlive() then return end
+    
+    Notify({
+        Title = notifPrefix,
+        Description = "Starting...",
+    })
+    
+    local exclusion = GenerateAutoWardrobeExclusions(targetWardrobePrompt)
+    local attempts, maxAttempts = 0, 60
+    
+    local function isSafeCheck(addMoreDist)
+        local isSafe = true
+        for _, trackEntity in pairs(autoWardrobeEntities) do
+            if not isSafe then break end
+            
+            local distanceThreshold = entityDistances[trackEntity.Name].Distance
+            
+            local entityDeleted = (trackEntity == nil or trackEntity.Parent == nil)
+            local inView = trackEntity.PrimaryPart and IsInViewOfPlayer(trackEntity.PrimaryPart, distanceThreshold + (addMoreDist and 15 or 0), exclusion)
+            local isClose = trackEntity.PrimaryPart and DistanceFromCharacter(trackEntity:GetPivot().Position) < distanceThreshold + (addMoreDist and 15 or 0)
+            
+            isSafe = entityDeleted or (not inView and not isClose)
+            if not isSafe then break end
+        end
+        
+        return isSafe
+    end
+    
+    local function waitForSafeExit()
+        if entity.Name == "A120" then
+            repeat task.wait() until not entity:IsDescendantOf(workspace) or 
+                                      (entity.PrimaryPart and entity.PrimaryPart.Position.Y < -10) or 
+                                      (not IsAlive() or not player.Character:GetAttribute("Hiding"))
+        else
+            local didPlayerSeeEntity = false
+            task.spawn(function()
+                repeat task.wait()
+                    if not IsAlive() or not entity or not entity:IsDescendantOf(workspace) then break end
+                    
+                    if player.Character:GetAttribute("Hiding") and entity.PrimaryPart and 
+                       IsInViewOfPlayer(entity.PrimaryPart, distance, exclusion) then
+                        didPlayerSeeEntity = true
+                        break
+                    end
+                until false
+            end)
+            
+            repeat task.wait(0.15)
+                local isSafe = isSafeCheck()
+                if didPlayerSeeEntity and isSafe then
+                    Notify({
+                        Title = notifPrefix,
+                        Description = "Exiting the hiding place, entity is far away.",
+                    })
+                    break
+                elseif isSafe and not entity:IsDescendantOf(workspace) then
+                    Notify({
+                        Title = notifPrefix,
+                        Description = "Exiting the hiding place, entity is deleted.",
+                    })
+                    break
+                end
+                
+                if not IsAlive() then
+                    Notify({
+                        Title = notifPrefix,
+                        Description = "Stopping (you died)",
+                    })
+                    break
+                end
+            until false
+        end
+        
+        return true
+    end
+    
+    local function hide()
+        if player.Character:GetAttribute("Hiding") and player.Character.HumanoidRootPart.Anchored then return false end
+        
+        if not getPrompt() then return false end
+        
+        repeat task.wait()
+            attempts = attempts + 1
+            
+            game.ProximityPromptService:SimulateActivation(targetWardrobePrompt)
+        until attempts > maxAttempts or not IsAlive() or 
+              (player.Character:GetAttribute("Hiding") and player.Character.HumanoidRootPart.Anchored)
+        
+        if attempts > maxAttempts or not IsAlive() then return false end
+        return true
+    end
+    
+    if entity.Name == "AmbushMoving" then
+        local lastPos = entity:GetPivot().Position
+        local isMoving = false
+        
+        task.spawn(function()
+            repeat task.wait(0.01)
+                local diff = (lastPos - entity:GetPivot().Position) / 0.01
+                lastPos = entity:GetPivot().Position
+                isMoving = diff.Magnitude > 0
+            until not entity or not entity:IsDescendantOf(workspace)
+        end)
+        
+        repeat task.wait()
+            Notify({
+                Title = notifPrefix,
+                Description = "Waiting for Ambush to be close enough...",
+            })
+            
+            repeat task.wait() until (isMoving and DistanceFromCharacter(entity:GetPivot().Position) <= distance) or 
+                                      (not entity or not entity:IsDescendantOf(workspace))
+            
+            if not entity or not entity:IsDescendantOf(workspace) then break end
+            
+            local success = hide()
+            if success then
+                Notify({
+                    Title = notifPrefix,
+                    Description = "Waiting for it to be safe to exit...",
+                })
+                
+                repeat task.wait() until (not isMoving and DistanceFromCharacter(entity:GetPivot().Position) >= distance) or 
+                                          (not entity or not entity:IsDescendantOf(workspace))
+                
+                if not entity or not entity:IsDescendantOf(workspace) then break end
+                
+                game:GetService("ReplicatedStorage").EntityInfo.CamLock:FireServer()
+            end
+        until not entity or not entity:IsDescendantOf(workspace) or not IsAlive()
+    else
+        repeat task.wait() until not isSafeCheck(true)
+        
+        repeat
+            local success = hide()
+            if success then
+                local finished = waitForSafeExit()
+                repeat task.wait() until finished
+                game:GetService("ReplicatedStorage").EntityInfo.CamLock:FireServer()
+            end
+            
+            task.wait()
+        until isSafeCheck()
+    end
+    
+    table.remove(autoWardrobeEntities, entityTrackingIndex)
+    
+    Notify({
+        Title = notifPrefix,
+        Description = "Finished.",
+    })
+end
+
+local function OnEntityAdded(child)
+    if not table.find(trackedEntities, child.Name) then return end
+    
+    if not child:FindFirstChild("PrimaryPart") then
+        local primaryPartAdded
+        primaryPartAdded = child.ChildAdded:Connect(function(added)
+            if added.Name == "PrimaryPart" then
+                primaryPartAdded:Disconnect()
+                task.wait()
+                if _G.msdoors_autohide then
+                    task.spawn(function()
+                        AutoWardrobe(child)
+                    end)
+                end
+            end
+        end)
+    else
+        if _G.msdoors_autohide then
+            task.spawn(function()
+                AutoWardrobe(child)
+            end)
+        end
+    end
+end
+
+game:GetService("ReplicatedStorage").EntityInfo.HideMonster.OnClientEvent:Connect(function()
+    local floorName = _G.msdoors_floor
+    if floorName == "Backdoor" or floorName == "Rooms" or floorName == "Retro" then return end
+    
+    local hideTime = CalculateHideTime(GetCurrentRoom()) or math.huge
+    local finalTime = tick() + math.round(hideTime)
+    
+    if _G.msdoors_notifyHideTime and hideTime ~= math.huge then
+        while player.Character:GetAttribute("Hiding") and IsAlive() and _G.msdoors_notifyHideTime do
+            local remainingTime = math.max(0, finalTime - tick())
+            
+            -- Show remaining time
+            if game:GetService("ReplicatedStorage"):FindFirstChild("EntityInfo") and 
+               game:GetService("ReplicatedStorage").EntityInfo:FindFirstChild("Caption") then
+                game:GetService("ReplicatedStorage").EntityInfo.Caption:FireClient(player, string.format("%.1f", remainingTime))
+            end
+            
+            task.wait()
+        end
+    end
+end)
+
+workspace.ChildAdded:Connect(OnEntityAdded)
+for _, child in ipairs(workspace:GetChildren()) do
+    task.spawn(function()
+        OnEntityAdded(child)
+    end)
+end
+
+
+    GroupAuto:AddDivider()
+    
+    GroupAuto:AddToggle("AutoWardrobeNotif", {
+        Text = "Auto " .. hidingPlaceName[_G.msdoors_floor] .. " Notifications",
+        Default = false,
+        Callback = function(Value)
+            _G.msdoors_autohide_notifications = Value
+        end
+    })
+    
+    GroupAuto:AddToggle("AutoWardrobe", {
+        Text = "Auto " .. hidingPlaceName[_G.msdoors_floor],
+        Default = false,
+        Tooltip = "Might fail with multiple entities (Rush & Ambush, 3+ Rush spawns)",
+        Risky = true,
+        Callback = function(Value)
+            _G.msdoors_autohide = Value
+        end
+    }):AddKeyPicker("AutoWardrobeKey", {
+        Mode = "Toggle",
+        Default = "Q",
+        Text = "Auto " .. hidingPlaceName[_G.msdoors_floor],
+        SyncToggleState = true
+    })
+    
+    GroupAuto:AddToggle("NotifyHideTime", {
+        Text = "Notify Hide Time",
+        Default = false,
+        Callback = function(Value)
+            _G.msdoors_notifyHideTime = Value
+        end
+    })
+    
+    GroupAuto:AddDivider()
+
+
+player:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+    local currentRoom = player:GetAttribute("CurrentRoom")
+end)
+
+
+return {
+    AutoWardrobe = AutoWardrobe
+}
 --// ADDONS \\--
 task.spawn(function()
     local AddonTab = Window:AddTab("Addons [BETA]", "package-plus")
