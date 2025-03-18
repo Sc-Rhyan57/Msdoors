@@ -32,7 +32,6 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
-_G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
 _G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
 _G.msdoors_ThoughtsEnabled = _G.msdoors_ThoughtsEnabled or false
