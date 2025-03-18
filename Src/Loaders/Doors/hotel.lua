@@ -2784,6 +2784,40 @@ GroupReach:AddToggle("DoorReach", {
     end
 })
 
+_G.msdoors_doorHitbox = _G.msdoors_doorHitbox or false
+local defaultSizes = {}
+
+local function updateDoors()
+    for _, door in pairs(workspace.CurrentRooms:GetDescendants()) do
+        if door:IsA("BasePart") and door.Name == "Door" then
+            if _G.msdoors_doorHitbox then
+                if not defaultSizes[door] then
+                    defaultSizes[door] = door.Size
+                end
+                door.Size = Vector3.new(30, door.Size.Y, door.Size.Z)
+            else
+                if defaultSizes[door] then
+                    door.Size = defaultSizes[door]
+                end
+            end
+        end
+    end
+end
+
+DoorReach:OnChanged(function(state)
+    _G.msdoors_doorHitbox = state
+    updateDoors()
+end)
+
+game.Workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("BasePart") and descendant.Name == "Door" and _G.msdoors_doorHitbox then
+        if not defaultSizes[descendant] then
+            defaultSizes[descendant] = descendant.Size
+        end
+        descendant.Size = Vector3.new(30, descendant.Size.Y, descendant.Size.Z)
+    end
+end)
+
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
     Min = 7,
