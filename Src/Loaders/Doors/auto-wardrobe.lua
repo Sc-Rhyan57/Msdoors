@@ -406,20 +406,18 @@ local floorName = _G.msdoors_floor or "Hotel"
 
 -- Adicionando os toggles diretamente na interface LinoriaLib
 -- Toggle para Auto Armário
-GroupAuto:AddToggle("AutoWardrobe", {
-    Text = "Auto armário",
-    Default = false,
-    Tooltip = "Pode falhar com múltiplas entidades (Rush & Ambush, 3+ Rush spawns)",
-    Risky = true,
-    Callback = function(Value)
-        _G.msdoors_autohide = Value
-    end,
-}):AddKeyPicker("AutoWardrobeKey", {
-    Mode = "Toggle",
-    Default = "Q",
-    Text = "Auto " .. HidingPlaceName[floorName],
-    SyncToggleState = true
+LeftGroupBox:AddToggle("AutoHide", {
+	Text = "Auto " .. HidingPlaceName[floorName],
+	DisabledTooltip = "I am disabled!",
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+            _G.msdoors_autohide = Value
+	end,
 })
+
 
 -- Toggle para notificações
 GroupAuto:AddToggle("AutoWardrobeNotif", {
