@@ -2763,7 +2763,8 @@ GroupReach:AddToggle("DoorReach", {
     Default = _G.msdoors_DoorReach,
     Callback = function(Value)
         _G.msdoors_DoorReach = Value
-
+         _G.msdoors_doorHitbox = Value
+         updateDoors()
         if state then
             local connection
             connection = RunService.Heartbeat:Connect(function()
@@ -2803,11 +2804,6 @@ local function updateDoors()
         end
     end
 end
-
-DoorReach:OnChanged(function(state)
-    _G.msdoors_doorHitbox = state
-    updateDoors()
-end)
 
 game.Workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     if descendant:IsA("BasePart") and descendant.Name == "Door" and _G.msdoors_doorHitbox then
