@@ -32,6 +32,7 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions ir false
+_G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false  
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
 _G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
 _G.msdoors_AntiSnare = _G.msdoors_AntiSnare or false
@@ -369,7 +370,7 @@ GroupHotel:AddToggle("HasteClockToggle", {
     Text = "Haste Clock",
     Tooltip = "Shows a timer for Haste events",
     DisabledTooltip = "Haste Clock is disabled",
-    Default = false,
+    Default = _G.msdoors_HasteClockEnabled,
     Disabled = false,
     Visible = true,
     Risky = false,
@@ -1846,13 +1847,12 @@ GroupVPlayer:AddToggle("Visual-No-Wardobre-Vignette", {
 	end,
 })
 
-local Toggles = {}
-local InstaInteractEnabled = false
 
+_G.msdoors_Toggles = _G.msdoors_Toggles or {}  
 local function UpdateProximityPrompts()
     for _, prompt in pairs(workspace.CurrentRooms:GetDescendants()) do
         if prompt:IsA("ProximityPrompt") then
-            if InstaInteractEnabled then
+            if _G.msdoors_InstaInteractEnabled then
                 if not prompt:GetAttribute("Hold") then 
                     prompt:SetAttribute("Hold", prompt.HoldDuration)
                 end
@@ -1863,9 +1863,10 @@ local function UpdateProximityPrompts()
         end
     end
 end
+
 workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     if descendant:IsA("ProximityPrompt") then
-        if InstaInteractEnabled then
+        if _G.msdoors_InstaInteractEnabled then
             if not descendant:GetAttribute("Hold") then 
                 descendant:SetAttribute("Hold", descendant.HoldDuration)
             end
@@ -1882,10 +1883,11 @@ GroupAuto:AddToggle("Main-Insta-Interact", {
 	Visible = true,
 	Risky = false,
 	Callback = function(value)
-        InstaInteractEnabled = value
+        _G.msdoors_InstaInteractEnabled = value
         UpdateProximityPrompts()
 	end,
 })
+
 
 _G.msdoors = _G.msdoors or {}
 _G.msdoors.autoInteract = {
