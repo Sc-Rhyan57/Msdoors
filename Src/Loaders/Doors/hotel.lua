@@ -33,8 +33,12 @@ _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors.autoInteract.Enabled = _G.msdoors.autoInteract.Enabled or false
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions ir false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
+
+_G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
 _G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
+_G.msdoors_ThoughtsEnabled = _G.msdoors_ThoughtsEnabled or false
 _G.msdoors_AntiGiggle = _G.msdoors_AntiGiggle or false
+_G.msdoors_atualizarPropriedadesFisicas = _G.msdoors_atualizarPropriedadesFisicas or false
 _G.msdoors_AntiSeekDoor = _G.msdoors_AntiSeekDoor or false
 _G.msdoors_AntiSnare = _G.msdoors_AntiSnare or false
 _G.msdoors_DupeRunning = _G.msdoors_DupeRunning or false
@@ -47,12 +51,15 @@ _G.msdoors_antijumpscares = _G.msdoors_antijumpscares or false
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
 _G.msdoors_antiscreech = _G.msdoors_antiscreech or false
 _G.msdoors_antidread = _G.msdoors_antidread or false
+_G.MSDoors_SpeedBypass = _G.MSDoors_SpeedBypass or false
+_G.MSDoors_SpeedBypassDelay = _G.MSDoors_SpeedBypassDelay or 0.23
 _G.msdoors_CurrentlyUsingSGF = _G.msdoors_CurrentlyUsingSGF or false
 _G.msdoors_SpeedBypassBeTurned = _G.msdoors_SpeedBypassBeTurned or nil
 _G.msdoors_SpeedHackBeTurned = _G.msdoors_SpeedHackBeTurned or nil
 _G.MaxActivationDistance = _G.MaxActivationDistance or 7
 _G.PromptClip = _G.PromptClip or false
 _G.msdoors_antieyes = _G.msdoors_antieyes or false
+_G.MSDoors_SpeedBypass = _G.MSDoors_SpeedBypass or false
 _G.msdoors_antilag = {
     Enabled = false,
     Connection = nil,
@@ -2683,28 +2690,31 @@ GroupTroll:AddToggle("Troll-Stunned-animation", {
 	end,
 })
 
+_G.msdoors_AnimTrack = _G.msdoors_AnimTrack or nil  
 GroupTroll:AddToggle("Troll-Thoughts", {
 	Text = "Thoughts",
 	Tooltip = "Faz seu personagem ficar com uma animação de pensamento.",
 	DisabledTooltip = "I am disabled!",
-	Default = false,
+	Default = _G.msdoors_ThoughtsEnabled,
 	Disabled = false,
 	Visible = true,
 	Risky = false,
 	Callback = function(Value)
+        _G.msdoors_ThoughtsEnabled = Value  
         local lplr = game.Players.LocalPlayer
         local thinkanims = {"18885101321", "18885098453", "18885095182"}
         
-        if Value then
+        if _G.msdoors_ThoughtsEnabled then
             local animation = Instance.new("Animation")
             animation.AnimationId = "rbxassetid://" .. thinkanims[math.random(1, #thinkanims)]
-            animtrack = lplr.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
-            animtrack.Looped = true
-            animtrack:Play()
+            _G.msdoors_AnimTrack = lplr.Character:FindFirstChildWhichIsA("Humanoid"):LoadAnimation(animation)
+            _G.msdoors_AnimTrack.Looped = true
+            _G.msdoors_AnimTrack:Play()
         else
-            if animtrack then
-                animtrack:Stop()
-                animtrack:Destroy()
+            if _G.msdoors_AnimTrack then
+                _G.msdoors_AnimTrack:Stop()
+                _G.msdoors_AnimTrack:Destroy()
+                _G.msdoors_AnimTrack = nil  
             end
         end
 	end,
@@ -2763,7 +2773,7 @@ GroupReach:AddSlider("Main-MaxActivationDistance", {
 
 GroupNot:AddToggle("Visual-Notifier-Entities", {
     Text = "Notificar Entidades",
-    Default = false,
+    Default = notificationsEnabled,
     Callback = function(value)
         notificationsEnabled = value
     end,
@@ -2950,10 +2960,8 @@ SelfTabE:AddToggle("Anti-Jumpscares", {
 --// SPEED BYPASS \\--
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
-_G.MSDoors_SpeedBypass = false
+
 _G.MSDoors_EnableJump = false
-_G.MSDoors_SpeedBypassDelay = 0.23
-_G.MSDoors_WalkSpeed = 15
 _G.MSDoors_FlySpeed = 15
 
 
@@ -3049,7 +3057,7 @@ GroupPlayer:AddToggle("WalkSpeed", {
 })
 GroupPlayer:AddSlider("WalkSpeedVelocity", {
 	Text = "WalkSpeed",
-	Default = 15,
+	Default = _G.MSDoors_WalkSpeed,
 	Min = 0,
 	Max = 100,
 	Rounding = 1,
@@ -3098,7 +3106,7 @@ end
 GroupPlayer:AddToggle("NoAccel", {
     Text = "No Acceleration",
     DisabledTooltip = "No Acceleration está desativado",
-    Default = false,
+    Default = _G.msdoors_atualizarPropriedadesFisicas,
     Disabled = false,
     Visible = true,
     Risky = false,
@@ -3133,7 +3141,7 @@ end
 GroupBypass:AddToggle("SpeedBypass", {
 	Text = "Speed Bypass",
 	DisabledTooltip = "I am disabled!",
-	Default = false,
+	Default = _G.MSDoors_SpeedBypass,
 	Disabled = false,
 	Visible = true,
 	Risky = false,
@@ -3156,7 +3164,7 @@ GroupBypass:AddToggle("SpeedBypass", {
 
 GroupBypass:AddSlider("WalkSpeedVelocity", {
 	Text = "Speed Bypass delay",
-	Default = 0.23,
+	Default = _G.MSDoors_SpeedBypassDelay,
 	Min = 0.22,
 	Max = 0.26,
 	Rounding = 1,
@@ -3361,7 +3369,7 @@ MenuGroup:AddToggle("ShowCustomCursor", {
 	end,
 })
 MenuGroup:AddDropdown("DPIDropdown", {
-	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Values = { "50%", "75%", "85%", "95%", "100%", "125%", "150%", "175%", "200%" },
 	Default = "100%",
 
 	Text = "DPI Scale",
@@ -3415,7 +3423,7 @@ MenuGroup:AddButton("Unload", function()
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
 end)
 
-_G.webhookEnabled = _G.webhookEnabled or true
+_G.webhookEnabled = _G.webhookEnabled or false
 _G.msdoors_webhook = _G.msdoors_webhook or "https://discord.com/api/webhooks/seu_id/seu_token"
 
 function SendEmbed(options)
@@ -3488,7 +3496,7 @@ end
 MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
 MenuDiscord:AddToggle("Webhook", {
     Text = "Webhook",
-    Default = false,
+    Default = _G.webhookEnabled,
     Disabled = false,
     Callback = function(Value)
         _G.webhookEnabled = Value
@@ -3496,7 +3504,7 @@ MenuDiscord:AddToggle("Webhook", {
 })
 MenuDiscord:AddDivider()
 MenuDiscord:AddInput("webhooklink", {
-    Default = "URL do Webhook",
+    Default = _G.msdoors_webhook,
     Numeric = false,
     Finished = false, 
     ClearTextOnFocus = true,
