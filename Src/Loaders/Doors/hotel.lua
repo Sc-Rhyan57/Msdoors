@@ -32,7 +32,8 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
-_G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 10
+_G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 20
+_G.msdoors_notpadlock = _G.msdoors_notpadlock or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
 _G.msdoors_DoorReach = _G.msdoors_DoorReach or false
 _G.msdoors_FigureDeaf = _G.msdoors_FigureDeaf or false
@@ -2165,17 +2166,6 @@ GroupAuto:AddToggle("AutoLibrarySolver", {
                             local code = { [1] = codeString }
                             game:GetService("ReplicatedStorage").RemotesFolder.PL:FireServer(unpack(code))
                         end
-
-                        Notify({
-                            Title = "Padlock Code",
-                            Description = string.format("Código da biblioteca: %s", codeString),
-                            Reason = tonumber(codeString) and "Resolvi o código do cadeado da biblioteca" or "Ainda faltam alguns livros",
-                            Image = "rbxassetid://",
-                            Color = Color3.fromRGB(255, 0, 0),
-                            Style = "SISTEMA",
-                            Duration = 6,
-                            NotifyStyle = _G.msdoors_LibraryNotif
-                        })
 			SendEmbed({
                              username = "Msdoors bot",
                              avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
@@ -2193,11 +2183,42 @@ GroupAuto:AddToggle("AutoLibrarySolver", {
                              thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
                              fields = { }
                          })
+			if _G.msdoors_notpadlock then
+			   Notify({
+                            Title = "Padlock Code",
+                            Description = string.format("Código da biblioteca: %s", codeString),
+                            Reason = tonumber(codeString) and "Resolvi o código do cadeado da biblioteca" or "Ainda faltam alguns livros",
+                            Image = "rbxassetid://",
+                            Color = Color3.fromRGB(255, 0, 0),
+                            Style = "SISTEMA",
+                            Duration = 6,
+                            NotifyStyle = _G.msdoors_LibraryNotif
+                        })
+									
+			TrySendChatMessage(string.format("Código da biblioteca: %s", codeString))
+			else
+			print(string.format("Código da biblioteca: %s", codeString))
+			end
+							
                     end)
                 end
             end
         end
     end
+})
+
+GroupAuto:AddSlider("autolibrarydistance", {
+	Text = "Distance to open",
+	Default = _G.msdoors_disAutoLibrary,
+	Min = 0,
+	Max = 120,
+	Rounding = 1,
+	Compact = true,
+	Callback = function(Value)
+		_G.msdoors_disAutoLibrary = Value
+	end,
+	DisabledTooltip = "I am disabled!",
+	Disabled = false,
 })
 
 GroupPlayer:AddToggle("EnableJump", {
@@ -2915,6 +2936,13 @@ GroupNot:AddToggle("Visual-Notifier-Entities", {
     end,
 })
 
+GroupNot:AddToggle("NotPadlockCode", {
+    Text = "Notify padlock code",
+    Default = _G.msdoors_notpadlock,
+    Callback = function(value)
+        _G.msdoors_notpadlock = Value
+    end,
+})
 
 GroupNotC:AddToggle("Chat-Notifier", {
     Text = "Enviar notificações no chat",
