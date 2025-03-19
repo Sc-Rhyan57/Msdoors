@@ -2901,16 +2901,23 @@ end)
 GroupReach:AddToggle("DoorReach", {
     Text = "Door Reach",
     Default = _G.msdoorsDoorReach,
+    
     Callback = function(Value)
         _G.msdoorsDoorReach = Value
+        
         if _G.doorReachConnection then
             _G.doorReachConnection:Disconnect()
             _G.doorReachConnection = nil
         end
+        
         if _G.msdoorsDoorReach then
-            _G.doorReachConnection = player:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
-                local currentRoom = player:GetAttribute("CurrentRoom")
-                if currentRoom then
+            local GameData = game:GetService("ReplicatedStorage"):WaitForChild("GameData")
+            local LatestRoomValue = GameData:WaitForChild("LatestRoom")
+            
+            _G.doorReachConnection = LatestRoomValue.Changed:Connect(function()
+                local currentRoom = LatestRoomValue.Value
+                
+                if currentRoom and workspace.CurrentRooms:FindFirstChild(currentRoom) then
                     local door = workspace.CurrentRooms[currentRoom]:FindFirstChild("Door")
                     if door and door:FindFirstChild("ClientOpen") then
                         door.ClientOpen:FireServer()
@@ -2918,8 +2925,8 @@ GroupReach:AddToggle("DoorReach", {
                 end
             end)
             
-            local currentRoom = player:GetAttribute("CurrentRoom")
-            if currentRoom then
+            local currentRoom = LatestRoomValue.Value
+            if currentRoom and workspace.CurrentRooms:FindFirstChild(currentRoom) then
                 local door = workspace.CurrentRooms[currentRoom]:FindFirstChild("Door")
                 if door and door:FindFirstChild("ClientOpen") then
                     door.ClientOpen:FireServer()
@@ -2928,7 +2935,6 @@ GroupReach:AddToggle("DoorReach", {
         end
     end
 })
-
 
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
