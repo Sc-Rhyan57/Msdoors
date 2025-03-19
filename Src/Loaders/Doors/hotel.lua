@@ -55,6 +55,7 @@ _G.msdoors_anticutscenes = _G.msdoors_anticutscenes or false
 _G.msdoors_antijumpscares = _G.msdoors_antijumpscares or false
 _G.msdoors_antia90 = _G.msdoors_antia90 or false
 _G.msdoors_antiscreech = _G.msdoors_antiscreech or false
+_G.msdoors_antiShade = _G.msdoors_antiShade or false
 _G.msdoors_antidread = _G.msdoors_antidread or false
 _G.MSDoors_SpeedBypass = _G.MSDoors_SpeedBypass or false
 _G.MSDoors_SpeedBypassDelay = _G.MSDoors_SpeedBypassDelay or 0.23
@@ -2616,7 +2617,7 @@ GroupAntiEntity:AddToggle("Anti-Screech", {
 	Visible = true,
 	Risky = false,
 	Callback = function(Value)
-        _G.msdoors_antiscppreech = Value
+        _G.msdoors_antiscreech = Value
         toggleScreech(Value)
 	end,
 })
@@ -2808,6 +2809,40 @@ GroupAntiEntity:AddToggle("AntiHearing", {
             end
         end
     end
+})
+
+-- Variável global
+_G.msdoors_antiShade = _G.msdoors_antiShade or false
+
+local function toggleShade(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local shade = modules:FindFirstChild("Shade") or modules:FindFirstChild("Shade_MSDOORS_DISABLE")
+    if not shade then return end
+
+    shade.Name = enabled and "Shade_MSDOORS_DISABLE" or "Shade"
+end
+
+GroupAntiEntity:AddToggle("Anti-Shade", {
+	Text = "Anti Halt",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antiShade,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antiShade = Value
+        toggleShade(Value)
+	end,
 })
 
 GroupTroll:AddToggle("Troll-Stunned-animation", {
