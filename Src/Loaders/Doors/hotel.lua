@@ -2949,7 +2949,7 @@ GroupNot:AddToggle("NotPadlockCode", {
     Text = "Notify padlock code",
     Default = _G.padlocknotify_chatActive,
     Callback = function(value)
-        _G.padlocknotify_chatActive = Value
+        _G.padlocknotify_chatActive = value
     end,
 })
 
