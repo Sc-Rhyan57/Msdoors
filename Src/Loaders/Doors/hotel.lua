@@ -2177,22 +2177,22 @@ GroupAuto:AddToggle("AutoLibrarySolver", {
                             NotifyStyle = _G.msdoors_LibraryNotif
                         })
 			SendEmbed({
-                     username = "Msdoors bot",
-                     avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
-                     content = "dsc.gg/msdoors-gg",      
-                     title = "PadLock Code",             
-                     description = string.format("Código da biblioteca: %s", codeString),          
-                     url = "",       
-                     color = 65280,                                 
-                     author_name = "Padlock code",
-                     author_url = "",
-                     author_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
-                     footer_text = "msdoors • " .. game.JobId,
-                     footer_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
-                     image_url = "",
-                     thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
-                     fields = { }
-                               })
+                             username = "Msdoors bot",
+                             avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                             content = "dsc.gg/msdoors-gg",      
+                             title = "PadLock Code",             
+                             description = string.format("Código da biblioteca: %s", codeString),          
+                             url = "",       
+                             color = 65280,                                 
+                             author_name = "Padlock code",
+                             author_url = "",
+                             author_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                             footer_text = "msdoors • " .. game.JobId,
+                             footer_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                             image_url = "",
+                             thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                             fields = { }
+                         })
                     end)
                 end
             end
