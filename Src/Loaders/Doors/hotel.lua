@@ -2911,10 +2911,11 @@ GroupReach:AddToggle("DoorReach", {
         end
         
         if _G.msdoorsDoorReach then
+            local RunService = game:GetService("RunService")
             local GameData = game:GetService("ReplicatedStorage"):WaitForChild("GameData")
             local LatestRoomValue = GameData:WaitForChild("LatestRoom")
             
-            _G.doorReachConnection = LatestRoomValue.Changed:Connect(function()
+            _G.doorReachConnection = RunService.Heartbeat:Connect(function()
                 local currentRoom = LatestRoomValue.Value
                 
                 if currentRoom and workspace.CurrentRooms:FindFirstChild(currentRoom) then
@@ -2924,14 +2925,6 @@ GroupReach:AddToggle("DoorReach", {
                     end
                 end
             end)
-            
-            local currentRoom = LatestRoomValue.Value
-            if currentRoom and workspace.CurrentRooms:FindFirstChild(currentRoom) then
-                local door = workspace.CurrentRooms[currentRoom]:FindFirstChild("Door")
-                if door and door:FindFirstChild("ClientOpen") then
-                    door.ClientOpen:FireServer()
-                end
-            end
         end
     end
 })
