@@ -38,7 +38,7 @@ _G.msdoors_NoFog = _G.msdoors_NoFog or false
 _G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 20
 _G.msdoors_notpadlock = _G.msdoors_notpadlock or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
-_G.msdoors_DoorReach = _G.msdoors_DoorReach or false
+_G.msdoorsDoorReach = _G.msdoorsDoorReach or false
 _G.msdoors_FigureDeaf = _G.msdoors_FigureDeaf or false
 _G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
 _G.msdoors_ThoughtsEnabled = _G.msdoors_ThoughtsEnabled or false
@@ -2898,31 +2898,37 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-
 GroupReach:AddToggle("DoorReach", {
     Text = "Door Reach",
-    Default = _G.msdoors_DoorReach,
+    Default = _G.msdoorsDoorReach,
     Callback = function(Value)
-        _G.msdoors_DoorReach = Value
-        if state then
-            local connection
-            connection = RunService.Heartbeat:Connect(function()
-                if not _G.msdoors_DoorReach then
-                    connection:Disconnect()
-                    return
-                end
-
-                if Toggles.DoorReach.Value and workspace.CurrentRooms:FindFirstChild(Script.LatestRoom.Value) then
-                    local door = workspace.CurrentRooms[Script.LatestRoom.Value]:FindFirstChild("Door")
-
+        _G.msdoorsDoorReach = Value
+        if _G.doorReachConnection then
+            _G.doorReachConnection:Disconnect()
+            _G.doorReachConnection = nil
+        end
+        if _G.msdoorsDoorReach then
+            _G.doorReachConnection = player:GetAttributeChangedSignal("CurrentRoom"):Connect(function()
+                local currentRoom = player:GetAttribute("CurrentRoom")
+                if currentRoom then
+                    local door = workspace.CurrentRooms[currentRoom]:FindFirstChild("Door")
                     if door and door:FindFirstChild("ClientOpen") then
                         door.ClientOpen:FireServer()
                     end
                 end
             end)
+            
+            local currentRoom = player:GetAttribute("CurrentRoom")
+            if currentRoom then
+                local door = workspace.CurrentRooms[currentRoom]:FindFirstChild("Door")
+                if door and door:FindFirstChild("ClientOpen") then
+                    door.ClientOpen:FireServer()
+                end
+            end
         end
     end
 })
+
 
 GroupReach:AddSlider("Main-MaxActivationDistance", {
     Text = "Prompt Reach Multiplier",
