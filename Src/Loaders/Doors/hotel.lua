@@ -2947,9 +2947,9 @@ GroupNot:AddToggle("Visual-Notifier-Entities", {
 
 GroupNot:AddToggle("NotPadlockCode", {
     Text = "Notify padlock code",
-    Default = _G.msdoors_notpadlock,
+    Default = _G.padlocknotify_chatActive,
     Callback = function(value)
-        _G.msdoors_notpadlock = Value
+        _G.padlocknotify_chatActive = Value
     end,
 })
 
