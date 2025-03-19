@@ -32,6 +32,7 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
+_G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 10
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
 _G.msdoors_DoorReach = _G.msdoors_DoorReach or false
 _G.msdoors_FigureDeaf = _G.msdoors_FigureDeaf or false
@@ -2124,6 +2125,80 @@ end
 InitializeScript()
 task.spawn(AutoInteractLoop)
 
+GroupAuto:AddDivider()
+GroupAuto:AddToggle("AutoLibrarySolver", {
+    Text = "Auto Library Solver",
+    Default = false,
+    Callback = function(value)
+        if value then
+            for _, player in pairs(game.Players:GetPlayers()) do
+                local character = player.Character
+                if character then
+                    character.ChildAdded:Connect(function(child)
+                        if not (child:IsA("Tool") and child.Name:match("LibraryHintPaper")) then return end
+
+                        task.wait(0.1)
+                        local codeData = {}
+
+                        if child:FindFirstChild("UI") then
+                            for _, img in pairs(child.UI:GetChildren()) do
+                                if img:IsA("ImageLabel") and tonumber(img.Name) then
+                                    codeData[img.ImageRectOffset.X .. img.ImageRectOffset.Y] = {tonumber(img.Name), "_"}
+                                end
+                            end
+                        end
+
+                        for _, img in pairs(game.Players.LocalPlayer.PlayerGui.PermUI.Hints:GetChildren()) do
+                            if img.Name == "Icon" and codeData[img.ImageRectOffset.X .. img.ImageRectOffset.Y] then
+                                codeData[img.ImageRectOffset.X .. img.ImageRectOffset.Y][2] = img.TextLabel.Text
+                            end
+                        end
+
+                        local finalCode = {}
+                        for _, num in pairs(codeData) do
+                            finalCode[num[1]] = num[2]
+                        end
+                        local codeString = table.concat(finalCode)
+
+                        local padlock = workspace:FindFirstChild("Padlock", true)
+                        if tonumber(codeString) and padlock and (padlock.PrimaryPart.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude <= _G.msdoors_disAutoLibrary then
+                            local code = { [1] = codeString }
+                            game:GetService("ReplicatedStorage").RemotesFolder.PL:FireServer(unpack(code))
+                        end
+
+                        Notify({
+                            Title = "Padlock Code",
+                            Description = string.format("Código da biblioteca: %s", codeString),
+                            Reason = tonumber(codeString) and "Resolvi o código do cadeado da biblioteca" or "Ainda faltam alguns livros",
+                            Image = "rbxassetid://",
+                            Color = Color3.fromRGB(255, 0, 0),
+                            Style = "SISTEMA",
+                            Duration = 6,
+                            NotifyStyle = _G.msdoors_LibraryNotif
+                        })
+			SendEmbed({
+                     username = "Msdoors bot",
+                     avatar_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                     content = "dsc.gg/msdoors-gg",      
+                     title = "PadLock Code",             
+                     description = string.format("Código da biblioteca: %s", codeString),          
+                     url = "",       
+                     color = 65280,                                 
+                     author_name = "Padlock code",
+                     author_url = "",
+                     author_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                     footer_text = "msdoors • " .. game.JobId,
+                     footer_icon_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                     image_url = "",
+                     thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
+                     fields = { }
+                               })
+                    end)
+                end
+            end
+        end
+    end
+})
 
 GroupPlayer:AddToggle("EnableJump", {
     Text = "Habilitar Pulo",
@@ -2839,6 +2914,7 @@ GroupNot:AddToggle("Visual-Notifier-Entities", {
         notificationsEnabled = value
     end,
 })
+
 
 GroupNotC:AddToggle("Chat-Notifier", {
     Text = "Enviar notificações no chat",
