@@ -2122,9 +2122,24 @@ local function AutoInteractLoop()
         end
     end
 end
-
 InitializeScript()
 task.spawn(AutoInteractLoop)
+
+_G.padlocknotify_chatActive = _G.padlocknotify_chatActive or false
+
+local function padlocknotify(message)
+    if _G.padlocknotify_chatActive then
+        local TextChatService = game:GetService("TextChatService")
+
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            local textChannel = TextChatService.TextChannels.RBXGeneral
+            textChannel:SendAsync(message)
+        else
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+        end
+    end
+end
+
 
 GroupAuto:AddDivider()
 GroupAuto:AddToggle("AutoLibrarySolver", {
@@ -2183,7 +2198,7 @@ GroupAuto:AddToggle("AutoLibrarySolver", {
                              thumbnail_url = "https://msdoors-gg.vercel.app/favicon.ico",
                              fields = { }
                          })
-			if _G.msdoors_notpadlock then
+			if _G.padlocknotify_chatActive then
 			   Notify({
                             Title = "Padlock Code",
                             Description = string.format("Código da biblioteca: %s", codeString),
@@ -2195,7 +2210,7 @@ GroupAuto:AddToggle("AutoLibrarySolver", {
                             NotifyStyle = _G.msdoors_LibraryNotif
                         })
 									
-			TrySendChatMessage(string.format("Código da biblioteca: %s", codeString))
+			padlocknotify(string.format("Código da biblioteca: %s", codeString))
 			else
 			print(string.format("Código da biblioteca: %s", codeString))
 			end
@@ -3342,7 +3357,6 @@ GroupBypass:AddSlider("WalkSpeedVelocity", {
 
 
 MSDoors_SetupCollision()
-
 LocalPlayer.CharacterAdded:Connect(function(NewCharacter)
     Character = NewCharacter
     RootPart = Character:WaitForChild("HumanoidRootPart")
