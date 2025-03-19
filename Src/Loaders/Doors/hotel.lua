@@ -32,6 +32,9 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
+_G.msdoors_Brightness = _G.msdoors_Brightness or 0
+_G.msdoors_Fullbright = _G.msdoors_Fullbright or false
+_G.msdoors_NoFog = _G.msdoors_NoFog or false
 _G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 20
 _G.msdoors_notpadlock = _G.msdoors_notpadlock or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
@@ -1859,6 +1862,100 @@ GroupVPlayer:AddToggle("Visual-No-Wardobre-Vignette", {
 	end,
 })
 
+_G.msdoors_fullbrightConnection = nil
+GroupAmbient:AddSlider("Brightness", {
+    Text = "Brilho",
+    Default = _G.msdoors_Brightness,
+    Min = 0,
+    Max = 20,
+    Rounding = 1,
+    Callback = function(value)
+        _G.msdoors_Brightness = value
+        Lighting.Brightness = value
+    end
+})
+
+GroupAmbient:AddToggle("Fullbright", {
+   Text = "Brilho total",
+   Default = _G.msdoors_Fullbright,
+   Callback = function(value)
+       _G.msdoors_Fullbright = value
+       
+       if value then
+           Lighting.Ambient = Color3.new(1, 1, 1)
+           
+           if _G.msdoors_fullbrightConnection then
+               _G.msdoors_fullbrightConnection:Disconnect()
+           end
+           
+           _G.msdoors_fullbrightConnection = game:GetService("RunService").RenderStepped:Connect(function()
+               Lighting.Ambient = Color3.new(1, 1, 1)
+           end)
+       else
+           if _G.msdoors_fullbrightConnection then
+               _G.msdoors_fullbrightConnection:Disconnect()
+               _G.msdoors_fullbrightConnection = nil
+           end
+           
+           local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
+           if currentRoom and workspace:FindFirstChild("CurrentRooms") and workspace.CurrentRooms:FindFirstChild(currentRoom) then
+               Lighting.Ambient = workspace.CurrentRooms[currentRoom]:GetAttribute("Ambient") or Color3.new(0, 0, 0)
+           else
+               Lighting.Ambient = Color3.new(0, 0, 0)
+           end
+       end
+   end
+})
+
+GroupAmbient:AddToggle("NoFog", {
+    Text = "No Fog",
+    Default = _G.msdoors_NoFog,
+    Callback = function(value)
+        _G.msdoors_NoFog = value
+        
+        if not Lighting:GetAttribute("FogStart") then
+            Lighting:SetAttribute("FogStart", Lighting.FogStart)
+        end
+        if not Lighting:GetAttribute("FogEnd") then
+            Lighting:SetAttribute("FogEnd", Lighting.FogEnd)
+        end
+
+        Lighting.FogStart = value and 0 or Lighting:GetAttribute("FogStart")
+        Lighting.FogEnd = value and math.huge or Lighting:GetAttribute("FogEnd")
+
+        local fog = Lighting:FindFirstChildOfClass("Atmosphere")
+        if fog then
+            if not fog:GetAttribute("Density") then
+                fog:SetAttribute("Density", fog.Density)
+            end
+            fog.Density = value and 0 or fog:GetAttribute("Density")
+        end
+    end
+})
+
+Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
+    if _G.msdoors_Brightness then
+        Lighting.Brightness = _G.msdoors_Brightness
+    end
+end)
+
+Lighting:GetPropertyChangedSignal("Ambient"):Connect(function()
+    if _G.msdoors_Fullbright then
+        Lighting.Ambient = Color3.new(1, 1, 1)
+    end
+end)
+
+Lighting:GetPropertyChangedSignal("FogStart"):Connect(function()
+    if _G.msdoors_NoFog then
+        Lighting.FogStart = 0
+    end
+end)
+
+Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
+    if _G.msdoors_NoFog then
+        Lighting.FogEnd = math.huge
+    end
+end)
 
 _G.msdoors_Toggles = _G.msdoors_Toggles or {}  
 local function UpdateProximityPrompts()
@@ -2275,109 +2372,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     humanoid.JumpHeight = Toggles.EnableJump.Value and Toggles.JumpBoost.Value or 0
 end)
 
-local Options = {}
-
-Options.Brightness = {Value = 0}
-Options.Fullbright = {Value = false}
-Options.NoFog = {Value = false}
-
-local Lighting = game:GetService("Lighting")
-local LocalPlayer = game.Players.LocalPlayer
-local fullbrightConnection = nil
-
-GroupAmbient:AddSlider("Brightness", {
-    Text = "Brilho",
-    Default = 0,
-    Min = 0,
-    Max = 20,
-    Rounding = 1,
-    Callback = function(value)
-        Options.Brightness.Value = value
-        Lighting.Brightness = value
-    end
-})
-
-GroupAmbient:AddToggle("Fullbright", {
-   Text = "Brilho total",
-   Default = false,
-   Callback = function(value)
-       Options.Fullbright.Value = value
-       
-       if value then
-           Lighting.Ambient = Color3.new(1, 1, 1)
-           
-           if fullbrightConnection then
-               fullbrightConnection:Disconnect()
-           end
-           
-           fullbrightConnection = game:GetService("RunService").RenderStepped:Connect(function()
-               Lighting.Ambient = Color3.new(1, 1, 1)
-           end)
-       else
-           if fullbrightConnection then
-               fullbrightConnection:Disconnect()
-               fullbrightConnection = nil
-           end
-           
-           local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
-           if currentRoom and workspace:FindFirstChild("CurrentRooms") and workspace.CurrentRooms:FindFirstChild(currentRoom) then
-               Lighting.Ambient = workspace.CurrentRooms[currentRoom]:GetAttribute("Ambient") or Color3.new(0, 0, 0)
-           else
-               Lighting.Ambient = Color3.new(0, 0, 0)
-           end
-       end
-   end
-})
-
-GroupAmbient:AddToggle("NoFog", {
-    Text = "No Fog",
-    Default = false,
-    Callback = function(value)
-        Options.NoFog.Value = value
-        
-        if not Lighting:GetAttribute("FogStart") then
-            Lighting:SetAttribute("FogStart", Lighting.FogStart)
-        end
-        if not Lighting:GetAttribute("FogEnd") then
-            Lighting:SetAttribute("FogEnd", Lighting.FogEnd)
-        end
-
-        Lighting.FogStart = value and 0 or Lighting:GetAttribute("FogStart")
-        Lighting.FogEnd = value and math.huge or Lighting:GetAttribute("FogEnd")
-
-        local fog = Lighting:FindFirstChildOfClass("Atmosphere")
-        if fog then
-            if not fog:GetAttribute("Density") then
-                fog:SetAttribute("Density", fog.Density)
-            end
-            fog.Density = value and 0 or fog:GetAttribute("Density")
-        end
-    end
-})
-
-Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
-    if Options and Options.Brightness and Options.Brightness.Value then
-        Lighting.Brightness = Options.Brightness.Value
-    end
-end)
-
-Lighting:GetPropertyChangedSignal("Ambient"):Connect(function()
-    if Options and Options.Fullbright and Options.Fullbright.Value then
-        Lighting.Ambient = Color3.new(1, 1, 1)
-    end
-end)
-
-Lighting:GetPropertyChangedSignal("FogStart"):Connect(function()
-    if Options and Options.NoFog and Options.NoFog.Value then
-        Lighting.FogStart = 0
-    end
-end)
-
-Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
-    if Options and Options.NoFog and Options.NoFog.Value then
-        Lighting.FogEnd = math.huge
-    end
-end)
 
 
 function _G.msdoors_antilag:Activate()
@@ -2446,7 +2440,7 @@ end
 
 GroupAmbient:AddToggle("AntiLag", {
     Text = "Anti-Lag",
-    Default = false,
+    Default = _G.msdoors_antilag.Enabled,
     Callback = function(value)
         _G.msdoors_antilag.Enabled = value
         if value then
@@ -2665,7 +2659,7 @@ local DupeName = (_G.msdoors_floor == "Hotel" and "Anti Dupe") or
 
 GroupAntiEntity:AddToggle("Anti-Dupe", {
     Text = DupeName,
-    Default = false,
+    Default = _G.msdoors_DupeRunning,
     Callback = function(state)
         _G.msdoors_DupeRunning = state
 
@@ -2770,7 +2764,7 @@ GroupAntiEntity:AddToggle("Anti-Dupe", {
 
 GroupAntiEntity:AddToggle("AntiHearing", {
     Text = "Anti-Figure Hearing",
-    Default = false,
+    Default = _G.msdoors_FigureDeaf,
     Callback = function(state)
         _G.msdoors_FigureDeaf = state
         
