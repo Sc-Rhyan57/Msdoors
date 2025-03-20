@@ -3785,7 +3785,7 @@ function SendEmbed(options)
 
 end
 
-MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat específico no <font color="#9DABFF">Discord</font>')
+MenuDiscord:AddLabel('• Enviar informações que estão ocorrendo\n no jogo em um chat\n específico no <font color="#9DABFF">Discord</font>')
 MenuDiscord:AddToggle("Webhook", {
     Text = "Webhook",
     Default = _G.webhookEnabled,
@@ -3851,7 +3851,7 @@ MenuInterface:AddDropdown("LibraryDropdown", {
     Values = { "Obsidian", "Linoria" },
     Default = "Obsidian",
     Multi = false,
-    Text = "Escolha a Biblioteca",
+    Text = "Biblioteca",
     Tooltip = "Selecione qual biblioteca usar",
     Callback = function(selected)
         if selected == "Obsidian" then
