@@ -2911,33 +2911,43 @@ end)
 
 GroupTroll:AddToggle("SpamOtherTools", {
     Text = "Spam Other Tools",
-    Tooltip = "Spams other players' tools",
     Risky = true,
+    Tooltip = "Spams other players' tools",
     Default = _G.msdoors_spamTools,
     Callback = function(Value)
         _G.msdoors_spamTools = Value
         
+        if not _G.msdoors_spamToolConnection then
+            _G.msdoors_spamToolConnection = nil
+        end
+        
+        local function spamTool(tool)
+            local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+            if remoteEvent then
+                remoteEvent:FireServer()
+            end
+        end
+        
         if _G.msdoors_spamTools then
-            local connection
+            local RunService = game:GetService("RunService")
             
-            connection = RunService.Heartbeat:Connect(function()
+            if _G.msdoors_spamToolConnection then
+                _G.msdoors_spamToolConnection:Disconnect()
+                _G.msdoors_spamToolConnection = nil
+            end
+            
+            _G.msdoors_spamToolConnection = RunService.Heartbeat:Connect(function()
                 for _, player in pairs(game:GetService("Players"):GetPlayers()) do
                     if player == game:GetService("Players").LocalPlayer then continue end
                     
                     for _, tool in pairs(player.Backpack:GetChildren()) do
-                        local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
-                        if remoteEvent then
-                            remoteEvent:FireServer()
-                        end
+                        spamTool(tool)
                     end
                     
                     if player.Character then
                         for _, tool in pairs(player.Character:GetChildren()) do
                             if tool:IsA("Tool") then
-                                local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
-                                if remoteEvent then
-                                    remoteEvent:FireServer()
-                                end
+                                spamTool(tool)
                             end
                         end
                         
@@ -2948,20 +2958,10 @@ GroupTroll:AddToggle("SpamOtherTools", {
                     end
                 end
             end)
-            
-            spawn(function()
-                while _G.msdoors_spamTools do
-                    task.wait(0.5)
-                end
-                if connection then
-                    connection:Disconnect()
-                end
-            end)
         else
-            for _, connection in pairs(getconnections(game:GetService("RunService").Heartbeat)) do
-                if connection.Function and getfenv(connection.Function)._G == _G then
-                    connection:Disconnect()
-                end
+            if _G.msdoors_spamToolConnection then
+                _G.msdoors_spamToolConnection:Disconnect()
+                _G.msdoors_spamToolConnection = nil
             end
         end
     end,
