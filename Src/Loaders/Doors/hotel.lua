@@ -2911,44 +2911,58 @@ end)
 
 GroupTroll:AddToggle("SpamOtherTools", {
     Text = "Spam Other Tools",
-    Tooltip = "Spams other players tools",
+    Tooltip = "Spams other players' tools",
+    Risky = true,
     Default = _G.msdoors_spamTools,
     Callback = function(Value)
         _G.msdoors_spamTools = Value
         
         if _G.msdoors_spamTools then
-            spawn(function()
-                while _G.msdoors_spamTools do
-                    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-                        if player == game:GetService("Players").LocalPlayer then continue end
-                        
-                        for _, tool in pairs(player.Backpack:GetChildren()) do
-                            local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
-                            if remoteEvent then
-                                remoteEvent:FireServer()
-                            end
-                        end
-                        
-                        if player.Character then
-                            for _, tool in pairs(player.Character:GetChildren()) do
-                                if tool:IsA("Tool") then
-                                    local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
-                                    if remoteEvent then
-                                        remoteEvent:FireServer()
-                                    end
-                                end
-                            end
-                            
-                            local toolRemote = player.Character:FindFirstChild("Remote", true)
-                            if toolRemote and toolRemote:IsA("RemoteEvent") then
-                                toolRemote:FireServer()
-                            end
+            local connection
+            
+            connection = RunService.Heartbeat:Connect(function()
+                for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+                    if player == game:GetService("Players").LocalPlayer then continue end
+                    
+                    for _, tool in pairs(player.Backpack:GetChildren()) do
+                        local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+                        if remoteEvent then
+                            remoteEvent:FireServer()
                         end
                     end
                     
-                    task.delay(0.05)
+                    if player.Character then
+                        for _, tool in pairs(player.Character:GetChildren()) do
+                            if tool:IsA("Tool") then
+                                local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+                                if remoteEvent then
+                                    remoteEvent:FireServer()
+                                end
+                            end
+                        end
+                        
+                        local toolRemote = player.Character:FindFirstChild("Remote", true)
+                        if toolRemote and toolRemote:IsA("RemoteEvent") then
+                            toolRemote:FireServer()
+                        end
+                    end
                 end
             end)
+            
+            spawn(function()
+                while _G.msdoors_spamTools do
+                    task.wait(0.5)
+                end
+                if connection then
+                    connection:Disconnect()
+                end
+            end)
+        else
+            for _, connection in pairs(getconnections(game:GetService("RunService").Heartbeat)) do
+                if connection.Function and getfenv(connection.Function)._G == _G then
+                    connection:Disconnect()
+                end
+            end
         end
     end,
 })
