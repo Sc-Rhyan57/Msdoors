@@ -2909,48 +2909,48 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
+
+_G.spamToolsConnection = nil
+
 GroupTroll:AddToggle("SpamOtherTools", {
     Text = "Spam Other Tools",
+    Default = _G.msdoors_spamTool,
     Risky = true,
-    Tooltip = "Spams other players' tools",
-    Default = _G.msdoors_spamTools,
+    Tooltip = "Ativa o spam de ferramentas nos jogadores",
     Callback = function(Value)
-        _G.msdoors_spamTools = Value
-        
-        if not _G.msdoors_spamToolConnection then
-            _G.msdoors_spamToolConnection = nil
-        end
-        
-        local function spamTool(tool)
-            local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
-            if remoteEvent then
-                remoteEvent:FireServer()
+        _G.msdoors_spamTool = Value
+
+        if Value then
+            if _G.spamToolsConnection then
+                _G.spamToolsConnection:Disconnect()
+                _G.spamToolsConnection = nil
             end
-        end
-        
-        if _G.msdoors_spamTools then
-            local RunService = game:GetService("RunService")
-            
-            if _G.msdoors_spamToolConnection then
-                _G.msdoors_spamToolConnection:Disconnect()
-                _G.msdoors_spamToolConnection = nil
-            end
-            
-            _G.msdoors_spamToolConnection = RunService.Heartbeat:Connect(function()
+
+            _G.spamToolsConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if not _G.msdoors_spamTool then return end
+
                 for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-                    if player == game:GetService("Players").LocalPlayer then continue end
-                    
-                    for _, tool in pairs(player.Backpack:GetChildren()) do
-                        spamTool(tool)
+                    if player == game.Players.LocalPlayer then continue end
+
+                    if player:FindFirstChild("Backpack") then
+                        for _, tool in pairs(player.Backpack:GetChildren()) do
+                            local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+                            if remoteEvent then
+                                remoteEvent:FireServer()
+                            end
+                        end
                     end
-                    
+
                     if player.Character then
                         for _, tool in pairs(player.Character:GetChildren()) do
                             if tool:IsA("Tool") then
-                                spamTool(tool)
+                                local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+                                if remoteEvent then
+                                    remoteEvent:FireServer()
+                                end
                             end
                         end
-                        
+
                         local toolRemote = player.Character:FindFirstChild("Remote", true)
                         if toolRemote and toolRemote:IsA("RemoteEvent") then
                             toolRemote:FireServer()
@@ -2959,13 +2959,14 @@ GroupTroll:AddToggle("SpamOtherTools", {
                 end
             end)
         else
-            if _G.msdoors_spamToolConnection then
-                _G.msdoors_spamToolConnection:Disconnect()
-                _G.msdoors_spamToolConnection = nil
+            if _G.spamToolsConnection then
+                _G.spamToolsConnection:Disconnect()
+                _G.spamToolsConnection = nil
             end
         end
-    end,
+    end
 })
+
 
 GroupReach:AddToggle("Main-PromptClip", {
     Text = "Prompt Clip",
