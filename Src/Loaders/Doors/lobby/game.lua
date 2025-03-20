@@ -63,7 +63,7 @@ local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
 local GroupMain = Tabs.Main:AddLeftGroupbox("Player")
 
 --// PAGES \\--
-Groupmain:AddLabel('<font color="#00FFFF">EM BREVE!</font>')
+GroupMain:AddLabel('<font color="#00FFFF">EM BREVE!</font>')
 --// ADDONS \\--
 task.spawn(function()
     local AddonTab = Window:AddTab("Addons [BETA]", "package-plus")
