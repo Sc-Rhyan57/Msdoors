@@ -35,6 +35,7 @@ _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
 _G.msdoors_Brightness = _G.msdoors_Brightness or 0
 _G.msdoors_Fullbright = _G.msdoors_Fullbright or false
 _G.msdoors_NoFog = _G.msdoors_NoFog or false
+_G.msdoorsNoCrouchBarriers = _G.msdoorsNoCrouchBarriers or false
 _G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 20
 _G.msdoors_notpadlock = _G.msdoors_notpadlock or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
@@ -105,7 +106,6 @@ local Tabs = {
 
 --// CRÉDITS PAGE \\--
 local GroupCredits = Tabs.Credits:AddLeftGroupbox("Créditos")
-
 --// MAIN PAGE \\--
 local GroupPlayer = Tabs.Main:AddLeftGroupbox("Player")
 local GroupReach = Tabs.Main:AddLeftGroupbox("Alcance")
@@ -3416,7 +3416,88 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-
+GroupBypass:AddToggle("NoCrouchBarriers", {
+	Text = "No Crouch Barriers",
+	Tooltip = "Removes barriers that require crouching", 
+	Default = _G.msdoorsNoCrouchBarriers, 
+	Callback = function(Value)
+		_G.msdoorsNoCrouchBarriers = Value
+		
+		if not _G.storedCrouchBarriers then
+			_G.storedCrouchBarriers = {}
+		end
+		
+		if Value then
+			if not _G.crouchBarrierMonitor then
+				_G.crouchBarrierMonitor = game:GetService("RunService").RenderStepped:Connect(function()
+					local currentRooms = game.Workspace:FindFirstChild("CurrentRooms")
+					if not currentRooms then return end
+					
+					local room0 = currentRooms:FindFirstChild("0")
+					if room0 and room0:FindFirstChild("Assets") then
+						local luggageCart = room0.Assets:FindFirstChild("Luggage_Cart_Crouch")
+						if luggageCart and not _G.storedCrouchBarriers["Room0_LuggageCart"] then
+							_G.storedCrouchBarriers["Room0_LuggageCart"] = {
+								Parent = luggageCart.Parent,
+								Object = luggageCart
+							}
+							luggageCart.Parent = nil
+						end
+					end
+					
+					for _, room in ipairs(currentRooms:GetChildren()) do
+						local roomNumber = tonumber(room.Name)
+						if not roomNumber then continue end
+						
+						if room:FindFirstChild("Assets") then
+							for _, glass in ipairs(room.Assets:GetChildren()) do
+								if glass:IsA("UnionOperation") and glass.Name == "SeeThroughGlass" then
+									local identifier = "Glass_Room" .. roomNumber
+									if not _G.storedCrouchBarriers[identifier] then
+										_G.storedCrouchBarriers[identifier] = {
+											Parent = glass.Parent,
+											Object = glass
+										}
+										glass.Parent = nil
+									end
+								end
+							end
+						end
+						
+						if room:FindFirstChild("Parts") then
+							local collision = room.Parts:FindFirstChild("Collision")
+							if collision and collision:IsA("Part") then
+								local identifier = "Collision_Room" .. roomNumber
+								if not _G.storedCrouchBarriers[identifier] then
+									_G.storedCrouchBarriers[identifier] = {
+										Parent = collision.Parent,
+										Object = collision
+									}
+									collision.Parent = nil
+								end
+							end
+						end
+					end
+				end)
+			end
+		else
+			if _G.crouchBarrierMonitor then
+				_G.crouchBarrierMonitor:Disconnect()
+				_G.crouchBarrierMonitor = nil
+			end
+			
+			for identifier, barrierData in pairs(_G.storedCrouchBarriers) do
+				local parent = barrierData.Parent
+				local barrier = barrierData.Object
+				
+				if parent and parent:IsDescendant(game.Workspace) then
+					barrier.Parent = parent
+				end
+				_G.storedCrouchBarriers[identifier] = nil
+			end
+		end
+	end,
+})
 --// ADDONS \\--
 task.spawn(function()
     local AddonTab = Window:AddTab("Addons [BETA]", "package-plus")
