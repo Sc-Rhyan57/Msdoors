@@ -32,6 +32,7 @@ local floorName = _G.msdoors_floor
 _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
+_G.msdoors_spamTools = _G.msdoors_spamTools or false
 _G.msdoors_Brightness = _G.msdoors_Brightness or 0
 _G.msdoors_Fullbright = _G.msdoors_Fullbright or false
 _G.msdoors_NoFog = _G.msdoors_NoFog or false
@@ -2811,7 +2812,6 @@ GroupAntiEntity:AddToggle("AntiHearing", {
     end
 })
 
--- Variável global
 _G.msdoors_antiShade = _G.msdoors_antiShade or false
 
 local function toggleShade(enabled)
@@ -2909,6 +2909,49 @@ workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
     end
 end)
 
+GroupTroll:AddToggle("SpamOtherTools", {
+    Text = "Spam Other Tools",
+    Tooltip = "Spams other players tools",
+    Default = _G.msdoors_spamTools,
+    Callback = function(Value)
+        _G.msdoors_spamTools = Value
+        
+        if _G.msdoors_spamTools then
+            spawn(function()
+                while _G.msdoors_spamTools do
+                    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+                        if player == game:GetService("Players").LocalPlayer then continue end
+                        
+                        for _, tool in pairs(player.Backpack:GetChildren()) do
+                            local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+                            if remoteEvent then
+                                remoteEvent:FireServer()
+                            end
+                        end
+                        
+                        if player.Character then
+                            for _, tool in pairs(player.Character:GetChildren()) do
+                                if tool:IsA("Tool") then
+                                    local remoteEvent = tool:FindFirstChildOfClass("RemoteEvent")
+                                    if remoteEvent then
+                                        remoteEvent:FireServer()
+                                    end
+                                end
+                            end
+                            
+                            local toolRemote = player.Character:FindFirstChild("Remote", true)
+                            if toolRemote and toolRemote:IsA("RemoteEvent") then
+                                toolRemote:FireServer()
+                            end
+                        end
+                    end
+                    
+                    task.delay(0.05)
+                end
+            end)
+        end
+    end,
+})
 
 GroupReach:AddToggle("Main-PromptClip", {
     Text = "Prompt Clip",
