@@ -4020,3 +4020,53 @@ SaveManager:BuildConfigSection(Tabs["UI Settings"])
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
 SaveManager:LoadAutoloadConfig()
 _G.MsdoorsLoaded = true
+
+Library:OnUnload(function()
+	print("[ Msdoors ] » descarregando...")
+	_G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
+_G.msdoors_AntiSeekObstructions = false
+_G.msdoors_InstaInteractEnabled = false
+_G.msdoors_spamTools = false
+_G.msdoors_Brightness = 0
+_G.msdoors_Fullbright = false
+_G.msdoors_NoFog = false
+_G.msdoorsNoCrouchBarriers = false
+_G.msdoors_disAutoLibrary = 20
+_G.msdoors_notpadlock = false
+_G.MSDoors_WalkSpeed = 15
+_G.msdoorsDoorReach = false
+_G.msdoors_FigureDeaf = false
+_G.msdoors_NoAmbienceEnabled = false  
+_G.msdoors_ThoughtsEnabled = false
+_G.msdoors_AntiGiggle = false
+_G.msdoors_atualizarPropriedadesFisicas = false
+_G.msdoors_AntiSeekDoor = false
+_G.msdoors_AntiSnare = false
+_G.msdoors_DupeRunning = false
+_G.msdoors_AntiGloomEgg = false
+_G.msdoors_AntiDupe = false
+_G.msdoors_AntiFlood = false
+_G.msdoors_AntiSeekDoor = false
+_G.msdoors_anticutscenes = false
+_G.msdoors_antijumpscares = false
+_G.msdoors_antia90 = false
+_G.msdoors_antiscreech = false
+_G.msdoors_antiShade = false
+_G.msdoors_antidread = false
+_G.MSDoors_SpeedBypass = false
+_G.MSDoors_SpeedBypassDelay = 0.23
+_G.msdoors_CurrentlyUsingSGF = false
+_G.msdoors_SpeedBypassBeTurned = nil
+_G.msdoors_SpeedHackBeTurned = nil
+_G.MaxActivationDistance = 7
+_G.PromptClip = false
+_G.msdoors_antieyes = false
+_G.MSDoors_SpeedBypass = false
+_G.msdoors_antilag = {
+    Enabled = false,
+    Connection = nil,
+    StoredProperties = {}
+}
+getgenv().AntiSeekManager = { IsEnabled = false }
+_G.ObsidianaLib = false
+end)
