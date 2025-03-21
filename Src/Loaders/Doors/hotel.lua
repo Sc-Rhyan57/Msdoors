@@ -4069,4 +4069,18 @@ _G.msdoors_antilag = {
 }
 getgenv().AntiSeekManager = { IsEnabled = false }
 _G.ObsidianaLib = false
+
+
+for name, toggle in pairs(Library.Toggles) do
+    toggle:SetValue(false)
+end
+for name, option in pairs(Library.Options) do
+    if option.Type == "Slider" then
+        option:SetValue(option.Min)
+    elseif option.Type == "Dropdown" then
+        option:SetValue(option.Values[1]) 
+    end
+end
+
+print("Todos os elementos foram resetados!")
 end)
