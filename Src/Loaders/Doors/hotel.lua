@@ -33,6 +33,7 @@ _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
 _G.msdoors_spamTools = _G.msdoors_spamTools or false
+_G.msdoors_autoReviveEnabled = _G.msdoors_autoReviveEnabled or false
 _G.msdoors_Brightness = _G.msdoors_Brightness or 0
 _G.msdoors_Fullbright = _G.msdoors_Fullbright or false
 _G.msdoors_NoFog = _G.msdoors_NoFog or false
@@ -248,6 +249,7 @@ GroupModifiers:AddToggle("Anti-A90", {
         })
     elseif floorName == "Super Hard Mode" then
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
+	local GroupPlayerFools = Tabs.Hotel:AddLeftGroupbox("Player")
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools23.")
 	--[[ ANTI BANANA ]]--
 _G.msdoors_bananaOGproperties = {}
@@ -312,6 +314,40 @@ GroupHotel:AddToggle("AntiBanana", {
     Callback = function(value)
         _G.msdoors_AntiBanana = value
         destroyAllBananaPeel()
+    end
+})
+
+GroupPlayerFools:AddButton({
+    Text = 'Revive',
+    Func = function()
+        RemotesFolder.Revive:FireServer()
+    end,
+    DoubleClick = false,
+    Tooltip = 'Click to revive'
+})
+
+local connectionAliveCheck = nil
+GroupPlayerFools:AddToggle('AutoRevive', {
+    Text = 'Auto Revive',
+    Default = _G.msdoors_autoReviveEnabled,
+    Tooltip = 'Automatically revive when dead',
+    Callback = function(Value)
+        _G.msdoors_autoReviveEnabled = Value
+        
+        if _G.msdoors_autoReviveEnabled then
+            connectionAliveCheck = game:GetService("RunService").RenderStepped:Connect(function()
+                local isAlive = game:GetService("Players").LocalPlayer:GetAttribute("Alive")
+                
+                if isAlive == false then
+                    RemotesFolder.Revive:FireServer()
+                end
+            end)
+        else
+            if connectionAliveCheck then
+                connectionAliveCheck:Disconnect()
+                connectionAliveCheck = nil
+            end
+        end
     end
 })
 		
@@ -4023,6 +4059,9 @@ _G.MsdoorsLoaded = true
 
 Library:OnUnload(function()
 	print("[ Msdoors ] » descarregando...")
+	if connectionAliveCheck then
+        connectionAliveCheck:Disconnect()
+	end
 	_G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = false
 _G.msdoors_InstaInteractEnabled = false
@@ -4060,6 +4099,7 @@ _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
 _G.MaxActivationDistance = 7
 _G.PromptClip = false
+_G.msdoors_autoReviveEnabled = false
 _G.msdoors_antieyes = false
 _G.MSDoors_SpeedBypass = false
 _G.msdoors_antilag = {
