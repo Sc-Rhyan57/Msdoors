@@ -353,7 +353,7 @@ GroupPlayerFools:AddToggle('AutoRevive', {
 		
     elseif floorName == "Retro Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
-    elseif floorName == "Ranked fools" then
+    elseif floorName == "Ranked" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Ranked25..")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
 	        --[[ ANTI GIGGLE ]]--
@@ -3839,6 +3839,8 @@ MenuGroup:AddDivider()
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 MenuGroup:AddDivider()
 MenuGroup:AddButton("Unload", function()
+    _G.MsdoorsLoaded = false
+    _G.ObsidianaLib = false
     Library:Notify({
         Title = "Fechando...",
         Description = "Aguarde, estamos cuidando de tudo!",
