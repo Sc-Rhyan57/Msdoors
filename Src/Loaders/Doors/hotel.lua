@@ -3844,34 +3844,6 @@ MenuGroup:AddButton("Unload", function()
         Description = "Aguarde, estamos cuidando de tudo!",
         Time = 5,
     })
-
-   
-    _G.msdoors_LibraryNotif = "Linoria"
-    _G.msdoors_DupeRunning = false
-    _G.msdoors_AntiDupe = false
-    _G.msdoors_AntiFlood = false
-    _G.msdoors_AntiSeekDoor = false
-    _G.msdoors_anticutscenes = false
-    _G.msdoors_antijumpscares = false
-    _G.msdoors_antia90 = false
-    _G.msdoors_antiscreech = false
-    _G.msdoors_antidread = false
-    _G.msdoors_CurrentlyUsingSGF = false
-    _G.msdoors_SpeedBypassBeTurned = nil
-    _G.msdoors_SpeedHackBeTurned = nil
-    _G.MaxActivationDistance = 7
-    _G.PromptClip = false
-    _G.msdoors_antieyes = false
-    _G.msdoors_antilag = {
-        Enabled = false,
-        Connection = nil,
-        StoredProperties = {}
-    }
-    getgenv().AntiSeekManager = { IsEnabled = false }
-    _G.ObsidianaLib = true
-
-    task.wait(5)
-
     Library:Unload()
 
     print("[Msdoors] • Tudo foi descarregado! Até outra hora 😉")
