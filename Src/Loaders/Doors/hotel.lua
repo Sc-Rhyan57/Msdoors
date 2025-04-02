@@ -353,7 +353,8 @@ GroupPlayerFools:AddToggle('AutoRevive', {
 		
     elseif floorName == "Retro Mode" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
-        
+    elseif floorName == "Ranked fools" then
+        print("[ Msdoors ] » Carregando funções da página Hotel para Ranked25..")
     elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor")
