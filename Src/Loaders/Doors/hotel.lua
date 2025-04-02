@@ -355,6 +355,73 @@ GroupPlayerFools:AddToggle('AutoRevive', {
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
     elseif floorName == "Ranked fools" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Ranked25..")
+	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
+	        --[[ ANTI GIGGLE ]]--
+GroupHotel:AddToggle("Anti-Giggle", {
+    Text = "Anti Giggle",
+    Default = _G.msdoors_AntiGiggle,
+    Callback = function(state)
+        _G.msdoors_AntiGiggle = state
+        local connection
+
+        if state then
+            connection = workspace.CurrentRooms.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "GiggleCeiling" then
+                    local hitbox = descendant:WaitForChild("Hitbox", 5)
+                    if hitbox then
+                        hitbox.CanTouch = false
+                    end
+                end
+            end)
+        elseif connection then
+            connection:Disconnect()
+        end
+
+        for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+            for _, giggle in pairs(room:GetDescendants()) do
+                if giggle.Name == "GiggleCeiling" then
+                    local hitbox = giggle:FindFirstChild("Hitbox")
+                    if hitbox then
+                        hitbox.CanTouch = not state
+                    end
+                end
+            end
+        end
+    end
+})
+		
+	--[[ ANTI A-90 ]]--
+    local function toggleA90(enabled)
+    local player = game.Players.LocalPlayer
+    local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
+    
+    if not mainUI then return end
+
+    local modules = mainUI:FindFirstChild("Initiator") and mainUI.Initiator:FindFirstChild("Main_Game") and 
+                    mainUI.Initiator.Main_Game:FindFirstChild("RemoteListener") and 
+                    mainUI.Initiator.Main_Game.RemoteListener:FindFirstChild("Modules")
+
+    if not modules then return end
+
+    local a90 = modules:FindFirstChild("A90") or modules:FindFirstChild("A90_MSDOORS_DISABLE")
+    if not a90 then return end
+
+    a90.Name = enabled and "A90_MSDOORS_DISABLE" or "A90"
+end
+
+GroupHotel:AddToggle("Anti-A90", {
+	Text = "Anti A90",
+	DisabledTooltip = "I am disabled!",
+	Default = _G.msdoors_antia90,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+	Callback = function(Value)
+        _G.msdoors_antia90 = Value
+        toggleA90(Value)
+	end,
+				
+        })
     elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor")
