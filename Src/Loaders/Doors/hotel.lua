@@ -358,6 +358,7 @@ GroupPlayerFools:AddToggle('AutoRevive', {
         print("[ Msdoors ] » Carregando funções da página Hotel para Ranked25..")
 	local GroupRankedPlayer = Tabs.Hotel:AddLeftGroupbox("Local")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
+	local player = Players.LocalPlayer
 	        --[[ ANTI GIGGLE ]]--
 GroupHotel:AddToggle("Anti-Giggle", {
     Text = "Anti Giggle",
