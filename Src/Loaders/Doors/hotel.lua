@@ -489,47 +489,53 @@ GroupHotel:AddToggle("Anti-A90", {
 	end,
 })
 
-GroupRankedPlayer:AddToggle("PowerupPad", {
-    Text = "Auto PowerUo",
-    Default = false,
-    Tooltip = "Automatically collects power-ups.",
-    Callback = function(Value)
-        _G.msdoors_autocltpad = Value
-        if state then
-            while _G.msdoors_autocltpad do
-                local success, err = pcall(function()
-                    local roomId = player:GetAttribute("CurrentRoom")
-                    if not roomId then return end
-                    local room = workspace.CurrentRooms:FindFirstChild(tostring(roomId))
-                    if room then
-                        local itemPads = room:FindFirstChild("ItemPads")
-                        if itemPads then
-                            for _, item in ipairs(itemPads:GetChildren()) do
-                                local hitbox = item:FindFirstChild("Hitbox")
-                                if hitbox then
-                                    hitbox.Size = Vector3.new(20, 20, 20)
+local function interactWithItemPads()
+    while _G.msdoors_autocltpad do
+        local success, err = pcall(function()
+            local roomId = player:GetAttribute("CurrentRoom")
+            if not roomId then return end
+            local room = workspace.CurrentRooms:FindFirstChild(tostring(roomId))
+            if room then
+                local itemPads = room:FindFirstChild("ItemPads")
+                if itemPads then
+                    for _, item in ipairs(itemPads:GetChildren()) do
+                        local hitbox = item:FindFirstChild("Hitbox")
+                        if hitbox then
+                            hitbox.Size = Vector3.new(20, 20, 20)
 
-                                    local touchInterest = hitbox:FindFirstChildWhichIsA("TouchTransmitter")
-                                    if touchInterest then
-                                        firetouchinterest(player.Character.HumanoidRootPart, hitbox, 0)
-                                        firetouchinterest(player.Character.HumanoidRootPart, hitbox, 1)
-                                    end
-                                end
-                                if item:IsA("ClickDetector") then
-                                    fireclickdetector(item)
-                                elseif item:IsA("ProximityPrompt") then
-                                    fireproximityprompt(item)
-                                end
+                            local touchInterest = hitbox:FindFirstChildWhichIsA("TouchTransmitter")
+                            if touchInterest then
+                                firetouchinterest(player.Character.HumanoidRootPart, hitbox, 0)
+                                firetouchinterest(player.Character.HumanoidRootPart, hitbox, 1)
                             end
                         end
+
+                        if item:IsA("ClickDetector") then
+                            fireclickdetector(item)
+                        elseif item:IsA("ProximityPrompt") then
+                            fireproximityprompt(item)
+                        end
                     end
-                end)
-                if not success then
-                    warn("[ Msdoors ] AutoPowerPoints:", err)
                 end
-                RunService.Heartbeat:Wait()
             end
+        end)
+
+        if not success then
+            warn("[ Msdoors ] » AutoPowerUP: ", err)
         end
+        RunService.Heartbeat:Wait()
+    end
+end
+
+GroupRankedPlayer:AddToggle("PowerupPad", {
+    Text = "AutoPowerUP",
+    Default = false,
+    Tooltip = "Automatically collects power-ups.",
+    Callback = function(state)
+    _G.msdoors_autocltpad = state
+    if state then
+        task.spawn(interactWithItemPads)
+	end
     end
 })
     elseif floorName == "Backdoor" then
