@@ -138,7 +138,7 @@ local GroupTroll = Tabs.Exploits:AddLeftGroupbox("Troll")
 local GroupBypass = Tabs.Exploits:AddRightGroupbox("Byppas")
 --// FLOOR PAGE \\--
 if _G.msdoors_floor then
-    if floorName == "Hotel" then
+    if floorName == "Hotel" then --[[ HOTEL TAB ]]--
         print("[ Msdoors ] » Carregando funções da página Hotel para Doors principal.")
         local GroupModifiers = Tabs.Hotel:AddRightGroupbox("Modificadores")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
@@ -248,7 +248,7 @@ GroupModifiers:AddToggle("Anti-A90", {
 	end,
 				
         })
-    elseif floorName == "Super Hard Mode" then
+    elseif floorName == "Super Hard Mode" then --[[ SUPER HARD MODE TAB ]]--
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
 	local GroupPlayerFools = Tabs.Hotel:AddLeftGroupbox("Player")
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools23.")
@@ -352,9 +352,9 @@ GroupPlayerFools:AddToggle('AutoRevive', {
     end
 })
 		
-    elseif floorName == "Retro Mode" then
+    elseif floorName == "Retro Mode" then --[[ RETRO MODE TAB ]]--
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
-    elseif floorName == "Ranked" then
+    elseif floorName == "Ranked" then --[[ RANKED MODE TAB ]]--
         print("[ Msdoors ] » Carregando funções da página Hotel para Ranked25..")
 	local GroupRankedPlayer = Tabs.Hotel:AddLeftGroupbox("Local")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
@@ -430,17 +430,17 @@ local function modifyBanana(child, enable)
         end
     end
 end
-
+-- game:GetService("ReplicatedStorage").ProjectileResults.NannerPeel
 local function destroyAllBananaPeel()
     for _, child in ipairs(workspace:GetChildren()) do
-        if child.Name == "BananaPeel" then
+        if child.Name == "NannerPeel" then
             modifyBanana(child, _G.msdoors_AntiBanana)
         end
     end
 end
 
 workspace.ChildAdded:Connect(function(child)
-    if _G.msdoors_AntiBanana and child.Name == "BananaPeel" then
+    if _G.msdoors_AntiBanana and child.Name == "NannerPeel" then
         task.wait(0.1)
         destroyAllBananaPeel()
     end
@@ -539,7 +539,7 @@ GroupRankedPlayer:AddToggle("PowerupPad", {
 	end
     end
 })
-    elseif floorName == "Backdoor" then
+    elseif floorName == "Backdoor" then --[[ BACKDOOR TAB ]]--
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Visuals")
