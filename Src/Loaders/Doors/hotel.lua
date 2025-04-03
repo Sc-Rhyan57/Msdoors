@@ -33,6 +33,7 @@ _G.msdoors_LibraryNotif = _G.msdoors_LibraryNotif or "Linoria"
 _G.msdoors_AntiSeekObstructions = _G.msdoors_AntiSeekObstructions or false
 _G.msdoors_InstaInteractEnabled = _G.msdoors_InstaInteractEnabled or false
 _G.msdoors_spamTools = _G.msdoors_spamTools or false
+_G.msdoors_autocltpad = _G.msdoors_autocltpad or false
 _G.msdoors_autoReviveEnabled = _G.msdoors_autoReviveEnabled or false
 _G.msdoors_Brightness = _G.msdoors_Brightness or 0
 _G.msdoors_Fullbright = _G.msdoors_Fullbright or false
@@ -355,6 +356,7 @@ GroupPlayerFools:AddToggle('AutoRevive', {
         print("[ Msdoors ] » Carregando funções da página Hotel para Fools24.")
     elseif floorName == "Ranked" then
         print("[ Msdoors ] » Carregando funções da página Hotel para Ranked25..")
+	local GroupRankedPlayer = Tabs.Hotel:AddLeftGroupbox("Local")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor Functions")
 	        --[[ ANTI GIGGLE ]]--
 GroupHotel:AddToggle("Anti-Giggle", {
@@ -389,10 +391,75 @@ GroupHotel:AddToggle("Anti-Giggle", {
         end
     end
 })
+
+	--[[ ANTI BANANA ]]--
+_G.msdoors_bananaOGproperties = {}
+
+local function modifyBanana(child, enable)
+    if enable then
+        _G.msdoors_bananaOGproperties[child] = {
+            Transparency = child.Transparency,
+            Material = child.Material,
+            CanTouch = child.CanTouch,
+            CanCollide = child.CanCollide,
+            CanQuery = child.CanQuery
+        }
+
+        child.Transparency = 0.7
+        child.Material = Enum.Material.Neon
+        child.CanTouch = false
+        child.CanCollide = false
+        child.CanQuery = false
+
+        for _, descendant in ipairs(child:GetDescendants()) do
+            if descendant:IsA("TouchTransmitter") or descendant:IsA("Constraint") then
+                descendant:Destroy()
+            elseif descendant:IsA("Script") or descendant:IsA("LocalScript") then
+                descendant.Disabled = true
+            end
+        end
+    else
+        if _G.msdoors_bananaOGproperties[child] then
+            child.Transparency = _G.msdoors_bananaOGproperties[child].Transparency
+            child.Material = _G.msdoors_bananaOGproperties[child].Material
+            child.CanTouch = _G.msdoors_bananaOGproperties[child].CanTouch
+            child.CanCollide = _G.msdoors_bananaOGproperties[child].CanCollide
+            child.CanQuery = _G.msdoors_bananaOGproperties[child].CanQuery
+            _G.msdoors_bananaOGproperties[child] = nil -- Liberar memória
+        end
+    end
+end
+
+local function destroyAllBananaPeel()
+    for _, child in ipairs(workspace:GetChildren()) do
+        if child.Name == "BananaPeel" then
+            modifyBanana(child, _G.msdoors_AntiBanana)
+        end
+    end
+end
+
+workspace.ChildAdded:Connect(function(child)
+    if _G.msdoors_AntiBanana and child.Name == "BananaPeel" then
+        task.wait(0.1)
+        destroyAllBananaPeel()
+    end
+end)
+
+GroupHotel:AddToggle("AntiBanana", {
+    Text = "Anti Banana",
+    DisabledTooltip = "I am disabled!",
+    Default = false,
+    Disabled = false,
+    Visible = true,
+    Risky = false,
+    Callback = function(value)
+        _G.msdoors_AntiBanana = value
+        destroyAllBananaPeel()
+    end
+})		
 		
-	--[[ ANTI A-90 ]]--
+		--[[ ANTI A-90 ]]--
     local function toggleA90(enabled)
-    local player = game.Players.LocalPlayer
     local mainUI = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MainUI")
     
     if not mainUI then return end
@@ -420,8 +487,51 @@ GroupHotel:AddToggle("Anti-A90", {
         _G.msdoors_antia90 = Value
         toggleA90(Value)
 	end,
-				
-        })
+})
+
+GroupRankedPlayer:AddToggle("PowerupPad", {
+    Text = "Auto PowerUo",
+    Default = false,
+    Tooltip = "Automatically collects power-ups.",
+    Callback = function(Value)
+        _G.msdoors_autocltpad = Value
+        if state then
+            while _G.msdoors_autocltpad do
+                local success, err = pcall(function()
+                    local roomId = player:GetAttribute("CurrentRoom")
+                    if not roomId then return end
+                    local room = workspace.CurrentRooms:FindFirstChild(tostring(roomId))
+                    if room then
+                        local itemPads = room:FindFirstChild("ItemPads")
+                        if itemPads then
+                            for _, item in ipairs(itemPads:GetChildren()) do
+                                local hitbox = item:FindFirstChild("Hitbox")
+                                if hitbox then
+                                    hitbox.Size = Vector3.new(20, 20, 20)
+
+                                    local touchInterest = hitbox:FindFirstChildWhichIsA("TouchTransmitter")
+                                    if touchInterest then
+                                        firetouchinterest(player.Character.HumanoidRootPart, hitbox, 0)
+                                        firetouchinterest(player.Character.HumanoidRootPart, hitbox, 1)
+                                    end
+                                end
+                                if item:IsA("ClickDetector") then
+                                    fireclickdetector(item)
+                                elseif item:IsA("ProximityPrompt") then
+                                    fireproximityprompt(item)
+                                end
+                            end
+                        end
+                    end
+                end)
+                if not success then
+                    warn("[ Msdoors ] AutoPowerPoints:", err)
+                end
+                RunService.Heartbeat:Wait()
+            end
+        end
+    end
+})
     elseif floorName == "Backdoor" then
         print("[ Msdoors ] » Carregando funções da página Hotel para The Backdoors.")
 	local GroupHotel = Tabs.Hotel:AddLeftGroupbox("Floor")
