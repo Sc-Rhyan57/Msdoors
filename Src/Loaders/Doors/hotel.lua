@@ -321,7 +321,7 @@ GroupHotel:AddToggle("AntiBanana", {
 GroupPlayerFools:AddButton({
     Text = 'Revive',
     Func = function()
-        RemotesFolder.Revive:FireServer()
+        game.replicatedstorage.bricks.revive:FireServer()
     end,
     DoubleClick = false,
     Tooltip = 'Click to revive'
@@ -340,7 +340,7 @@ GroupPlayerFools:AddToggle('AutoRevive', {
                 local isAlive = game:GetService("Players").LocalPlayer:GetAttribute("Alive")
                 
                 if isAlive == false then
-                    RemotesFolder.Revive:FireServer()
+                    game.replicatedstorage.bricks.revive:FireServer()
                 end
             end)
         else
