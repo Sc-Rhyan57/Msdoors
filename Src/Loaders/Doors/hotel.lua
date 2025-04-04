@@ -42,7 +42,7 @@ _G.msdoorsNoCrouchBarriers = _G.msdoorsNoCrouchBarriers or false
 _G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 20
 _G.msdoors_notpadlock = _G.msdoors_notpadlock or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
-_G.MSDoors_jumpEnabled = _G.MSDoors_jumpEnabled = or false
+_G.MSDoors_jumpEnabled = _G.MSDoors_jumpEnabled or false
 _G.MSDoors_JumpBoost = _G.MSDoors_JumpBoost = or 4
 _G.msdoorsDoorReach = _G.msdoorsDoorReach or false
 _G.msdoors_FigureDeaf = _G.msdoors_FigureDeaf or false
