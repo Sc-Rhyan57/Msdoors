@@ -2,6 +2,7 @@ if _G.ObsidianaLib then
     warn("[Msdoors] • Script já carregado!")
     return
 end
+
 _G.msdoors_syslibrary = _G.msdoors_syslibrary or "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local repo = _G.msdoors_syslibrary
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
