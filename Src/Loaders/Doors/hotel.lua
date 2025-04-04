@@ -285,7 +285,7 @@ local function modifyBanana(child, enable)
             child.CanTouch = _G.msdoors_bananaOGproperties[child].CanTouch
             child.CanCollide = _G.msdoors_bananaOGproperties[child].CanCollide
             child.CanQuery = _G.msdoors_bananaOGproperties[child].CanQuery
-            _G.msdoors_bananaOGproperties[child] = nil -- Liberar memória
+            _G.msdoors_bananaOGproperties[child] = nil
         end
     end
 end
@@ -321,7 +321,7 @@ GroupHotel:AddToggle("AntiBanana", {
 GroupPlayerFools:AddButton({
     Text = 'Revive',
     Func = function()
-        game.replicatedstorage.bricks.revive:FireServer()
+        game:GetService("ReplicatedStorage").EntityInfo.Revive:FireServer()
     end,
     DoubleClick = false,
     Tooltip = 'Click to revive'
@@ -340,7 +340,7 @@ GroupPlayerFools:AddToggle('AutoRevive', {
                 local isAlive = game:GetService("Players").LocalPlayer:GetAttribute("Alive")
                 
                 if isAlive == false then
-                    game.replicatedstorage.bricks.revive:FireServer()
+                    game:GetService("ReplicatedStorage").EntityInfo.Revive:FireServer()
                 end
             end)
         else
