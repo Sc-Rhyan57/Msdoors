@@ -42,6 +42,8 @@ _G.msdoorsNoCrouchBarriers = _G.msdoorsNoCrouchBarriers or false
 _G.msdoors_disAutoLibrary = _G.msdoors_disAutoLibrary or 20
 _G.msdoors_notpadlock = _G.msdoors_notpadlock or false
 _G.MSDoors_WalkSpeed = _G.MSDoors_WalkSpeed or 15
+_G.MSDoors_jumpEnabled = _G.MSDoors_jumpEnabled = or false
+_G.MSDoors_JumpBoost = _G.MSDoors_JumpBoost = or 4
 _G.msdoorsDoorReach = _G.msdoorsDoorReach or false
 _G.msdoors_FigureDeaf = _G.msdoors_FigureDeaf or false
 _G.msdoors_NoAmbienceEnabled = _G.msdoors_NoAmbienceEnabled or false  
@@ -2556,6 +2558,11 @@ GroupAuto:AddSlider("autolibrarydistance", {
 	Disabled = false,
 })
 
+_G.MSDoors_FeatureConnections = {
+    Character = {},
+    Humanoid = {}
+}
+
 GroupPlayer:AddToggle("EnableJump", {
     Text = "Habilitar Pulo",
     Default = false
@@ -2566,7 +2573,29 @@ GroupPlayer:AddToggle("EnableJump", {
         
         local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoid then
-            humanoid.JumpHeight = value and Toggles.JumpBoost.Value or 0
+            humanoid.JumpHeight = value and _G.MSDoors_JumpBoost or 0
+        end
+    end
+    
+    _G.MSDoors_jumpEnabled = value
+    if character and not _G.MSDoors_FeatureConnections.Character["CanJump"] then
+        if _G.MSDoors_FeatureConnections.Character["CanJump"] then
+            _G.MSDoors_FeatureConnections.Character["CanJump"]:Disconnect()
+        end
+        
+        _G.MSDoors_FeatureConnections.Character["CanJump"] = character:GetAttributeChangedSignal("CanJump"):Connect(function()
+            if not _G.MSDoors_jumpEnabled then return end
+            
+            if not character:GetAttribute("CanJump") then
+                character:SetAttribute("CanJump", true)
+            end
+        end)
+    end
+
+    if not value and _G.MSDoors_SpeedBypass ~= nil and not _G.MSDoors_SpeedBypass then
+        if _G.LastSpeed and _G.LastSpeed > 0 then
+            _G.MSDoors_WalkSpeed = _G.LastSpeed
+            _G.LastSpeed = 0
         end
     end
 end)
@@ -2586,14 +2615,114 @@ GroupPlayer:AddSlider("JumpBoost", {
             humanoid.JumpHeight = value
         end
     end
+    _G.MSDoors_JumpBoost = value
+    if character and humanoid and not _G.MSDoors_FeatureConnections.Humanoid["Jump"] then
+        if _G.MSDoors_FeatureConnections.Humanoid["Jump"] then
+            _G.MSDoors_FeatureConnections.Humanoid["Jump"]:Disconnect()
+        end
+        _G.MSDoors_FeatureConnections.Humanoid["Jump"] = humanoid:GetPropertyChangedSignal("JumpHeight"):Connect(function()
+            if _G.MSDoors_jumpEnabled then
+                humanoid.JumpHeight = _G.MSDoors_JumpBoost
+            end
+            if _G.MSDoors_SpeedBypass ~= nil then
+                if not _G.MSDoors_SpeedBypass then
+                    if humanoid.JumpHeight > 0 then
+                        _G.LastSpeed = _G.MSDoors_WalkSpeed
+                        _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, 18)
+                    elseif _G.LastSpeed and _G.LastSpeed > 0 then
+                        _G.MSDoors_WalkSpeed = _G.LastSpeed
+                        _G.LastSpeed = 0
+                    end
+                end
+            end
+        end)
+    end
 end)
 
 LocalPlayer.CharacterAdded:Connect(function(character)
-    character:SetAttribute("CanJump", Toggles.EnableJump.Value)
+    for _, oldConnection in pairs(_G.MSDoors_FeatureConnections.Character) do
+        if oldConnection.Connected then
+            oldConnection:Disconnect()
+        end
+    end
+    
+    for _, oldConnection in pairs(_G.MSDoors_FeatureConnections.Humanoid) do
+        if oldConnection.Connected then
+            oldConnection:Disconnect()
+        end
+    end
+    
+    _G.MSDoors_FeatureConnections.Character = {}
+    _G.MSDoors_FeatureConnections.Humanoid = {}
+
+    character:SetAttribute("CanJump", _G.MSDoors_jumpEnabled)
     
     local humanoid = character:WaitForChild("Humanoid")
-    humanoid.JumpHeight = Toggles.EnableJump.Value and Toggles.JumpBoost.Value or 0
+    humanoid.JumpHeight = _G.MSDoors_jumpEnabled and _G.MSDoors_JumpBoost or 0
+    
+    _G.MSDoors_FeatureConnections.Character["CanJump"] = character:GetAttributeChangedSignal("CanJump"):Connect(function()
+        if not _G.MSDoors_jumpEnabled then return end
+        
+        if not character:GetAttribute("CanJump") then
+            character:SetAttribute("CanJump", true)
+        end
+    end)
+    
+    _G.MSDoors_FeatureConnections.Humanoid["Jump"] = humanoid:GetPropertyChangedSignal("JumpHeight"):Connect(function()
+        if _G.MSDoors_jumpEnabled then
+            humanoid.JumpHeight = _G.MSDoors_JumpBoost
+        end
+        
+        if _G.MSDoors_SpeedBypass ~= nil then
+            if not _G.MSDoors_SpeedBypass then
+                if humanoid.JumpHeight > 0 then
+                    _G.LastSpeed = _G.MSDoors_WalkSpeed
+                    _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, 18)
+                elseif _G.LastSpeed and _G.LastSpeed > 0 then
+                    _G.MSDoors_WalkSpeed = _G.LastSpeed
+                    _G.LastSpeed = 0
+                end
+            end
+        end
+    end)
 end)
+
+if LocalPlayer.Character then
+    local character = LocalPlayer.Character
+    character:SetAttribute("CanJump", _G.MSDoors_jumpEnabled or false)
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.JumpHeight = (_G.MSDoors_jumpEnabled and _G.MSDoors_JumpBoost) or 0
+    end
+    _G.MSDoors_FeatureConnections.Character["CanJump"] = character:GetAttributeChangedSignal("CanJump"):Connect(function()
+        if not _G.MSDoors_jumpEnabled then return end
+        
+        if not character:GetAttribute("CanJump") then
+            character:SetAttribute("CanJump", true)
+        end
+    end)
+    
+    if humanoid then
+        _G.MSDoors_FeatureConnections.Humanoid["Jump"] = humanoid:GetPropertyChangedSignal("JumpHeight"):Connect(function()
+            if _G.MSDoors_jumpEnabled then
+                humanoid.JumpHeight = _G.MSDoors_JumpBoost
+            end
+            
+            if _G.MSDoors_SpeedBypass ~= nil then
+                if not _G.MSDoors_SpeedBypass then
+                    if humanoid.JumpHeight > 0 then
+                        _G.LastSpeed = _G.MSDoors_WalkSpeed
+                        _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, 18)
+                    elseif _G.LastSpeed and _G.LastSpeed > 0 then
+                        _G.MSDoors_WalkSpeed = _G.LastSpeed
+                        _G.LastSpeed = 0
+                    end
+                end
+            end
+        end)
+    end
+end
 
 
 
