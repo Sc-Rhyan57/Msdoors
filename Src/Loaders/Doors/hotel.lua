@@ -3773,7 +3773,7 @@ GroupBypass:AddToggle("SpeedBypass", {
             _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, 75)
             MSDoors_SpeedBypass()
         else
-            if MSDoors_Script.FakeRevive.Enabled then return end
+            if _G.msdoors_fakerevive then return end
             
             local speed = MSDoors_Script.Bypassed and 75 or (_G.MSDoors_EnableJump and 18 or 22)
             _G.MSDoors_WalkSpeed = math.min(_G.MSDoors_WalkSpeed, speed)
@@ -4386,7 +4386,7 @@ _G.MSDoors_SpeedBypassDelay = 0.23
 _G.msdoors_CurrentlyUsingSGF = false
 _G.msdoors_SpeedBypassBeTurned = nil
 _G.msdoors_SpeedHackBeTurned = nil
-_G.MaxActivationDistance = 7
+_G.MaxActivationDistance = 13
 _G.PromptClip = false
 _G.msdoors_autoReviveEnabled = false
 _G.msdoors_antieyes = false
