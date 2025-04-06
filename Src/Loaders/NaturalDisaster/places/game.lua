@@ -67,66 +67,7 @@ _G.RemoveAds = false
 
 print("[Msdoors] • [✅] Inicialização de Serviços")
 
---[[ VERIFICAÇÃO DE JOGO ]]--
---[[
-local GAME_ID_ESPERADO = 189707
-local function getGameInfo()
-    local success, gameInfo = pcall(function()
-        return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
-    end)
-    
-    if not success then
-        warn("[Msdoors] • Erro ao obter informações do jogo:", gameInfo)
-        return nil
-    end
-    
-    return gameInfo
-end
-local function verificarJogo()
-    local gameInfo = getGameInfo()
-    
-    if not gameInfo then
-        error(string.format([[
-[ERRO CRÍTICO]
-==========================================
-Falha ao verificar o jogo atual
-Detalhes do erro:
-- Não foi possível obter informações do jogo
-- Place ID atual: %d
-- Hora do erro: %s
-==========================================
-]], game.PlaceId, os.date("%Y-%m-%d %H:%M:%S")))
-        return false
-    end
-    
-    if game.PlaceId ~= GAME_ID_ESPERADO then
-        error(string.format([[
-[ERRO DE VERIFICAÇÃO]
-==========================================
-Jogo incompatível detectado!
-Detalhes:
-- ID Esperado: %d
-- ID Atual: %d
-- Nome do Jogo: %s
-- Criador: %s
-- Hora da verificação: %s
-==========================================
-]], GAME_ID_ESPERADO, game.PlaceId, gameInfo.Name, gameInfo.Creator.Name, os.date("%Y-%m-%d %H:%M:%S")))
-        return false
-    end
-    print(string.format([[
-[VERIFICAÇÃO BEM-SUCEDIDA]
-==========================================
-Jogo verificado com sucesso!
-- ID do Jogo: %d
-- Nome: %s
-- Hora: %s
-==========================================
-]], game.PlaceId, gameInfo.Name, os.date("%Y-%m-%d %H:%M:%S")))
-    return true
-end
-verificarJogo()
-]]--
+
 --[[ NEW TABS ]]--
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
