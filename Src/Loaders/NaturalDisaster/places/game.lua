@@ -66,7 +66,9 @@ _G.RemoveBlizzardUI = false
 _G.RemoveAds = false
 
 print("[Msdoors] • [✅] Inicialização de Serviços")
+
 --[[ VERIFICAÇÃO DE JOGO ]]--
+--[[
 local GAME_ID_ESPERADO = 189707
 local function getGameInfo()
     local success, gameInfo = pcall(function()
@@ -124,7 +126,7 @@ Jogo verificado com sucesso!
     return true
 end
 verificarJogo()
-
+]]--
 --[[ NEW TABS ]]--
 local Window = Library:CreateWindow({
     Title = "Msdoors v1",
